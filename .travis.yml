@@ -1,0 +1,11 @@
+sudo: false
+language: java
+jdk:
+- oraclejdk7
+cache:
+  directories:
+  - "$HOME/.gradle/wrapper"
+  - "$HOME/.gradle/native"
+  - "$HOME/.gradle/caches/2.6"
+  - "$HOME/.gradle/caches/modules-2/files-2.1"
+  - "$HOME/.gradle/caches/modules-2/metadata-2.15"

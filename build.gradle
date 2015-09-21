@@ -1,0 +1,89 @@
+plugins {
+    id 'com.jfrog.bintray' version '1.2'
+    id 'com.gradle.plugin-publish' version '0.9.1'
+    id 'com.palantir.git-version' version '0.1.3'
+    id 'eclipse'
+    id 'groovy'
+    id 'idea'
+    id 'maven-publish'
+}
+
+task createClasspathManifest {
+    def outputDir = file("$buildDir/$name")
+
+    inputs.files sourceSets.main.runtimeClasspath
+    outputs.dir outputDir
+
+    doLast {
+        outputDir.mkdirs()
+        file("$outputDir/plugin-classpath.txt").text = sourceSets.main.runtimeClasspath.join("\n")
+    }
+}
+
+repositories {
+    jcenter()
+}
+
+dependencies {
+    compile gradleApi()
+    compile localGroovy()
+
+    testCompile gradleTestKit()
+    testCompile('org.spockframework:spock-core:1.0-groovy-2.3') {
+        exclude module: 'groovy-all'
+    }
+    testCompile files(createClasspathManifest)
+}
+
+group 'com.palantir.deploy'
+version gitVersion()
+
+task sourceJar(type: Jar) {
+    from sourceSets.main.allSource
+    classifier 'sources'
+}
+
+publishing {
+    publications {
+        bintray(MavenPublication) {
+            from components.java
+            artifact(sourceJar) {
+                classifier 'sources'
+            }
+        }
+    }
+}
+
+bintray {
+    user = System.getenv('BINTRAY_USER')
+    key = System.getenv('BINTRAY_KEY')
+    pkg {
+        repo = 'releases'
+        name = 'gradle-docker'
+        userOrg = 'palantir'
+        licenses = ['Apache-2.0']
+        publications = ['bintray']
+    }
+}
+
+bintrayUpload.onlyIf {
+    project.version ==~ /\d+\.\d+\.\d+/
+}
+
+bintrayUpload.dependsOn { generatePomFileForBintrayPublication }
+bintrayUpload.dependsOn { sourceJar }
+bintrayUpload.dependsOn { build }
+
+pluginBundle {
+    website = 'https://github.com/palantir/gradle-docker'
+    vcsUrl = 'https://github.com/palantir/gradle-docker'
+    description = 'Gradle Docker is a simple docker orchestrator for executing docker build and push from within Gradle.'
+    tags = ['docker']
+
+    plugins {
+        dockerPlugin {
+            id = 'com.palantir.docker'
+            displayName = 'Palantir Gradle Docker'
+        }
+    }
+}
