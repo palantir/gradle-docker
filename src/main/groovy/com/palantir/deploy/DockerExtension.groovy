@@ -17,7 +17,6 @@ package com.palantir.deploy
 
 import org.gradle.api.Task
 
-import com.google.common.base.Preconditions
 import com.google.common.collect.ImmutableSet
 
 class DockerExtension {
@@ -62,8 +61,7 @@ class DockerExtension {
     }
 
     public void resolvePathsAndValidate(File projectDir) {
-        Preconditions.checkArgument(name != null && !name.isEmpty(),
-            "name is a required docker configuration item.")
+        checkName(name)
 
         if (dockerfile == null) {
             dockerfile = 'Dockerfile'
@@ -74,7 +72,7 @@ class DockerExtension {
             resolvedDockerfile = new File(projectDir, dockerfile)
         }
 
-        Preconditions.checkArgument(resolvedDockerfile.exists(), "dockerfile '%s' does not exist.", dockerfile)
+        checkFileExists(resolvedDockerfile, "dockerfile '%s' does not exist.", dockerfile)
 
         ImmutableSet.Builder<File> builder = ImmutableSet.builder()
         for (String file : files) {
@@ -82,11 +80,23 @@ class DockerExtension {
             if (!resFile.isAbsolute()) {
                 resFile = new File(projectDir, file)
             }
-            Preconditions.checkArgument(resFile.exists(), "file '%s' does not exist.", file)
+            checkFileExists(resFile, "file '%s' does not exist.", file)
             builder.add(resFile)
         }
 
         resolvedFiles = builder.build()
+    }
+
+    private static void checkName(String name) {
+        if (name == null || name.isEmpty()) {
+            throw new IllegalArgumentException("name is a required docker configuration item.")
+        }
+    }
+
+    private static void checkFileExists(File resFile, String message, Object... args) {
+        if (!resFile.exists()) {
+            throw new IllegalArgumentException(String.format(message, args))
+        }
     }
 
 }
