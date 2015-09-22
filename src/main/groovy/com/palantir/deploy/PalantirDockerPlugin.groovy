@@ -18,28 +18,60 @@ package com.palantir.deploy
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.Task
+import org.gradle.api.tasks.Copy
+import org.gradle.api.tasks.Delete
+import org.gradle.api.tasks.Exec
 
 class PalantirDockerPlugin implements Plugin<Project> {
     void apply(Project project) {
         DockerExtension ext = project.extensions.create('docker', DockerExtension)
 
-        Task delete = project.tasks.create('dockerClean', DockerCleanTask)
+        Task clean = project.tasks.create('dockerClean', Delete, {
+            description = "Cleans Docker build directory."
+        })
 
-        Task prepare = project.tasks.create('dockerPrepare', DockerPrepareTask)
-        prepare.dependsOn(delete)
+        Task prepare = project.tasks.create('dockerPrepare', Copy, {
+            description = "Prepares Docker build directory."
+            dependsOn clean
+        })
 
-        Task exec = project.tasks.create('docker', DockerTask)
-        exec.dependsOn(prepare)
+        Task exec = project.tasks.create('docker', Exec, {
+            description = "Builds Docker image."
+            dependsOn prepare
+        })
 
-        Task pushTask = project.tasks.create('dockerPush', DockerPushTask)
-        pushTask.dependsOn(exec)
+        Task push = project.tasks.create('dockerPush', Exec, {
+            description = "Pushes Docker image to configured Docker Hub."
+            dependsOn exec
+        })
 
         project.afterEvaluate {
             ext.resolvePathsAndValidate(project.projectDir)
-            exec.dependsOn(ext.getDependencies())
-            prepare.configure()
-            exec.configure()
-            pushTask.configure()
+            String dockerDir = "${project.buildDir}/docker"
+
+            clean.delete dockerDir
+
+            prepare.with {
+                from (ext.resolvedDockerfile) {
+                    rename { fileName ->
+                        fileName.replace(ext.resolvedDockerfile.getName(), 'Dockerfile')
+                    }
+                }
+                from ext.dependencies*.outputs
+                from ext.resolvedFiles
+                into dockerDir
+            }
+
+            exec.with {
+                workingDir dockerDir
+                commandLine 'docker', 'build', '-t', ext.name, '.'
+                dependsOn ext.getDependencies()
+            }
+
+            push.with {
+                workingDir dockerDir
+                commandLine 'docker', 'push', '-t', ext.name
+            }
         }
     }
 }
