@@ -36,7 +36,7 @@ dependencies {
     testCompile files(createClasspathManifest)
 }
 
-group 'com.palantir.deploy'
+group 'com.palantir.gradle.docker'
 version gitVersion()
 
 task sourceJar(type: Jar) {
