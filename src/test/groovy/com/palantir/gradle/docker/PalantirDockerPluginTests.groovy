@@ -151,6 +151,35 @@ class PalantirDockerPluginTests extends Specification {
         exec("docker rmi ${id}")
     }
 
+    def 'check files are correctly added to docker context' () {
+        given:
+        String id = UUID.randomUUID().toString()
+        String filename = "foo.txt"
+        temporaryFolder.newFile('Dockerfile') << """
+            FROM alpine:3.2
+            MAINTAINER ${id}
+            ADD ${filename} /tmp/
+        """.stripIndent()
+        buildFile << """
+            apply plugin: 'com.palantir.docker'
+
+            docker {
+                name '${id}'
+                files "${filename}"
+            }
+        """.stripIndent()
+        new File(projectDir, filename).createNewFile()
+        when:
+        BuildResult buildResult = with('docker').build()
+
+        then:
+        buildResult.task(':dockerPrepare').outcome == TaskOutcome.SUCCESS
+        buildResult.task(':docker').outcome == TaskOutcome.SUCCESS
+        exec("docker inspect --format '{{.Author}}' ${id}") == "'${id}'\n"
+        exec("docker rmi ${id}")
+    }
+
+
     private GradleRunner with(String... tasks) {
         GradleRunner.create().withProjectDir(projectDir).withArguments(tasks)
     }

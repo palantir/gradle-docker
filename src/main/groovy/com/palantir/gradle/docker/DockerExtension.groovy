@@ -50,7 +50,7 @@ class DockerExtension {
     }
 
     public void files(String... args) {
-        this.files = ImmutableSet.copyOf(files);
+        this.files = ImmutableSet.copyOf(args);
     }
 
     public File getResolvedDockerfile() {
