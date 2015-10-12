@@ -68,7 +68,7 @@ bintray {
 }
   
 bintrayUpload.onlyIf {
-    System.getenv('BINTRAY_USER') && System.getenv('BINTRAY_KEY') && project.version ==~ /\d+\.\d+\.\d+/
+    System.getenv('TRAVIS_TAG') && System.getenv('BINTRAY_USER') && System.getenv('BINTRAY_KEY') && project.version ==~ /\d+\.\d+\.\d+/
 }
   
 bintrayUpload.dependsOn { generatePomFileForBintrayPublication }
@@ -90,6 +90,6 @@ pluginBundle {
 }
 
 publishPlugins.onlyIf {
-    project.version ==~ /\d+\.\d+\.\d+/
+    System.getenv('TRAVIS_TAG') && project.version ==~ /\d+\.\d+\.\d+/
 }
 
