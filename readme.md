@@ -1,5 +1,7 @@
 Docker Gradle Plugin
 ====================
+[![Build Status](https://travis-ci.org/palantir/gradle-docker.svg?branch=develop)](https://travis-ci.org/palantir/gradle-docker)
+
 Adds basic tasks for building and pushing docker images based on a simple
 configuration block that specifies the container name, the Dockerfile, task
 dependencies, and any additional file resources required for the Docker build.
