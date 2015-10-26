@@ -30,34 +30,15 @@ class PalantirDockerPluginTests extends Specification {
 
     File projectDir
     File buildFile
+    List<File> pluginClasspath
 
-    def setup() {
-        projectDir = temporaryFolder.root
-        buildFile = temporaryFolder.newFile('build.gradle')
-
-        def pluginClasspathResource = getClass().classLoader.findResource("plugin-classpath.txt")
-        if (pluginClasspathResource == null) {
-            throw new IllegalStateException("Did not find plugin classpath resource, run `testClasses` build task.")
-        }
-
-        def pluginClasspath = pluginClasspathResource.readLines()
-            .collect { it.replace('\\', '\\\\') } // escape backslashes in Windows paths
-            .collect { "'$it'" }
-            .join(", ")
-
-        buildFile << """
-            buildscript {
-                dependencies {
-                    classpath files($pluginClasspath)
-                }
-            }
-        """.stripIndent()
-    }
 
     def 'fail when missing docker configuration' () {
         given:
         buildFile << '''
-            apply plugin: 'com.palantir.docker'
+            plugins {
+                id 'com.palantir.docker'
+            }
         '''.stripIndent()
 
         when:
@@ -70,7 +51,9 @@ class PalantirDockerPluginTests extends Specification {
     def 'fail with empty container name' () {
         given:
         buildFile << '''
-            apply plugin: 'com.palantir.docker'
+            plugins {
+                id 'com.palantir.docker'
+            }
             docker {
                 name ''
             }
@@ -86,7 +69,9 @@ class PalantirDockerPluginTests extends Specification {
     def 'fail with missing dockerfile' () {
         given:
         buildFile << '''
-            apply plugin: 'com.palantir.docker'
+            plugins {
+                id 'com.palantir.docker'
+            }
             docker {
                 name 'test'
                 dockerfile 'missing'
@@ -108,7 +93,9 @@ class PalantirDockerPluginTests extends Specification {
             MAINTAINER ${id}
         """.stripIndent()
         buildFile << """
-            apply plugin: 'com.palantir.docker'
+            plugins {
+                id 'com.palantir.docker'
+            }
 
             docker {
                 name '${id}'
@@ -133,7 +120,9 @@ class PalantirDockerPluginTests extends Specification {
             MAINTAINER ${id}
         """.stripIndent()
         buildFile << """
-            apply plugin: 'com.palantir.docker'
+            plugins {
+                id 'com.palantir.docker'
+            }
 
             docker {
                 name '${id}'
@@ -161,7 +150,9 @@ class PalantirDockerPluginTests extends Specification {
             ADD ${filename} /tmp/
         """.stripIndent()
         buildFile << """
-            apply plugin: 'com.palantir.docker'
+            plugins {
+                id 'com.palantir.docker'
+            }
 
             docker {
                 name '${id}'
@@ -181,7 +172,10 @@ class PalantirDockerPluginTests extends Specification {
 
 
     private GradleRunner with(String... tasks) {
-        GradleRunner.create().withProjectDir(projectDir).withArguments(tasks)
+        GradleRunner.create()
+            .withPluginClasspath(pluginClasspath)
+            .withProjectDir(projectDir)
+            .withArguments(tasks)
     }
 
     private String exec(String task) {
@@ -190,6 +184,20 @@ class PalantirDockerPluginTests extends Specification {
         proc.consumeProcessOutput(sout, serr)
         proc.waitFor()
         return sout.toString()
+    }
+
+    def setup() {
+        projectDir = temporaryFolder.root
+        buildFile = temporaryFolder.newFile('build.gradle')
+
+        def pluginClasspathResource = getClass().classLoader.findResource("plugin-classpath.txt")
+        if (pluginClasspathResource == null) {
+            throw new IllegalStateException("Did not find plugin classpath resource, run `testClasses` build task.")
+        }
+
+        pluginClasspath = pluginClasspathResource.readLines()
+            .collect { it.replace('\\', '\\\\') } // escape backslashes in Windows paths
+            .collect { new File(it) }
     }
 
 }
