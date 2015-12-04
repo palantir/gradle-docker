@@ -15,19 +15,31 @@
  */
 package com.palantir.gradle.docker
 
+import com.google.common.base.Strings
+import org.gradle.api.Project
 import org.gradle.api.Task
 
 import com.google.common.base.Preconditions
 import com.google.common.collect.ImmutableSet
 
 class DockerExtension {
+    Project project
+
     private String name = null
-    private String dockerfile = null
+    private String dockerfile = 'Dockerfile'
+    private String dockerComposeTemplate = 'docker-compose.yml.template'
+    private String dockerComposeFile = 'docker-compose.yml'
     private Set<Task> dependencies = ImmutableSet.of()
     private Set<String> files = ImmutableSet.of()
 
     private File resolvedDockerfile = null
+    private File resolvedDockerComposeTemplate = null
+    private File resolvedDockerComposeFile = null
     private Set<File> resolvedFiles = null
+
+    public DockerExtension(Project project) {
+        this.project = project
+    }
 
     public void setName(String name) {
         this.name = name
@@ -39,6 +51,16 @@ class DockerExtension {
 
     public void setDockerfile(String dockerfile) {
         this.dockerfile = dockerfile
+    }
+
+    public void setDockerComposeTemplate(String dockerComposeTemplate) {
+        this.dockerComposeTemplate = dockerComposeTemplate
+        Preconditions.checkArgument(project.file(dockerComposeTemplate).exists(),
+            "Could not find specified dockerComposeTemplate file: %s", project.file(dockerComposeTemplate))
+    }
+
+    public void setDockerComposeFile(String dockerComposeFile) {
+        this.dockerComposeFile = dockerComposeFile
     }
 
     public void dependsOn(Task... args) {
@@ -57,36 +79,34 @@ class DockerExtension {
         return resolvedDockerfile
     }
 
+    File getResolvedDockerComposeTemplate() {
+        return resolvedDockerComposeTemplate
+    }
+
+    File getResolvedDockerComposeFile() {
+        return resolvedDockerComposeFile
+    }
+
     public Set<String> getResolvedFiles() {
         return resolvedFiles
     }
 
-    public void resolvePathsAndValidate(File projectDir) {
-        Preconditions.checkArgument(name != null && !name.isEmpty(),
+    public void resolvePathsAndValidate() {
+        Preconditions.checkArgument(!Strings.isNullOrEmpty(name),
             "name is a required docker configuration item.")
 
-        if (dockerfile == null) {
-            dockerfile = 'Dockerfile'
-        }
-
-        resolvedDockerfile = new File(dockerfile)
-        if (!resolvedDockerfile.isAbsolute()) {
-            resolvedDockerfile = new File(projectDir, dockerfile)
-        }
-
+        resolvedDockerfile = project.file(dockerfile)
         Preconditions.checkArgument(resolvedDockerfile.exists(), "dockerfile '%s' does not exist.", dockerfile)
+        resolvedDockerComposeFile = project.file(dockerComposeFile)
+        resolvedDockerComposeTemplate = project.file(dockerComposeTemplate)
 
         ImmutableSet.Builder<File> builder = ImmutableSet.builder()
         for (String file : files) {
-            File resFile = new File(file)
-            if (!resFile.isAbsolute()) {
-                resFile = new File(projectDir, file)
-            }
+            def resFile = project.file(file)
             Preconditions.checkArgument(resFile.exists(), "file '%s' does not exist.", file)
             builder.add(resFile)
         }
 
         resolvedFiles = builder.build()
     }
-
 }
