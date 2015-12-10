@@ -56,7 +56,7 @@ class DockerExtension {
     public void setDockerComposeTemplate(String dockerComposeTemplate) {
         this.dockerComposeTemplate = dockerComposeTemplate
         Preconditions.checkArgument(project.file(dockerComposeTemplate).exists(),
-            "Could not find specified dockerComposeTemplate file: %s", project.file(dockerComposeTemplate))
+            "Could not find specified template file: %s", project.file(dockerComposeTemplate))
     }
 
     public void setDockerComposeFile(String dockerComposeFile) {

@@ -15,7 +15,6 @@
  */
 package com.palantir.gradle.docker
 
-import com.google.common.base.Preconditions
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.artifacts.Configuration
@@ -27,6 +26,7 @@ import org.gradle.api.tasks.Exec
 import org.gradle.api.tasks.bundling.Zip
 
 class PalantirDockerPlugin implements Plugin<Project> {
+    @Override
     void apply(Project project) {
         DockerExtension ext = project.extensions.create('docker', DockerExtension, project)
         project.configurations.create("docker")
@@ -52,12 +52,6 @@ class PalantirDockerPlugin implements Plugin<Project> {
 
         Zip dockerfileZip = project.tasks.create('dockerfileZip', Zip, {
             description = "Bundles the configured Dockerfile in a ZIP file"
-
-        })
-
-        Copy generateDockerCompose = project.tasks.create('generateDockerCompose', Copy, {
-            description = 'Populates docker-compose.yml.template file with image versions specified by "docker" ' +
-                'dependencies'
         })
 
         PublishArtifact dockerArtifact = new ArchivePublishArtifact(dockerfileZip)
@@ -96,33 +90,6 @@ class PalantirDockerPlugin implements Plugin<Project> {
             dockerfileZip.with {
                 from(ext.resolvedDockerfile)
             }
-
-            // Configure docker-compose templating
-            if (ext.resolvedDockerComposeTemplate.exists()) {
-                def dockerDependencies = project.configurations.docker.resolvedConfiguration.resolvedArtifacts
-                def templateTokens = dockerDependencies.collectEntries {
-                    def version = it.moduleVersion.id
-                    [("{{${version.group}:${version.name}}}"): version.version]
-                }
-
-                generateDockerCompose.with {
-                    from(ext.resolvedDockerComposeTemplate)
-                    into(ext.resolvedDockerComposeFile.parentFile)
-                    rename { fileName -> fileName.replace(
-                        ext.resolvedDockerComposeTemplate.name, ext.resolvedDockerComposeFile.name) }
-                    filter { String line -> replaceAll(line, templateTokens, ext) }
-                }
-            }
         }
-    }
-
-    /** Replaces all occurrences of templatesTokens's keys by their corresponding values in the given line. */
-    static def replaceAll(String line, Map<String, String> templateTokens, DockerExtension ext) {
-        templateTokens.each { mapping -> line = line.replace(mapping.key, mapping.value) }
-        def unmatchedTokens = line.findAll(/\{\{.*\}\}/)
-        Preconditions.checkState(unmatchedTokens.size() == 0,
-            "Failed to resolve Docker dependencies mention in %s: %s",
-            ext.resolvedDockerComposeTemplate, unmatchedTokens)
-        line
     }
 }
