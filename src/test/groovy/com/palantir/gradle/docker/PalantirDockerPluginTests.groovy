@@ -225,4 +225,24 @@ class PalantirDockerPluginTests extends AbstractPluginTest {
         ["foogroup", "barmodule", "0.1.2", temporaryFolder.root.name, "2.3.4"].each { dockerPom.contains(it) }
         !dockerPom.contains("guava")
     }
+
+    def 'Can apply both "docker" and "docker-compose" plugins'() {
+        given:
+        temporaryFolder.newFile('Dockerfile') << "Foo"
+        buildFile << '''
+            plugins {
+                id 'com.palantir.docker'
+                id 'com.palantir.docker-compose'
+            }
+
+            docker {
+                name 'foo'
+            }
+        '''.stripIndent()
+
+        when:
+        BuildResult buildResult = with('tasks').build()
+        then:
+        buildResult.task(':tasks').outcome == TaskOutcome.SUCCESS
+    }
 }

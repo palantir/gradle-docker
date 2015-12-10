@@ -29,7 +29,9 @@ class PalantirDockerPlugin implements Plugin<Project> {
     @Override
     void apply(Project project) {
         DockerExtension ext = project.extensions.create('docker', DockerExtension, project)
-        project.configurations.create("docker")
+        if (!project.configurations.findByName('docker')) {
+            project.configurations.create('docker')
+        }
 
         Delete clean = project.tasks.create('dockerClean', Delete, {
             description = "Cleans Docker build directory."
