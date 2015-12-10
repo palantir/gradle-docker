@@ -10,7 +10,9 @@ class DockerComposePlugin implements Plugin<Project> {
     void apply(Project project) {
         DockerComposeExtension ext =
             project.extensions.create('dockerCompose', DockerComposeExtension, project)
-        project.configurations.create("docker")
+        if (!project.configurations.findByName('docker')) {
+            project.configurations.create('docker')
+        }
 
         Copy generateDockerCompose = project.tasks.create('generateDockerCompose', Copy, {
             description = 'Populates docker-compose.yml.template file with image versions specified by "docker" ' +
