@@ -36,6 +36,10 @@ dependencies {
     testCompile files(createClasspathManifest)
 }
 
+if (System.env.CIRCLE_TEST_REPORTS) {
+    test.reports.junitXml.destination = new File(System.env.CIRCLE_TEST_REPORTS, getName())
+}
+
 group 'com.palantir.gradle.docker'
 version gitVersion()
 
@@ -48,16 +52,15 @@ publishing {
     publications {
         bintray(MavenPublication) {
             from components.java
-            artifact(sourceJar) {
-                classifier 'sources'
-            }
+            artifact(sourceJar)
+            artifact(publishPluginJavaDocsJar)
         }
     }
 }
   
 bintray {
-    user = System.getenv('BINTRAY_USER')
-    key = System.getenv('BINTRAY_KEY')
+    user = System.env.BINTRAY_USER
+    key = System.env.BINTRAY_KEY
     pkg {
         repo = 'releases'
         name = 'gradle-docker'
@@ -67,13 +70,11 @@ bintray {
     }
 }
   
+bintrayUpload.dependsOn 'generatePomFileForBintrayPublication', 'sourceJar', 'build'
+
 bintrayUpload.onlyIf {
-    System.getenv('TRAVIS_TAG') && System.getenv('BINTRAY_USER') && System.getenv('BINTRAY_KEY') && project.version ==~ /\d+\.\d+\.\d+/
+    System.env.BINTRAY_USER && System.env.BINTRAY_KEY && project.version ==~ /\d+\.\d+\.\d+/
 }
-  
-bintrayUpload.dependsOn { generatePomFileForBintrayPublication }
-bintrayUpload.dependsOn { sourceJar }
-bintrayUpload.dependsOn { build }
 
 pluginBundle {
     website = 'https://github.com/palantir/gradle-docker'
@@ -94,6 +95,6 @@ pluginBundle {
 }
 
 publishPlugins.onlyIf {
-    System.getenv('TRAVIS_TAG') && project.version ==~ /\d+\.\d+\.\d+/
+    project.version ==~ /\d+\.\d+\.\d+/
 }
 
