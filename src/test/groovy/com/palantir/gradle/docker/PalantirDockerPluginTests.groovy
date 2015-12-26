@@ -157,7 +157,7 @@ class PalantirDockerPluginTests extends AbstractPluginTest {
         buildResult.task(':dockerPrepare').outcome == TaskOutcome.SUCCESS
         buildResult.task(':docker').outcome == TaskOutcome.SUCCESS
         exec("docker inspect --format '{{.Author}}' ${id}") == "'${id}'\n"
-        exec("docker rmi ${id}")
+        exec("docker rmi -f ${id}")
     }
 
     def 'Publishes "docker" dependencies via "docker" component'() {
