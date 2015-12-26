@@ -35,7 +35,7 @@ class PalantirDockerPluginTests extends AbstractPluginTest {
         BuildResult buildResult = with('docker').buildAndFail()
 
         then:
-        buildResult.standardError.contains("name is a required docker configuration item.")
+        buildResult.output.contains("name is a required docker configuration item.")
     }
 
     def 'fail with empty container name'() {
@@ -53,7 +53,7 @@ class PalantirDockerPluginTests extends AbstractPluginTest {
         BuildResult buildResult = with('docker').buildAndFail()
 
         then:
-        buildResult.standardError.contains("name is a required docker configuration item.")
+        buildResult.output.contains("name is a required docker configuration item.")
     }
 
     def 'fail with missing dockerfile'() {
@@ -72,7 +72,7 @@ class PalantirDockerPluginTests extends AbstractPluginTest {
         BuildResult buildResult = with('docker').buildAndFail()
 
         then:
-        buildResult.standardError.contains("dockerfile 'missing' does not exist.")
+        buildResult.output.contains("dockerfile 'missing' does not exist.")
     }
 
     def 'check plugin creates a docker container with default configuration'() {

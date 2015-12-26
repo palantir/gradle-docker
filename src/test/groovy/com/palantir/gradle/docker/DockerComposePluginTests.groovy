@@ -65,8 +65,8 @@ class DockerComposePluginTests extends AbstractPluginTest {
         when:
         BuildResult buildResult = with('generateDockerCompose', '--stacktrace').buildAndFail()
         then:
-        buildResult.standardError.contains("Failed to resolve Docker dependencies declared in")
-        buildResult.standardError.contains("{{foo:bar}}")
+        buildResult.output.contains("Failed to resolve Docker dependencies declared in")
+        buildResult.output.contains("{{foo:bar}}")
     }
 
     def 'docker-compose template and file can have custom locations'() {
@@ -113,6 +113,6 @@ class DockerComposePluginTests extends AbstractPluginTest {
         when:
         BuildResult buildResult = with('generateDockerCompose').buildAndFail()
         then:
-        buildResult.standardError.contains("Could not find specified template file")
+        buildResult.output.contains("Could not find specified template file")
     }
 }
