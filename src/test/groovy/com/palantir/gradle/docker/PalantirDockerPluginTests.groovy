@@ -99,7 +99,7 @@ class PalantirDockerPluginTests extends AbstractPluginTest {
         buildResult.task(':dockerPrepare').outcome == TaskOutcome.SUCCESS
         buildResult.task(':docker').outcome == TaskOutcome.SUCCESS
         exec("docker inspect --format '{{.Author}}' ${id}") == "'${id}'\n"
-        exec("docker rmi ${id}")
+        execCond("docker rmi -f ${id}")
     }
 
     def 'check plugin creates a docker container with non-standard Dockerfile name'() {
@@ -127,7 +127,7 @@ class PalantirDockerPluginTests extends AbstractPluginTest {
         buildResult.task(':dockerPrepare').outcome == TaskOutcome.SUCCESS
         buildResult.task(':docker').outcome == TaskOutcome.SUCCESS
         exec("docker inspect --format '{{.Author}}' ${id}") == "'${id}'\n"
-        exec("docker rmi ${id}")
+        execCond("docker rmi -f ${id}")
     }
 
     def 'check files are correctly added to docker context'() {
@@ -157,7 +157,7 @@ class PalantirDockerPluginTests extends AbstractPluginTest {
         buildResult.task(':dockerPrepare').outcome == TaskOutcome.SUCCESS
         buildResult.task(':docker').outcome == TaskOutcome.SUCCESS
         exec("docker inspect --format '{{.Author}}' ${id}") == "'${id}'\n"
-        exec("docker rmi -f ${id}")
+        execCond("docker rmi -f ${id}")
     }
 
     def 'Publishes "docker" dependencies via "docker" component'() {
@@ -244,5 +244,89 @@ class PalantirDockerPluginTests extends AbstractPluginTest {
         BuildResult buildResult = with('tasks').build()
         then:
         buildResult.task(':tasks').outcome == TaskOutcome.SUCCESS
+    }
+
+    def 'no tag task when no tags defined'() {
+        given:
+        String id = UUID.randomUUID().toString()
+        temporaryFolder.newFile('Dockerfile') << """
+            FROM alpine:3.2
+            MAINTAINER ${id}
+        """.stripIndent()
+        buildFile << """
+            plugins {
+                id 'com.palantir.docker'
+            }
+
+            docker {
+                name '${id}'
+            }
+        """.stripIndent()
+
+        when:
+        BuildResult buildResult = with('tasks').build()
+
+        then:
+        !buildResult.output.contains('dockerTag')
+    }
+
+    def 'tag and push tasks created for each tag'() {
+        given:
+        String id = UUID.randomUUID().toString()
+        temporaryFolder.newFile('Dockerfile') << """
+            FROM alpine:3.2
+            MAINTAINER ${id}
+        """.stripIndent()
+        buildFile << """
+            plugins {
+                id 'com.palantir.docker'
+            }
+
+            docker {
+                name '${id}'
+                tags 'latest', 'another'
+            }
+        """.stripIndent()
+
+        when:
+        BuildResult buildResult = with('tasks').build()
+
+        then:
+        buildResult.output.contains('dockerTagLatest')
+        buildResult.output.contains('dockerTagAnother')
+        buildResult.output.contains('dockerPushLatest')
+        buildResult.output.contains('dockerPushAnother')
+    }
+
+    def 'running tag task creates images with specified tags'() {
+        given:
+        String id = UUID.randomUUID().toString()
+        temporaryFolder.newFile('Dockerfile') << """
+            FROM alpine:3.2
+            MAINTAINER ${id}
+        """.stripIndent()
+        buildFile << """
+            plugins {
+                id 'com.palantir.docker'
+            }
+
+            docker {
+                name '${id}'
+                tags 'latest', 'another'
+            }
+        """.stripIndent()
+
+        when:
+        BuildResult buildResult = with('dockerTag').build()
+
+        then:
+        buildResult.task(':dockerPrepare').outcome == TaskOutcome.SUCCESS
+        buildResult.task(':docker').outcome == TaskOutcome.SUCCESS
+        buildResult.task(':dockerTag').outcome == TaskOutcome.SUCCESS
+        exec("docker inspect --format '{{.Author}}' ${id}") == "'${id}'\n"
+        exec("docker inspect --format '{{.Author}}' ${id}:latest") == "'${id}'\n"
+        exec("docker inspect --format '{{.Author}}' ${id}:another") == "'${id}'\n"
+        execCond("docker rmi -f ${id}")
+        execCond("docker rmi -f ${id}:another")
     }
 }

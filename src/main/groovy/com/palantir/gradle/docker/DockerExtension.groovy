@@ -15,11 +15,11 @@
  */
 package com.palantir.gradle.docker
 
-import com.google.common.base.Strings
 import org.gradle.api.Project
 import org.gradle.api.Task
 
 import com.google.common.base.Preconditions
+import com.google.common.base.Strings
 import com.google.common.collect.ImmutableSet
 
 class DockerExtension {
@@ -31,6 +31,7 @@ class DockerExtension {
     private String dockerComposeFile = 'docker-compose.yml'
     private Set<Task> dependencies = ImmutableSet.of()
     private Set<String> files = ImmutableSet.of()
+    private Set<String> tags = ImmutableSet.of()
 
     private File resolvedDockerfile = null
     private File resolvedDockerComposeTemplate = null
@@ -73,6 +74,14 @@ class DockerExtension {
 
     public void files(String... args) {
         this.files = ImmutableSet.copyOf(args);
+    }
+
+    public Set<String> getTags() {
+        return tags
+    }
+
+    public void tags(String... args) {
+        this.tags = ImmutableSet.copyOf(args);
     }
 
     public File getResolvedDockerfile() {
