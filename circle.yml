@@ -3,16 +3,16 @@ machine:
     version: openjdk7
   services:
     - docker
+  environment:
+    TERM: dumb
 
 general:
   artifacts:
     - build/libs
 
 test:
-  pre:
-    - ./gradlew assemble:
-        environment:
-          TERM: dumb
+  override:
+    - ./gradlew --parallel -i build
 
 deployment:
   release:
