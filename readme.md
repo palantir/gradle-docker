@@ -2,19 +2,19 @@ Docker Gradle Plugin
 ====================
 [![Build Status](https://circleci.com/gh/palantir/gradle-docker.svg?style=svg)](https://circleci.com/gh/palantir/gradle-docker)
 
-This repository provides two Gradle plugins for working with Docker containers:
-- The `com.palantir.docker` plugin add basic tasks for building and pushing
-docker images based on a simple configuration block that specifies the container
-name, the Dockerfile, task dependencies, and any additional file resources
-required for the Docker build.
-- The `com.palantir.docker-compose` plugin adds a task for populating
-placeholders in a docker-compose template file with image versions resolved from
-dependencies.
+This repository provides three Gradle plugins for working with Docker containers:
+- `com.palantir.docker`: add basic tasks for building and pushing
+  docker images based on a simple configuration block that specifies the container
+  name, the Dockerfile, task dependencies, and any additional file resources
+  required for the Docker build.
+- `com.palantir.docker-compose`: adds a task for populating placeholders in a 
+  docker-compose template file with image versions resolved from
+  dependencies.
+- `com.palantir.docker-run`: adds tasks for starting, stopping, statusing and cleaning
+  up a named container based on a specified image
 
 Docker Plugin
 -------------
-
-### Usage
 Apply the plugin using standard gradle convention:
 
     plugins {
@@ -61,7 +61,6 @@ Configuration specifying all parameters:
 
 Managing Docker image dependencies
 ----------------------------------
-
 The `com.palantir.docker` and `com.palantir.docker-compose` plugins provide
 functionality to declare and resolve version-aware dependencies between docker
 images. The primary use-case is to generate `docker-compose.yml` files whose
@@ -163,21 +162,45 @@ The template and generated file locations are customizable through the
         dockerComposeFile 'my-docker-compose.yml'
     }
 
+Docker Plugin
+-------------
+Apply the plugin using standard gradle convention:
+
+    plugins {
+        id 'com.palantir.docker-run' version '<version>'
+    }
+
+Use the `dockerRun` configuration block to configure the name, image and optional
+command to execute for the `dockerRun` tasks:
+
+    dockerRun {
+        name 'my-container'
+        image 'busybox'
+        command 'sleep 100'
+    }
+
 Tasks
 -----
 
- * `docker`: build a docker container with the specified name and Dockerfile
- * `dockerTag`: tag the docker container with all specified tags
- * `dockerTag<tag>`: tag the docker container with `<tag>`
- * `dockerPush`: push the specified container to a docker repository
- * `dockerPush<tag>`: push the `<tag>` docker container to a docker repository
- * `dockerPrepare`: prepare to build a docker container by copying
-   dependent task outputs, referenced files, and `dockerfile` into a temporary
-   directory
- * `dockerClean`: remove temporary directory associated with the docker build
- * `dockerfileZip`: builds a ZIP file containing the configured Dockerfile
- * `generateDockerCompose`: Populates a docker-compose file template with image
-   versions declared by dependencies
+ * **Docker**
+   * `docker`: build a docker container with the specified name and Dockerfile
+   * `dockerTag`: tag the docker container with all specified tags
+   * `dockerTag<tag>`: tag the docker container with `<tag>`
+   * `dockerPush`: push the specified container to a docker repository
+   * `dockerPush<tag>`: push the `<tag>` docker container to a docker repository
+   * `dockerPrepare`: prepare to build a docker container by copying
+     dependent task outputs, referenced files, and `dockerfile` into a temporary
+     directory
+   * `dockerClean`: remove temporary directory associated with the docker build
+   * `dockerfileZip`: builds a ZIP file containing the configured Dockerfile
+ * **Docker Compose**
+   * `generateDockerCompose`: Populates a docker-compose file template with image
+     versions declared by dependencies
+ * **Docker Run**
+   * `dockerRun`: run the specified image with the specified name
+   * `dockerStop`: stop the running container
+   * `dockerRunStatus`: indicate the run status of the container
+   * `dockerRemoveContainer`: remove the container
 
 License
 -------

@@ -91,6 +91,10 @@ pluginBundle {
             id = 'com.palantir.docker-compose'
             displayName = 'Palantir Gradle Docker-Compose'
         }
+        dockerRunPlugin {
+            id = 'com.palantir.docker-run'
+            displayName = 'Palantir Gradle Docker-Run'
+        }
     }
 }
 
