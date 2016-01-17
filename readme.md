@@ -18,12 +18,27 @@ Docker Plugin
 Apply the plugin using standard gradle convention:
 
     plugins {
-        id 'com.palantir.docker'
+        id 'com.palantir.docker' version '<version>'
     }
 
 Set the container name, and then optionally specify a Dockerfile path, any task
 dependencies and file resources required for the Docker build. This plugin will
 automatically include outputs of task dependencies in the Docker build context.
+
+**Docker Configuration Parameters**
+- `name` the name to use for this container, may include a tag
+- `tags` (optional) an argument list of tags to create; any tag in `name` will
+  be stripped before applying a specific tag; defaults to the empty set
+- `dockerfile` (optional) dockerfile to use for building the image; defaults to
+  `${projectDir}/Dockerfile`
+- `dependsOn` (optional) an argument list of tasks that docker builds must depend on;
+  defaults to the empty set
+- `files` (optional) an argument list of files to be included in the docker build context
+
+To build a docker container, run the `docker` task. To push that container to a
+docker repository, run the `dockerPush` task.
+
+Tag and Push tasks for each tag will be generated for each provided `tags` entry. 
 
 **Examples**
 
@@ -37,13 +52,11 @@ Configuration specifying all parameters:
 
     docker {
         name 'hub.docker.com/username/my-app:version'
+        tags 'latest'
         dockerfile 'Dockerfile'
         dependsOn tasks.distTar
         files 'file1.txt', 'file2.txt'
     }
-
-To build a docker container, run the `docker` task. To push that container to a
-docker repository, run the `dockerPush` task.
 
 
 Managing Docker image dependencies
@@ -154,7 +167,10 @@ Tasks
 -----
 
  * `docker`: build a docker container with the specified name and Dockerfile
+ * `dockerTag`: tag the docker container with all specified tags
+ * `dockerTag<tag>`: tag the docker container with `<tag>`
  * `dockerPush`: push the specified container to a docker repository
+ * `dockerPush<tag>`: push the `<tag>` docker container to a docker repository
  * `dockerPrepare`: prepare to build a docker container by copying
    dependent task outputs, referenced files, and `dockerfile` into a temporary
    directory
@@ -162,10 +178,6 @@ Tasks
  * `dockerfileZip`: builds a ZIP file containing the configured Dockerfile
  * `generateDockerCompose`: Populates a docker-compose file template with image
    versions declared by dependencies
-
-
-
-
 
 License
 -------

@@ -17,6 +17,7 @@ package com.palantir.gradle.docker
 
 import org.gradle.api.Plugin
 import org.gradle.api.Project
+import org.gradle.api.Task
 import org.gradle.api.artifacts.Configuration
 import org.gradle.api.artifacts.PublishArtifact
 import org.gradle.api.internal.artifacts.publish.ArchivePublishArtifact
@@ -34,37 +35,41 @@ class PalantirDockerPlugin implements Plugin<Project> {
         }
 
         Delete clean = project.tasks.create('dockerClean', Delete, {
-            description = "Cleans Docker build directory."
+            group = 'Docker'
+            description = 'Cleans Docker build directory.'
         })
 
         Copy prepare = project.tasks.create('dockerPrepare', Copy, {
-            description = "Prepares Docker build directory."
+            group = 'Docker'
+            description = 'Prepares Docker build directory.'
             dependsOn clean
         })
 
         Exec exec = project.tasks.create('docker', Exec, {
-            description = "Builds Docker image."
+            group = 'Docker'
+            description = 'Builds Docker image.'
             dependsOn prepare
         })
 
         Exec push = project.tasks.create('dockerPush', Exec, {
-            description = "Pushes Docker image to configured Docker Hub."
+            group = 'Docker'
+            description = 'Pushes named Docker image to configured Docker Hub.'
             dependsOn exec
         })
 
         Zip dockerfileZip = project.tasks.create('dockerfileZip', Zip, {
-            description = "Bundles the configured Dockerfile in a ZIP file"
+            group = 'Docker'
+            description = 'Bundles the configured Dockerfile in a zip file'
         })
 
         PublishArtifact dockerArtifact = new ArchivePublishArtifact(dockerfileZip)
-        Configuration dockerConfiguration = project.getConfigurations().getByName("docker")
+        Configuration dockerConfiguration = project.getConfigurations().getByName('docker')
         dockerConfiguration.getArtifacts().add(dockerArtifact)
         project.getComponents().add(new DockerComponent(dockerArtifact, dockerConfiguration.getAllDependencies()))
 
         project.afterEvaluate {
             ext.resolvePathsAndValidate()
             String dockerDir = "${project.buildDir}/docker"
-
             clean.delete dockerDir
 
             prepare.with {
@@ -84,6 +89,33 @@ class PalantirDockerPlugin implements Plugin<Project> {
                 dependsOn ext.getDependencies()
             }
 
+            if (!ext.tags.isEmpty()) {
+                Task tag = project.tasks.create('dockerTag', {
+                    group = 'Docker'
+                    description = 'Applies all tags to the Docker image.'
+                })
+
+                for (String tagName : ext.tags) {
+                    String taskTagName = ucfirst(tagName)
+                    Exec subTask = project.tasks.create('dockerTag' + taskTagName, Exec, {
+                        group = 'Docker'
+                        description = "Tags Docker image with tag '${tagName}'"
+                        workingDir dockerDir
+                        commandLine 'docker', 'tag', '--force=true', ext.name, computeName(ext.name, tagName)
+                        dependsOn exec
+                    })
+                    tag.dependsOn subTask
+
+                    project.tasks.create('dockerPush' + taskTagName, Exec, {
+                        group = 'Docker'
+                        description = "Pushes the Docker image with tag '${tagName}' to configured Docker Hub"
+                        workingDir dockerDir
+                        commandLine 'docker', 'push', computeName(ext.name, tagName)
+                        dependsOn tag
+                    })
+                }
+            }
+
             push.with {
                 workingDir dockerDir
                 commandLine 'docker', 'push', ext.name
@@ -94,4 +126,15 @@ class PalantirDockerPlugin implements Plugin<Project> {
             }
         }
     }
+
+    private String computeName(String name, String tag) {
+        return name.replaceAll(":.*", "") + ":" + tag
+    }
+
+    private String ucfirst(String str) {
+        StringBuffer sb = new StringBuffer(str);
+        sb.replace(0, 1, str.substring(0, 1).toUpperCase());
+        return sb.toString();
+    }
+
 }
