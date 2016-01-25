@@ -18,6 +18,7 @@ package com.palantir.gradle.docker
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.tasks.Copy
+import org.gradle.api.tasks.Exec
 
 import com.google.common.base.Preconditions
 
@@ -31,8 +32,26 @@ class DockerComposePlugin implements Plugin<Project> {
         }
 
         Copy generateDockerCompose = project.tasks.create('generateDockerCompose', Copy, {
+            group = 'Docker Compose'
             description = 'Populates docker-compose.yml.template file with image versions specified by "docker" ' +
                 'dependencies'
+        })
+
+        Exec dockerComposeUp = project.tasks.create('dockerComposeUp', Exec, {
+            group = 'Docker Compose'
+            description = 'Builds and starts containers defined in your docker-compose.yml'
+            dependsOn generateDockerCompose
+        })
+
+        Exec dockerComposeStop = project.tasks.create('dockerComposeStop', Exec, {
+            group = 'Docker Compose'
+            description = 'Stops containers started by dockerComposeUp'
+        })
+
+        Exec dockerComposeRemove = project.tasks.create('dockerComposeRemove', Exec, {
+            group = 'Docker Compose'
+            description = 'Removes stopped containers'
+            dependsOn dockerComposeStop
         })
 
         project.afterEvaluate {
@@ -53,6 +72,18 @@ class DockerComposePlugin implements Plugin<Project> {
                     }
                     filter { String line -> replaceAll(line, templateTokens, ext) }
                 }
+            }
+
+            dockerComposeUp.with {
+                commandLine 'docker-compose', '-f', "${ext.resolvedDockerComposeFile.name}", 'up', '-d'
+            }
+
+            dockerComposeStop.with {
+                commandLine 'docker-compose', '-f', "${ext.resolvedDockerComposeFile.name}", 'stop'
+            }
+
+            dockerComposeRemove.with {
+                commandLine 'docker-compose', '-f', "${ext.resolvedDockerComposeFile.name}", 'rm', '-f'
             }
         }
     }

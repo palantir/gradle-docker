@@ -130,4 +130,32 @@ class DockerComposePluginTests extends AbstractPluginTest {
         then:
         buildResult.output.contains("Could not find specified template file")
     }
+
+    def 'can start, stop, and remove containers given a docker compose file'() {
+        given:
+        temporaryFolder.newFile('my-docker-compose.yml') << '''
+            service1:
+                image: 'alpine:3.2'
+                command: sleep 1000
+        '''.stripIndent()
+        buildFile << '''
+            plugins {
+                id 'com.palantir.docker-compose'
+            }
+
+            dockerCompose {
+                dockerComposeFile 'my-docker-compose.yml'
+            }
+        '''.stripIndent()
+
+        when:
+        BuildResult buildResult = with('dockerComposeUp', 'dockerComposeStop').build()
+        BuildResult offline = with('dockerComposeRemove').build()
+
+        then:
+        buildResult.task(':dockerComposeUp').outcome == TaskOutcome.SUCCESS
+        buildResult.task(':dockerComposeStop').outcome == TaskOutcome.SUCCESS
+
+        offline.task(':dockerComposeRemove').outcome == TaskOutcome.SUCCESS
+    }
 }
