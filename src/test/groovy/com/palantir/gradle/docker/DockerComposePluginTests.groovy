@@ -136,7 +136,13 @@ class DockerComposePluginTests extends AbstractPluginTest {
         temporaryFolder.newFile('my-docker-compose.yml') << '''
             service1:
                 image: 'alpine:3.2'
-                command: sleep 1000
+                command: sleep 10000
+                container_name: service1
+
+            service2:
+                image: 'alpine:3.2'
+                command: sleep 10000
+                container_name: service2
         '''.stripIndent()
         buildFile << '''
             plugins {
@@ -149,12 +155,22 @@ class DockerComposePluginTests extends AbstractPluginTest {
         '''.stripIndent()
 
         when:
-        BuildResult buildResult = with('dockerComposeUp', 'dockerComposeStop').build()
-        BuildResult offline = with('dockerComposeRemove').build()
+        BuildResult cleanResult = with('dockerComposeRemove').build()
+        BuildResult buildResult = with('dockerComposeUp', 'dockerComposeUpStatus', 'dockerComposeStop').build()
+        BuildResult offline = with('dockerComposeUpStatus', 'dockerComposeRemove').build()
 
         then:
+        cleanResult.task(':dockerComposeRemove').outcome == TaskOutcome.SUCCESS
+
         buildResult.task(':dockerComposeUp').outcome == TaskOutcome.SUCCESS
+
+        buildResult.task(':dockerComposeUpStatus').outcome == TaskOutcome.SUCCESS
+        buildResult.output =~ /(?m):dockerComposeUpStatus\nService 'service1' is RUNNING.\nService 'service2' is RUNNING./
+
         buildResult.task(':dockerComposeStop').outcome == TaskOutcome.SUCCESS
+
+        offline.task(':dockerComposeUpStatus').outcome == TaskOutcome.SUCCESS
+        offline.output =~ /(?m):dockerComposeUpStatus\nService 'service1' is STOPPED.\nService 'service2' is STOPPED./
 
         offline.task(':dockerComposeRemove').outcome == TaskOutcome.SUCCESS
     }
