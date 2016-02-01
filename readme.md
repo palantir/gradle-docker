@@ -1,6 +1,7 @@
 Docker Gradle Plugin
 ====================
-[![Build Status](https://circleci.com/gh/palantir/gradle-docker.svg?style=svg)](https://circleci.com/gh/palantir/gradle-docker)
+[![Build Status](https://circleci.com/gh/palantir/gradle-docker.svg?style=shield)](https://circleci.com/gh/palantir/gradle-docker)
+[![Gradle Plugins Release](https://img.shields.io/github/release/palantir/gradle-docker.svg)](https://plugins.gradle.org/plugin/com.palantir.docker)
 
 This repository provides three Gradle plugins for working with Docker containers:
 - `com.palantir.docker`: add basic tasks for building and pushing
