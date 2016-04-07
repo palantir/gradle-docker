@@ -2,7 +2,7 @@ machine:
   java:
     version: openjdk7
   pre:
-    - curl -sSL https://s3.amazonaws.com/circle-downloads/install-circleci-docker.sh | bash -s -- 1.10.3
+    - curl -sSL https://s3.amazonaws.com/circle-downloads/install-circleci-docker.sh | bash -s -- 1.10.0
     - sudo wget -O /usr/local/bin/docker-compose 'https://github.com/docker/compose/releases/download/1.6.2/docker-compose-Linux-x86_64'
     - sudo chmod 0755 /usr/local/bin/docker-compose
   services:
@@ -16,7 +16,9 @@ general:
 
 test:
   override:
-    - ./gradlew --parallel -i build
+    - ./gradlew -i build
+  post:
+    - ./gradlew -i copyTestArtifactsToCircle
 
 deployment:
   release:
@@ -24,4 +26,3 @@ deployment:
     commands:
       - ./gradlew -i bintrayUpload
       - ./gradlew -i -Dgradle.publish.key=$GRADLE_KEY -Dgradle.publish.secret=$GRADLE_SECRET publishPlugins
-
