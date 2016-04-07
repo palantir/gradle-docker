@@ -77,7 +77,7 @@ class PalantirDockerPluginTests extends AbstractPluginTest {
 
     def 'check plugin creates a docker container with default configuration'() {
         given:
-        String id = UUID.randomUUID().toString()
+        String id = 'id1'
         temporaryFolder.newFile('Dockerfile') << """
             FROM alpine:3.2
             MAINTAINER ${id}
@@ -104,7 +104,7 @@ class PalantirDockerPluginTests extends AbstractPluginTest {
 
     def 'check plugin creates a docker container with non-standard Dockerfile name'() {
         given:
-        String id = UUID.randomUUID().toString()
+        String id = 'id2'
         temporaryFolder.newFile('foo') << """
             FROM alpine:3.2
             MAINTAINER ${id}
@@ -132,7 +132,7 @@ class PalantirDockerPluginTests extends AbstractPluginTest {
 
     def 'check files are correctly added to docker context'() {
         given:
-        String id = UUID.randomUUID().toString()
+        String id = 'id3'
         String filename = "foo.txt"
         temporaryFolder.newFile('Dockerfile') << """
             FROM alpine:3.2
@@ -248,7 +248,7 @@ class PalantirDockerPluginTests extends AbstractPluginTest {
 
     def 'no tag task when no tags defined'() {
         given:
-        String id = UUID.randomUUID().toString()
+        String id = 'id4'
         temporaryFolder.newFile('Dockerfile') << """
             FROM alpine:3.2
             MAINTAINER ${id}
@@ -272,7 +272,7 @@ class PalantirDockerPluginTests extends AbstractPluginTest {
 
     def 'tag and push tasks created for each tag'() {
         given:
-        String id = UUID.randomUUID().toString()
+        String id = 'id5'
         temporaryFolder.newFile('Dockerfile') << """
             FROM alpine:3.2
             MAINTAINER ${id}
@@ -300,7 +300,7 @@ class PalantirDockerPluginTests extends AbstractPluginTest {
 
     def 'running tag task creates images with specified tags'() {
         given:
-        String id = UUID.randomUUID().toString()
+        String id = 'id6'
         temporaryFolder.newFile('Dockerfile') << """
             FROM alpine:3.2
             MAINTAINER ${id}
