@@ -79,7 +79,7 @@ class PalantirDockerPluginTests extends AbstractPluginTest {
         given:
         String id = 'id1'
         temporaryFolder.newFile('Dockerfile') << """
-            FROM alpine:3.2
+            FROM alpine:edge
             MAINTAINER ${id}
         """.stripIndent()
         buildFile << """
@@ -106,7 +106,7 @@ class PalantirDockerPluginTests extends AbstractPluginTest {
         given:
         String id = 'id2'
         temporaryFolder.newFile('foo') << """
-            FROM alpine:3.2
+            FROM alpine:edge
             MAINTAINER ${id}
         """.stripIndent()
         buildFile << """
@@ -135,9 +135,8 @@ class PalantirDockerPluginTests extends AbstractPluginTest {
         String id = 'id3'
         String filename = "foo.txt"
         temporaryFolder.newFile('Dockerfile') << """
-            FROM alpine:3.2
+            FROM alpine:edge
             MAINTAINER ${id}
-            ADD ${filename} /tmp/
         """.stripIndent()
         buildFile << """
             plugins {
@@ -156,8 +155,17 @@ class PalantirDockerPluginTests extends AbstractPluginTest {
         then:
         buildResult.task(':dockerPrepare').outcome == TaskOutcome.SUCCESS
         buildResult.task(':docker').outcome == TaskOutcome.SUCCESS
+        println exec("docker images")
+        println exec("docker version")
         exec("docker inspect --format '{{.Author}}' ${id}") == "'${id}'\n"
-        execCond("docker rmi -f ${id}")
+        // execCond("sleep1; docker rmi -f ${id}")
+        println exec("docker inspect ${id}")
+        StringBuffer sout = new StringBuffer(), serr = new StringBuffer()
+        Process proc = "docker rmi -f ${id}".execute()
+        proc.consumeProcessOutput(sout, serr)
+        proc.waitFor()
+        println sout.toString()
+        println serr.toString()
     }
 
     def 'Publishes "docker" dependencies via "docker" component'() {
@@ -250,7 +258,7 @@ class PalantirDockerPluginTests extends AbstractPluginTest {
         given:
         String id = 'id4'
         temporaryFolder.newFile('Dockerfile') << """
-            FROM alpine:3.2
+            FROM alpine:edge
             MAINTAINER ${id}
         """.stripIndent()
         buildFile << """
@@ -274,7 +282,7 @@ class PalantirDockerPluginTests extends AbstractPluginTest {
         given:
         String id = 'id5'
         temporaryFolder.newFile('Dockerfile') << """
-            FROM alpine:3.2
+            FROM alpine:edge
             MAINTAINER ${id}
         """.stripIndent()
         buildFile << """
@@ -302,7 +310,7 @@ class PalantirDockerPluginTests extends AbstractPluginTest {
         given:
         String id = 'id6'
         temporaryFolder.newFile('Dockerfile') << """
-            FROM alpine:3.2
+            FROM alpine:edge
             MAINTAINER ${id}
         """.stripIndent()
         buildFile << """

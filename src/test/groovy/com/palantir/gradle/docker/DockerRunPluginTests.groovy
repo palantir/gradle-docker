@@ -24,7 +24,7 @@ class DockerRunPluginTests extends AbstractPluginTest {
     def 'can run, status, and stop a container made by the docker plugin' () {
         given:
         temporaryFolder.newFile('Dockerfile') << '''
-            FROM alpine:3.2
+            FROM alpine:edge
             CMD sleep 1000
         '''.stripIndent()
         buildFile << '''
@@ -76,7 +76,7 @@ class DockerRunPluginTests extends AbstractPluginTest {
 
             dockerRun {
                 name 'bar'
-                image 'alpine:3.2'
+                image 'alpine:edge'
                 ports '8080'
                 command 'sleep', '1000'
             }
