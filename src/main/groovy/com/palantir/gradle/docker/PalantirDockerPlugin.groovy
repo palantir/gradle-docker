@@ -103,7 +103,7 @@ class PalantirDockerPlugin implements Plugin<Project> {
                         group = 'Docker'
                         description = "Tags Docker image with tag '${tagName}'"
                         workingDir dockerDir
-                        commandLine 'docker', 'tag', '--force=true', ext.name, computeName(ext.name, tagName)
+                        commandLine 'docker', 'tag', ext.name, computeName(ext.name, tagName)
                         dependsOn exec
                     })
                     tag.dependsOn subTask
