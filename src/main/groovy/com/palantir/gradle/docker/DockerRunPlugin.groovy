@@ -15,31 +15,24 @@
  */
 package com.palantir.gradle.docker
 
+import com.google.common.collect.Lists
 import org.gradle.api.Plugin
 import org.gradle.api.Project
-import org.gradle.api.Task
 import org.gradle.api.tasks.Exec
-
-import com.google.common.collect.Lists
-
 
 class DockerRunPlugin implements Plugin<Project> {
     @Override
     void apply(Project project) {
         DockerRunExtension ext = project.extensions.create('dockerRun', DockerRunExtension)
 
-        Task setup = DockerSetupTask.getOrInstall(project)
-
         Exec dockerRunStatus = project.tasks.create('dockerRunStatus', Exec, {
             group = 'Docker Run'
             description = 'Checks the run status of the container'
-            dependsOn setup
         })
 
         Exec dockerRun = project.tasks.create('dockerRun', Exec, {
             group = 'Docker Run'
             description = 'Runs the specified container with port mappings'
-            dependsOn setup
             finalizedBy dockerRunStatus
         })
 
@@ -47,14 +40,12 @@ class DockerRunPlugin implements Plugin<Project> {
             group = 'Docker Run'
             description = 'Stops the named container if it is running'
             ignoreExitValue = true
-            dependsOn setup
         })
 
         Exec dockerRemoveContainer = project.tasks.create('dockerRemoveContainer', Exec, {
             group = 'Docker Run'
             description = 'Removes the persistent container associated with the Docker Run tasks'
             ignoreExitValue = true
-            dependsOn setup
         })
 
         project.afterEvaluate {
