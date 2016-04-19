@@ -18,7 +18,6 @@ package com.palantir.gradle.docker
 import org.gradle.testkit.runner.BuildResult
 import org.gradle.testkit.runner.TaskOutcome
 
-
 class DockerRunPluginTests extends AbstractPluginTest {
 
     def 'can run, status, and stop a container made by the docker plugin' () {
@@ -102,5 +101,95 @@ class DockerRunPluginTests extends AbstractPluginTest {
         offline.task(':dockerRunStatus').outcome == TaskOutcome.SUCCESS
         offline.output =~ /(?m):dockerRunStatus\nDocker container 'bar' is STOPPED./
     }
+
+    def 'can optionally not daemonize'() {
+        given:
+        buildFile << '''
+            plugins {
+                id 'com.palantir.docker-run'
+            }
+
+            dockerRun {
+                name 'bar-nodaemonize'
+                image 'alpine:3.2'
+                ports '8080'
+                command 'echo', '"hello world"'
+                daemonize false
+            }
+        '''.stripIndent()
+
+        when:
+        BuildResult buildResult = with('dockerRemoveContainer', 'dockerRun', 'dockerRunStatus').build()
+
+        then:
+        buildResult.task(':dockerRemoveContainer').outcome == TaskOutcome.SUCCESS
+
+        buildResult.task(':dockerRun').outcome == TaskOutcome.SUCCESS
+
+        buildResult.task(':dockerRunStatus').outcome == TaskOutcome.SUCCESS
+        buildResult.output =~ /(?m):dockerRunStatus\nDocker container 'bar-nodaemonize' is STOPPED./
+    }
+
+    def 'can mount volumes'() {
+        if (!isLinux()) {
+            // whenever Docker on Windows/OSX is able to mount volumes outside of /User,
+            // this should be removed
+            return
+        }
+        if (isCi()) {
+            // circleci has problems removing volumes:
+            // see: https://discuss.circleci.com/t/docker-error-removing-intermediate-container/70/10
+            return
+        }
+
+        given:
+        File testFolder = temporaryFolder.newFolder("test")
+        temporaryFolder.newFile('Dockerfile') << '''
+            FROM alpine:3.2
+
+            RUN mkdir /test
+            VOLUME /test
+            CMD cat /test/testfile
+        '''.stripIndent()
+        buildFile << '''
+            plugins {
+                id 'com.palantir.docker'
+                id 'com.palantir.docker-run'
+            }
+
+            docker {
+                name 'foo-image:latest'
+            }
+
+            dockerRun {
+                name 'foo'
+                image 'foo-image:latest'
+                volumes "test": "/test"
+                daemonize false
+            }
+        '''.stripIndent()
+
+        when:
+        new File(testFolder, "testfile").text = "HELLO WORLD\n"
+        BuildResult buildResult = with('docker', 'dockerRemoveContainer', 'dockerRun', 'dockerRunStatus').build()
+
+        then:
+        buildResult.task(':dockerRemoveContainer').outcome == TaskOutcome.SUCCESS
+
+        buildResult.task(':dockerRun').outcome == TaskOutcome.SUCCESS
+        buildResult.output =~ /(?m)HELLO WORLD/
+        buildResult.task(':dockerRunStatus').outcome == TaskOutcome.SUCCESS
+        buildResult.output =~ /(?m):dockerRunStatus\nDocker container 'bar' is STOPPED./
+    }
+
+
+    def isLinux() {
+        return System.getProperty("os.name") =~ /(?i).*linux.*/
+    }
+
+    def isCi() {
+        return System.getenv("CI") == "true"
+    }
+
 
 }

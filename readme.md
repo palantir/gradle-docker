@@ -163,8 +163,8 @@ The template and generated file locations are customizable through the
         dockerComposeFile 'my-docker-compose.yml'
     }
 
-Docker Plugin
--------------
+Docker Run Plugin
+-----------------
 Apply the plugin using standard gradle convention:
 
     plugins {
@@ -177,8 +177,22 @@ command to execute for the `dockerRun` tasks:
     dockerRun {
         name 'my-container'
         image 'busybox'
-        command 'sleep 100'
+        volumes 'hostvolume': '/containervolume'
+        daemonize true
+        command 'sleep', '100'
     }
+
+**Docker Run Configuration Parameters**
+- `name` the name to use for this container, may include a tag.
+- `image` the name of the image to use.
+- `volumes` optional map of volumes to mount in the container. The key is path
+  to the host volume, relative to the project folder, the value is the exposed
+  container volume path.
+- `damonize` defaults to true to daemonize the container after starting. However
+  if your container runs a command and exits, you can set this to false.
+- `clean` will add `--rm` to the `docker run` command to ensure that containers
+  are cleaned up after running.
+- `command` the command to run.
 
 Tasks
 -----
