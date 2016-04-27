@@ -19,6 +19,12 @@ import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.Task
 import org.gradle.api.tasks.Exec
+import org.gradle.logging.StyledTextOutput
+import org.gradle.logging.StyledTextOutputFactory
+import static org.gradle.logging.StyledTextOutput.Style
+
+import java.io.File
+import java.util.Map.Entry
 
 import com.google.common.collect.Lists
 
@@ -40,7 +46,6 @@ class DockerRunPlugin implements Plugin<Project> {
             group = 'Docker Run'
             description = 'Runs the specified container with port mappings'
             dependsOn setup
-            finalizedBy dockerRunStatus
         })
 
         Exec dockerStop = project.tasks.create('dockerStop', Exec, {
@@ -73,10 +78,31 @@ class DockerRunPlugin implements Plugin<Project> {
 
             dockerRun.with {
                 List<String> args = Lists.newArrayList()
-                args.addAll(['docker', 'run', '-d'])
+                args.addAll(['docker', 'run'])
+                if (ext.daemonize) {
+                  args.add('-d')
+                }
+                if (ext.clean) {
+                  args.add('--rm')
+                } else {
+                  finalizedBy dockerRunStatus
+                }
                 for (String port : ext.ports) {
                     args.add('-p')
                     args.add(port)
+                }
+                for (Entry<String,String> volume : ext.volumes.entrySet()) {
+                    File localFile = new File(project.projectDir, volume.key)
+
+                    if (!localFile.exists()) {
+                       StyledTextOutput o = project.services.get(StyledTextOutputFactory).create(DockerRunPlugin)
+                       o.withStyle(Style.Error).println("ERROR: Local folder ${localFile} doesn't exist. Mounted volume will not be visible to container")
+                       throw new IllegalStateException("Local folder ${localFile} doesn't exist.")
+
+                    }
+
+                    args.add('-v')
+                    args.add("${localFile.absolutePath}:${volume.value}")
                 }
                 args.addAll(['--name', ext.name, ext.image])
                 if (!ext.command.isEmpty()) {

@@ -17,6 +17,7 @@ package com.palantir.gradle.docker
 
 import com.google.common.base.Preconditions
 import com.google.common.collect.ImmutableList
+import com.google.common.collect.ImmutableMap
 import com.google.common.collect.ImmutableSet
 
 
@@ -26,6 +27,9 @@ class DockerRunExtension {
     private String image
     private List<String> command = ImmutableList.of()
     private Set<String> ports = ImmutableSet.of()
+    private Map<String,String> volumes = ImmutableMap.of()
+    private boolean daemonize = true
+    private boolean clean = false
 
     public String getName() {
         return name
@@ -33,6 +37,22 @@ class DockerRunExtension {
 
     public void setName(String name) {
         this.name = name
+    }
+
+    public boolean getDaemonize() {
+        return daemonize
+    }
+
+    public void setDaemonize(boolean daemonize) {
+        this.daemonize = daemonize
+    }
+
+    public boolean getClean() {
+        return clean
+    }
+
+    public void setClean(boolean clean) {
+        this.clean = clean
     }
 
     public String getImage() {
@@ -49,6 +69,10 @@ class DockerRunExtension {
 
     public List<String> getCommand() {
         return command
+    }
+
+    public Map<String,String> getVolumes() {
+        return volumes
     }
 
     public void command(String... command) {
@@ -69,6 +93,10 @@ class DockerRunExtension {
             }
         }
         this.ports = builder.build()
+    }
+
+    public void volumes(Map<String,String> volumes) {
+      this.volumes = ImmutableMap.copyOf(volumes)
     }
 
     private static void checkPortIsValid(String port) {
