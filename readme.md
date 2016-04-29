@@ -188,7 +188,7 @@ command to execute for the `dockerRun` tasks:
 - `volumes` optional map of volumes to mount in the container. The key is path
   to the host volume, relative to the project folder, the value is the exposed
   container volume path.
-- `damonize` defaults to true to daemonize the container after starting. However
+- `daemonize` defaults to true to daemonize the container after starting. However
   if your container runs a command and exits, you can set this to false.
 - `clean` will add `--rm` to the `docker run` command to ensure that containers
   are cleaned up after running.
