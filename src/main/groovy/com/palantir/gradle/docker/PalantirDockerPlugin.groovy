@@ -85,9 +85,16 @@ class PalantirDockerPlugin implements Plugin<Project> {
                 into dockerDir
             }
 
+            List<String> buildCommandLine = ['docker', 'build']
+            if (! ext.buildArgs.isEmpty()) {
+                for (Map.Entry<String, String> buildArg : ext.buildArgs.entrySet()) {
+                    buildCommandLine.addAll('--build-arg', "${buildArg.getKey()}=${buildArg.getValue()}")
+                }
+            }
+            buildCommandLine.addAll(['-t', ext.name, '.'])
             exec.with {
                 workingDir dockerDir
-                commandLine 'docker', 'build', '-t', ext.name, '.'
+                commandLine buildCommandLine
                 dependsOn ext.getDependencies()
             }
 
