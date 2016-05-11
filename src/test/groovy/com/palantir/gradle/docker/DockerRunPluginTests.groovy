@@ -179,7 +179,7 @@ class DockerRunPluginTests extends AbstractPluginTest {
         buildResult.task(':dockerRun').outcome == TaskOutcome.SUCCESS
         buildResult.output =~ /(?m)HELLO WORLD/
         buildResult.task(':dockerRunStatus').outcome == TaskOutcome.SUCCESS
-        buildResult.output =~ /(?m):dockerRunStatus\nDocker container 'bar' is STOPPED./
+        buildResult.output =~ /(?m):dockerRunStatus\nDocker container 'foo' is STOPPED./
     }
 
 
