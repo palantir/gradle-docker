@@ -18,6 +18,8 @@ package com.palantir.gradle.docker
 import org.gradle.testkit.runner.BuildResult
 import org.gradle.testkit.runner.TaskOutcome
 
+import static org.gradle.testkit.runner.TaskOutcome.SUCCESS
+
 class DockerRunPluginTests extends AbstractPluginTest {
 
     def 'can run, status, and stop a container made by the docker plugin' () {
@@ -47,20 +49,20 @@ class DockerRunPluginTests extends AbstractPluginTest {
         BuildResult offline = with('dockerRunStatus', 'dockerRemoveContainer').build()
 
         then:
-        buildResult.task(':docker').outcome == TaskOutcome.SUCCESS
-        buildResult.task(':dockerRemoveContainer').outcome == TaskOutcome.SUCCESS
+        buildResult.task(':docker').outcome == SUCCESS
+        buildResult.task(':dockerRemoveContainer').outcome == SUCCESS
 
-        buildResult.task(':dockerRun').outcome == TaskOutcome.SUCCESS
+        buildResult.task(':dockerRun').outcome == SUCCESS
         // CircleCI build nodes print a WARNING
         buildResult.output =~ /(?m):dockerRun(WARNING:.*\n)?\n[A-Za-z0-9]+/
 
-        buildResult.task(':dockerRunStatus').outcome == TaskOutcome.SUCCESS
+        buildResult.task(':dockerRunStatus').outcome == SUCCESS
         buildResult.output =~ /(?m):dockerRunStatus\nDocker container 'foo' is RUNNING./
 
-        buildResult.task(':dockerStop').outcome == TaskOutcome.SUCCESS
+        buildResult.task(':dockerStop').outcome == SUCCESS
         buildResult.output =~ /(?m):dockerStop\nfoo/
 
-        offline.task(':dockerRunStatus').outcome == TaskOutcome.SUCCESS
+        offline.task(':dockerRunStatus').outcome == SUCCESS
         offline.output =~ /(?m):dockerRunStatus\nDocker container 'foo' is STOPPED./
 
         execCond('docker rmi -f foo-image')
@@ -86,19 +88,19 @@ class DockerRunPluginTests extends AbstractPluginTest {
         BuildResult offline = with('dockerRunStatus', 'dockerRemoveContainer').build()
 
         then:
-        buildResult.task(':dockerRemoveContainer').outcome == TaskOutcome.SUCCESS
+        buildResult.task(':dockerRemoveContainer').outcome == SUCCESS
 
-        buildResult.task(':dockerRun').outcome == TaskOutcome.SUCCESS
+        buildResult.task(':dockerRun').outcome == SUCCESS
         // CircleCI build nodes print a WARNING
         buildResult.output =~ /(?m):dockerRun(WARNING:.*\n)?\n[A-Za-z0-9]+/
 
-        buildResult.task(':dockerRunStatus').outcome == TaskOutcome.SUCCESS
+        buildResult.task(':dockerRunStatus').outcome == SUCCESS
         buildResult.output =~ /(?m):dockerRunStatus\nDocker container 'bar' is RUNNING./
 
-        buildResult.task(':dockerStop').outcome == TaskOutcome.SUCCESS
+        buildResult.task(':dockerStop').outcome == SUCCESS
         buildResult.output =~ /(?m):dockerStop\nbar/
 
-        offline.task(':dockerRunStatus').outcome == TaskOutcome.SUCCESS
+        offline.task(':dockerRunStatus').outcome == SUCCESS
         offline.output =~ /(?m):dockerRunStatus\nDocker container 'bar' is STOPPED./
     }
 
@@ -122,11 +124,11 @@ class DockerRunPluginTests extends AbstractPluginTest {
         BuildResult buildResult = with('dockerRemoveContainer', 'dockerRun', 'dockerRunStatus').build()
 
         then:
-        buildResult.task(':dockerRemoveContainer').outcome == TaskOutcome.SUCCESS
+        buildResult.task(':dockerRemoveContainer').outcome == SUCCESS
 
-        buildResult.task(':dockerRun').outcome == TaskOutcome.SUCCESS
+        buildResult.task(':dockerRun').outcome == SUCCESS
 
-        buildResult.task(':dockerRunStatus').outcome == TaskOutcome.SUCCESS
+        buildResult.task(':dockerRunStatus').outcome == SUCCESS
         buildResult.output =~ /(?m):dockerRunStatus\nDocker container 'bar-nodaemonize' is STOPPED./
     }
 
@@ -174,9 +176,9 @@ class DockerRunPluginTests extends AbstractPluginTest {
         BuildResult buildResult = with('docker', 'dockerRemoveContainer', 'dockerRun', 'dockerRunStatus').build()
 
         then:
-        buildResult.task(':dockerRemoveContainer').outcome == TaskOutcome.SUCCESS
+        buildResult.task(':dockerRemoveContainer').outcome == SUCCESS
 
-        buildResult.task(':dockerRun').outcome == TaskOutcome.SUCCESS
+        buildResult.task(':dockerRun').outcome == SUCCESS
         buildResult.output =~ /(?m)HELLO WORLD/
         buildResult.task(':dockerRunStatus').outcome == TaskOutcome.SUCCESS
         buildResult.output =~ /(?m):dockerRunStatus\nDocker container 'foo' is STOPPED./
