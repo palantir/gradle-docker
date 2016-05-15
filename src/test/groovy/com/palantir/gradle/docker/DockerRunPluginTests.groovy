@@ -16,7 +16,6 @@
 package com.palantir.gradle.docker
 
 import org.gradle.testkit.runner.BuildResult
-import org.gradle.testkit.runner.TaskOutcome
 
 import static org.gradle.testkit.runner.TaskOutcome.SUCCESS
 
