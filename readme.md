@@ -35,6 +35,8 @@ automatically include outputs of task dependencies in the Docker build context.
 - `dependsOn` (optional) an argument list of tasks that docker builds must depend on;
   defaults to the empty set
 - `files` (optional) an argument list of files to be included in the docker build context
+- `buildArgs` (optional) an argument map of string to string which will set --build-arg
+  arguments to the docker build command; defaults to empty, which results in no --build-arg parameters
 
 To build a docker container, run the `docker` task. To push that container to a
 docker repository, run the `dockerPush` task.
@@ -57,6 +59,7 @@ Configuration specifying all parameters:
         dockerfile 'Dockerfile'
         dependsOn tasks.distTar
         files 'file1.txt', 'file2.txt'
+        buildArgs([BUILD_VERSION: 'version'])
     }
 
 

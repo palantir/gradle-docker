@@ -20,6 +20,7 @@ import org.gradle.api.Task
 
 import com.google.common.base.Preconditions
 import com.google.common.base.Strings
+import com.google.common.collect.ImmutableMap
 import com.google.common.collect.ImmutableSet
 
 class DockerExtension {
@@ -32,6 +33,7 @@ class DockerExtension {
     private Set<Task> dependencies = ImmutableSet.of()
     private Set<String> files = ImmutableSet.of()
     private Set<String> tags = ImmutableSet.of()
+    private Map<String, String> buildArgs = ImmutableMap.of()
 
     private File resolvedDockerfile = null
     private File resolvedDockerComposeTemplate = null
@@ -117,5 +119,13 @@ class DockerExtension {
         }
 
         resolvedFiles = builder.build()
+    }
+
+    public Map<String, String> getBuildArgs() {
+        return buildArgs
+    }
+
+    public void buildArgs(Map<String, String> buildArgs) {
+        this.buildArgs = ImmutableMap.copyOf(buildArgs);
     }
 }

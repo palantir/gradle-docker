@@ -329,4 +329,36 @@ class PalantirDockerPluginTests extends AbstractPluginTest {
         execCond("docker rmi -f ${id}")
         execCond("docker rmi -f ${id}:another")
     }
+
+    def 'build args'() {
+        given:
+        String id = 'id7'
+        temporaryFolder.newFile('Dockerfile') << '''
+            FROM alpine:3.2
+            ARG BUILD_ARG_NO_DEFAULT
+            ARG BUILD_ARG_WITH_DEFAULT=defaultBuildArg
+            ENV ENV_BUILD_ARG_NO_DEFAULT $BUILD_ARG_NO_DEFAULT
+            ENV ENV_BUILD_ARG_WITH_DEFAULT $BUILD_ARG_WITH_DEFAULT
+        '''.stripIndent()
+        buildFile << """
+            plugins {
+                id 'com.palantir.docker'
+            }
+
+            docker {
+                name '${id}'
+                buildArgs([BUILD_ARG_NO_DEFAULT: 'gradleBuildArg', BUILD_ARG_WITH_DEFAULT: 'gradleOverrideBuildArg'])
+            }
+        """.stripIndent()
+
+        when:
+        BuildResult buildResult = with('docker').build()
+
+        then:
+        buildResult.task(':docker').outcome == TaskOutcome.SUCCESS
+        exec("docker inspect --format '{{.Config.Env}}' ${id}").contains('ENV_BUILD_ARG_NO_DEFAULT=gradleBuildArg')
+        exec("docker inspect --format '{{.Config.Env}}' ${id}").contains('BUILD_ARG_WITH_DEFAULT=gradleOverrideBuildArg')
+        execCond("docker rmi -f ${id}") || true
+    }
+
 }
