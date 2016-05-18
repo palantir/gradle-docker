@@ -20,6 +20,7 @@ import com.google.common.collect.ImmutableList
 import com.google.common.collect.ImmutableMap
 import com.google.common.collect.ImmutableSet
 
+import static com.google.common.base.Preconditions.checkNotNull
 
 class DockerRunExtension {
 
@@ -27,6 +28,7 @@ class DockerRunExtension {
     private String image
     private List<String> command = ImmutableList.of()
     private Set<String> ports = ImmutableSet.of()
+    private Map<String,String> env = ImmutableMap.of()
     private Map<String,String> volumes = ImmutableMap.of()
     private boolean daemonize = true
     private boolean clean = false
@@ -77,6 +79,18 @@ class DockerRunExtension {
 
     public void command(String... command) {
         this.command = ImmutableList.copyOf(command)
+    }
+
+    private void setEnvSingle(String key, String value) {
+        this.env.put(checkNotNull(key, "key"), checkNotNull(value, "value"))
+    }
+
+    public void env(Map<String,String> env) {
+        this.env = ImmutableMap.copyOf(env)
+    }
+
+    public Map<String, String> getEnv() {
+        return env
     }
 
     public void ports(String... ports) {

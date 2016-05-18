@@ -15,19 +15,17 @@
  */
 package com.palantir.gradle.docker
 
+import com.google.common.collect.Lists
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.Task
 import org.gradle.api.tasks.Exec
 import org.gradle.logging.StyledTextOutput
 import org.gradle.logging.StyledTextOutputFactory
-import static org.gradle.logging.StyledTextOutput.Style
 
-import java.io.File
 import java.util.Map.Entry
 
-import com.google.common.collect.Lists
-
+import static org.gradle.logging.StyledTextOutput.Style
 
 class DockerRunPlugin implements Plugin<Project> {
     @Override
@@ -104,6 +102,7 @@ class DockerRunPlugin implements Plugin<Project> {
                     args.add('-v')
                     args.add("${localFile.absolutePath}:${volume.value}")
                 }
+                args.addAll(ext.env.collect{ k, v -> ['-e', "${k}=${v}"] }.flatten())
                 args.addAll(['--name', ext.name, ext.image])
                 if (!ext.command.isEmpty()) {
                     args.addAll(ext.command)

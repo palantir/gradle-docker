@@ -182,6 +182,49 @@ class DockerRunPluginTests extends AbstractPluginTest {
         buildResult.output =~ /(?m):dockerRunStatus\nDocker container 'foo' is STOPPED./
     }
 
+    def 'can run with environment variables'() {
+        given:
+        temporaryFolder.newFile('Dockerfile') << '''
+            FROM alpine:3.2
+
+            RUN mkdir /test
+            VOLUME /test
+            ENV MYVAR1 QUUW
+            ENV MYVAR2 QUUX
+            ENV MYVAR3 QUUY
+            ENV MYVAR4 QUUZ
+            CMD echo "\$MYVAR1 = \$MYVAR2 = \$MYVAR3 = \$MYVAR4"
+        '''.stripIndent()
+        buildFile << '''
+            plugins {
+                id 'com.palantir.docker'
+                id 'com.palantir.docker-run'
+            }
+
+            docker {
+                name 'foo-image:latest'
+            }
+
+            dockerRun {
+                name 'foo-envvars'
+                image 'foo-image:latest'
+                env 'MYVAR1': 'FOO', 'MYVAR2': 'BAR', 'MYVAR4': 'ZIP'
+                daemonize false
+            }
+        '''.stripIndent()
+
+        when:
+        BuildResult buildResult = with('docker', 'dockerRemoveContainer', 'dockerRun', 'dockerRunStatus').build()
+
+        then:
+        buildResult.task(':dockerRemoveContainer').outcome == TaskOutcome.SUCCESS
+
+        buildResult.task(':dockerRun').outcome == TaskOutcome.SUCCESS
+        buildResult.output =~ /(?m)FOO = BAR = QUUY = ZIP/
+        buildResult.task(':dockerRunStatus').outcome == TaskOutcome.SUCCESS
+        buildResult.output =~ /(?m):dockerRunStatus\nDocker container 'foo-envvars' is STOPPED./
+    }
+
 
     def isLinux() {
         return System.getProperty("os.name") =~ /(?i).*linux.*/
