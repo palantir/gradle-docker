@@ -182,6 +182,7 @@ command to execute for the `dockerRun` tasks:
         image 'busybox'
         volumes 'hostvolume': '/containervolume'
         daemonize true
+        env 'MYVAR1': 'MYVALUE1', 'MYVAR2': 'MYVALUE2'
         command 'sleep', '100'
     }
 
@@ -191,6 +192,8 @@ command to execute for the `dockerRun` tasks:
 - `volumes` optional map of volumes to mount in the container. The key is path
   to the host volume, relative to the project folder, the value is the exposed
   container volume path.
+- `env` optional map of environment variables to supply to the running container.
+  These must be exposed in the Dockerfile with `ENV` instructions.
 - `daemonize` defaults to true to daemonize the container after starting. However
   if your container runs a command and exits, you can set this to false.
 - `clean` will add `--rm` to the `docker run` command to ensure that containers
