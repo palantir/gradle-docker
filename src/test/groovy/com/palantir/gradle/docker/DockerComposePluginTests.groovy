@@ -130,4 +130,48 @@ class DockerComposePluginTests extends AbstractPluginTest {
         then:
         buildResult.output.contains("Could not find specified template file")
     }
+
+    def 'can start, stop, and remove containers given a docker compose file'() {
+        given:
+        temporaryFolder.newFile('my-docker-compose.yml') << '''
+            service1:
+                image: 'alpine:3.2'
+                command: sleep 10000
+                container_name: service1
+
+            service2:
+                image: 'alpine:3.2'
+                command: sleep 10000
+                container_name: service2
+        '''.stripIndent()
+        buildFile << '''
+            plugins {
+                id 'com.palantir.docker-compose'
+            }
+
+            dockerCompose {
+                dockerComposeFile 'my-docker-compose.yml'
+            }
+        '''.stripIndent()
+
+        when:
+        BuildResult cleanResult = with('dockerComposeRemove').build()
+        BuildResult buildResult = with('dockerComposeUp', 'dockerComposeUpStatus', 'dockerComposeStop').build()
+        BuildResult offline = with('dockerComposeUpStatus', 'dockerComposeRemove').build()
+
+        then:
+        cleanResult.task(':dockerComposeRemove').outcome == TaskOutcome.SUCCESS
+
+        buildResult.task(':dockerComposeUp').outcome == TaskOutcome.SUCCESS
+
+        buildResult.task(':dockerComposeUpStatus').outcome == TaskOutcome.SUCCESS
+        buildResult.output =~ /(?m):dockerComposeUpStatus\nService 'service1' is RUNNING.\nService 'service2' is RUNNING./
+
+        buildResult.task(':dockerComposeStop').outcome == TaskOutcome.SUCCESS
+
+        offline.task(':dockerComposeUpStatus').outcome == TaskOutcome.SUCCESS
+        offline.output =~ /(?m):dockerComposeUpStatus\nService 'service1' is STOPPED.\nService 'service2' is STOPPED./
+
+        offline.task(':dockerComposeRemove').outcome == TaskOutcome.SUCCESS
+    }
 }
