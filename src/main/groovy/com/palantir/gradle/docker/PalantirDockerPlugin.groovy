@@ -34,8 +34,6 @@ class PalantirDockerPlugin implements Plugin<Project> {
             project.configurations.create('docker')
         }
 
-        Task setup = DockerSetupTask.getOrInstall(project)
-
         Delete clean = project.tasks.create('dockerClean', Delete, {
             group = 'Docker'
             description = 'Cleans Docker build directory.'
@@ -50,7 +48,7 @@ class PalantirDockerPlugin implements Plugin<Project> {
         Exec exec = project.tasks.create('docker', Exec, {
             group = 'Docker'
             description = 'Builds Docker image.'
-            dependsOn prepare, setup
+            dependsOn prepare
         })
 
         Exec push = project.tasks.create('dockerPush', Exec, {
