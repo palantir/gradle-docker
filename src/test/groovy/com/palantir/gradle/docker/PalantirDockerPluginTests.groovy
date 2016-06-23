@@ -21,8 +21,6 @@ import org.gradle.api.internal.artifacts.mvnsettings.DefaultMavenSettingsProvide
 import org.gradle.testkit.runner.BuildResult
 import org.gradle.testkit.runner.TaskOutcome
 
-import static org.gradle.testkit.runner.TaskOutcome.SUCCESS
-
 class PalantirDockerPluginTests extends AbstractPluginTest {
 
     def 'fail when missing docker configuration'() {
@@ -98,8 +96,8 @@ class PalantirDockerPluginTests extends AbstractPluginTest {
         BuildResult buildResult = with('docker').build()
 
         then:
-        buildResult.task(':dockerPrepare').outcome == SUCCESS
-        buildResult.task(':docker').outcome == SUCCESS
+        buildResult.task(':dockerPrepare').outcome == TaskOutcome.SUCCESS
+        buildResult.task(':docker').outcome == TaskOutcome.SUCCESS
         exec("docker inspect --format '{{.Author}}' ${id}") == "'${id}'\n" as String
         execCond("docker rmi -f ${id}")
     }
@@ -126,8 +124,8 @@ class PalantirDockerPluginTests extends AbstractPluginTest {
         BuildResult buildResult = with('docker').build()
 
         then:
-        buildResult.task(':dockerPrepare').outcome == SUCCESS
-        buildResult.task(':docker').outcome == SUCCESS
+        buildResult.task(':dockerPrepare').outcome == TaskOutcome.SUCCESS
+        buildResult.task(':docker').outcome == TaskOutcome.SUCCESS
         exec("docker inspect --format '{{.Author}}' ${id}") == "'${id}'\n" as String
         execCond("docker rmi -f ${id}")
     }
@@ -156,8 +154,8 @@ class PalantirDockerPluginTests extends AbstractPluginTest {
         BuildResult buildResult = with('docker').build()
 
         then:
-        buildResult.task(':dockerPrepare').outcome == SUCCESS
-        buildResult.task(':docker').outcome == SUCCESS
+        buildResult.task(':dockerPrepare').outcome == TaskOutcome.SUCCESS
+        buildResult.task(':docker').outcome == TaskOutcome.SUCCESS
         exec("docker inspect --format '{{.Author}}' ${id}") == "'${id}'\n" as String
         execCond("docker rmi -f ${id}") || true
     }
@@ -204,7 +202,7 @@ class PalantirDockerPluginTests extends AbstractPluginTest {
         when:
         BuildResult buildResult = with('publishToMavenLocal').build()
         then:
-        buildResult.task(':publishToMavenLocal').outcome == SUCCESS
+        buildResult.task(':publishToMavenLocal').outcome == TaskOutcome.SUCCESS
         def publishFolder = new DefaultLocalMavenRepositoryLocator(
             new DefaultMavenSettingsProvider(new DefaultMavenFileLocations())).localMavenRepository.toPath()
             .resolve("testgroup")
@@ -245,7 +243,7 @@ class PalantirDockerPluginTests extends AbstractPluginTest {
         when:
         BuildResult buildResult = with('tasks').build()
         then:
-        buildResult.task(':tasks').outcome == SUCCESS
+        buildResult.task(':tasks').outcome == TaskOutcome.SUCCESS
     }
 
     def 'no tag task when no tags defined'() {
@@ -324,9 +322,9 @@ class PalantirDockerPluginTests extends AbstractPluginTest {
         BuildResult buildResult = with('dockerTag').build()
 
         then:
-        buildResult.task(':dockerPrepare').outcome == SUCCESS
-        buildResult.task(':docker').outcome == SUCCESS
-        buildResult.task(':dockerTag').outcome == SUCCESS
+        buildResult.task(':dockerPrepare').outcome == TaskOutcome.SUCCESS
+        buildResult.task(':docker').outcome == TaskOutcome.SUCCESS
+        buildResult.task(':dockerTag').outcome == TaskOutcome.SUCCESS
         exec("docker inspect --format '{{.Author}}' ${id}") == imageId
         exec("docker inspect --format '{{.Author}}' ${id}:latest") == imageId
         exec("docker inspect --format '{{.Author}}' ${id}:another") == imageId
