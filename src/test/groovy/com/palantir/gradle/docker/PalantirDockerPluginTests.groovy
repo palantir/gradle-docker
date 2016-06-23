@@ -314,7 +314,7 @@ class PalantirDockerPluginTests extends AbstractPluginTest {
 
             docker {
                 name '${id}'
-                tags 'mytag', 'another'
+                tags 'latest', 'another'
             }
         """.stripIndent()
 
