@@ -89,6 +89,9 @@ class PalantirDockerPlugin implements Plugin<Project> {
                     buildCommandLine.addAll('--build-arg', "${buildArg.getKey()}=${buildArg.getValue()}")
                 }
             }
+            if (ext.pull) {
+                buildCommandLine.add '--pull'
+            }
             buildCommandLine.addAll(['-t', ext.name, '.'])
             exec.with {
                 workingDir dockerDir

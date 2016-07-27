@@ -330,7 +330,7 @@ class PalantirDockerPluginTests extends AbstractPluginTest {
         execCond("docker rmi -f ${id}:another")
     }
 
-    def 'build args'() {
+    def 'build args are correctly processed'() {
         given:
         String id = 'id7'
         temporaryFolder.newFile('Dockerfile') << '''
@@ -358,6 +358,33 @@ class PalantirDockerPluginTests extends AbstractPluginTest {
         buildResult.task(':docker').outcome == TaskOutcome.SUCCESS
         exec("docker inspect --format '{{.Config.Env}}' ${id}").contains('ENV_BUILD_ARG_NO_DEFAULT=gradleBuildArg')
         exec("docker inspect --format '{{.Config.Env}}' ${id}").contains('BUILD_ARG_WITH_DEFAULT=gradleOverrideBuildArg')
+        execCond("docker rmi -f ${id}") || true
+    }
+
+    def 'base image is pulled when "pull" parameter is set'() {
+        given:
+        String id = 'id8'
+        temporaryFolder.newFile('Dockerfile') << '''
+            FROM alpine:3.2
+        '''.stripIndent()
+        buildFile << """
+            plugins {
+                id 'com.palantir.docker'
+            }
+
+            docker {
+                name '${id}'
+                pull true
+            }
+        """.stripIndent()
+
+        when:
+        execCond("docker pull alpine:3.2")
+        BuildResult buildResult = with('docker').build()
+
+        then:
+        buildResult.task(':docker').outcome == TaskOutcome.SUCCESS
+        buildResult.output.contains 'Pulling from library/alpine'
         execCond("docker rmi -f ${id}") || true
     }
 

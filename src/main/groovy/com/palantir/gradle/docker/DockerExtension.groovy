@@ -34,6 +34,7 @@ class DockerExtension {
     private Set<String> files = ImmutableSet.of()
     private Set<String> tags = ImmutableSet.of()
     private Map<String, String> buildArgs = ImmutableMap.of()
+    private boolean pull = false
 
     private File resolvedDockerfile = null
     private File resolvedDockerComposeTemplate = null
@@ -75,7 +76,7 @@ class DockerExtension {
     }
 
     public void files(String... args) {
-        this.files = ImmutableSet.copyOf(args);
+        this.files = ImmutableSet.copyOf(args)
     }
 
     public Set<String> getTags() {
@@ -83,7 +84,7 @@ class DockerExtension {
     }
 
     public void tags(String... args) {
-        this.tags = ImmutableSet.copyOf(args);
+        this.tags = ImmutableSet.copyOf(args)
     }
 
     public File getResolvedDockerfile() {
@@ -126,6 +127,14 @@ class DockerExtension {
     }
 
     public void buildArgs(Map<String, String> buildArgs) {
-        this.buildArgs = ImmutableMap.copyOf(buildArgs);
+        this.buildArgs = ImmutableMap.copyOf(buildArgs)
+    }
+
+    public boolean getPull() {
+        return pull
+    }
+
+    public void pull(boolean pull) {
+        this.pull = pull
     }
 }
