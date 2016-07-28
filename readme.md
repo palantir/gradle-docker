@@ -249,3 +249,8 @@ Tasks
 License
 -------
 This plugin is made available under the [Apache 2.0 License](http://www.apache.org/licenses/LICENSE-2.0).
+
+Contributing
+------------
+Contributions to this project must follow the [contribution guide](CONTRIBUTING.md).
+
