@@ -18,9 +18,11 @@ Docker Plugin
 -------------
 Apply the plugin using standard gradle convention:
 
-    plugins {
-        id 'com.palantir.docker' version '<version>'
-    }
+````gradle
+plugins {
+    id 'com.palantir.docker' version '<version>'
+}
+````
 
 Set the container name, and then optionally specify a Dockerfile path, any task
 dependencies and file resources required for the Docker build. This plugin will
@@ -37,6 +39,8 @@ automatically include outputs of task dependencies in the Docker build context.
 - `files` (optional) an argument list of files to be included in the docker build context
 - `buildArgs` (optional) an argument map of string to string which will set --build-arg
   arguments to the docker build command; defaults to empty, which results in no --build-arg parameters
+- `pull` (optional) a boolean argument which defines whether Docker should attempt to pull
+  a newer version of the base image before building; defaults to `false`
 
 To build a docker container, run the `docker` task. To push that container to a
 docker repository, run the `dockerPush` task.
@@ -47,20 +51,25 @@ Tag and Push tasks for each tag will be generated for each provided `tags` entry
 
 Simplest configuration:
 
-    docker {
-        name 'hub.docker.com/username/my-app:version'
-    }
+````gradle
+docker {
+    name 'hub.docker.com/username/my-app:version'
+}
+```
 
 Configuration specifying all parameters:
 
-    docker {
-        name 'hub.docker.com/username/my-app:version'
-        tags 'latest'
-        dockerfile 'Dockerfile'
-        dependsOn tasks.distTar
-        files 'file1.txt', 'file2.txt'
-        buildArgs([BUILD_VERSION: 'version'])
-    }
+````gradle
+docker {
+    name 'hub.docker.com/username/my-app:version'
+    tags 'latest'
+    dockerfile 'Dockerfile'
+    dependsOn tasks.distTar
+    files 'file1.txt', 'file2.txt'
+    buildArgs([BUILD_VERSION: 'version'])
+    pull true
+}
+```
 
 
 Managing Docker image dependencies
@@ -79,26 +88,28 @@ Docker containers.
 
 **Example**
 
-    plugins {
-        id 'maven-publish'
-        id 'com.palantir.docker'
-    }
+```gradle
+plugins {
+    id 'maven-publish'
+    id 'com.palantir.docker'
+}
 
-    ...
+...
 
-    dependencies {
-        docker 'foogroup:barmodule:0.1.2'
-        docker project(":someSubProject")
-    }
+dependencies {
+    docker 'foogroup:barmodule:0.1.2'
+    docker project(":someSubProject")
+}
 
-    publishing {
-        publications {
-            dockerPublication(MavenPublication) {
-                from components.docker
-                artifactId project.name + "-docker"
-            }
+publishing {
+    publications {
+        dockerPublication(MavenPublication) {
+            from components.docker
+            artifactId project.name + "-docker"
         }
     }
+}
+```
 
 The above configuration adds a Maven publication that specifies dependencies on
 `barmodule` and the `someSubProject` Gradle sub project. The resulting POM file
@@ -127,28 +138,34 @@ resulting file as `docker-compose.yml`.
 
 Assume a `docker-compose.yml.template` as follows:
 
-    myservice:
-      image: 'repository/myservice:latest'
-    otherservice:
-      image: 'repository/otherservice:{{othergroup:otherservice}}'
+```yaml
+myservice:
+  image: 'repository/myservice:latest'
+otherservice:
+  image: 'repository/otherservice:{{othergroup:otherservice}}'
+```
 
 `build.gradle` declares a dependency on a docker image published as
 'othergroup:otherservice' in version 0.1.2:
 
-    plugins {
-        id 'com.palantir.docker-compose'
-    }
+```gradle
+plugins {
+    id 'com.palantir.docker-compose'
+}
 
-    dependencies {
-        docker 'othergroup:otherservice:0.1.2'
-    }
+dependencies {
+    docker 'othergroup:otherservice:0.1.2'
+}
+```
 
 The `generateDockerCompose` task creates a `docker-compose.yml` as follows:
 
-    myservice:
-      image: 'repository/myservice:latest'
-    otherservice:
-      image: 'repository/otherservice:0.1.2'
+```yaml
+myservice:
+  image: 'repository/myservice:latest'
+otherservice:
+  image: 'repository/otherservice:0.1.2'
+```
 
 The `generateDockerCompose` task fails if the template file contains variables
 that cannot get resolved using the provided `docker` dependencies. Version
@@ -161,30 +178,36 @@ version.
 The template and generated file locations are customizable through the
 `dockerCompose` extension:
 
-    dockerCompose {
-        template 'my-template.yml'
-        dockerComposeFile 'my-docker-compose.yml'
-    }
+```gradle
+dockerCompose {
+    template 'my-template.yml'
+    dockerComposeFile 'my-docker-compose.yml'
+}
+```
 
 Docker Run Plugin
 -----------------
 Apply the plugin using standard gradle convention:
 
-    plugins {
-        id 'com.palantir.docker-run' version '<version>'
-    }
+```gradle
+plugins {
+    id 'com.palantir.docker-run' version '<version>'
+}
+```
 
 Use the `dockerRun` configuration block to configure the name, image and optional
 command to execute for the `dockerRun` tasks:
 
-    dockerRun {
-        name 'my-container'
-        image 'busybox'
-        volumes 'hostvolume': '/containervolume'
-        daemonize true
-        env 'MYVAR1': 'MYVALUE1', 'MYVAR2': 'MYVALUE2'
-        command 'sleep', '100'
-    }
+```gradle
+dockerRun {
+    name 'my-container'
+    image 'busybox'
+    volumes 'hostvolume': '/containervolume'
+    daemonize true
+    env 'MYVAR1': 'MYVALUE1', 'MYVAR2': 'MYVALUE2'
+    command 'sleep', '100'
+}
+```
 
 **Docker Run Configuration Parameters**
 - `name` the name to use for this container, may include a tag.
@@ -196,8 +219,8 @@ command to execute for the `dockerRun` tasks:
   These must be exposed in the Dockerfile with `ENV` instructions.
 - `daemonize` defaults to true to daemonize the container after starting. However
   if your container runs a command and exits, you can set this to false.
-- `clean` will add `--rm` to the `docker run` command to ensure that containers
-  are cleaned up after running.
+- `clean` (optional) a boolean argument which adds `--rm` to the `docker run`
+  command to ensure that containers are cleaned up after running; defaults to `false`
 - `command` the command to run.
 
 Tasks
