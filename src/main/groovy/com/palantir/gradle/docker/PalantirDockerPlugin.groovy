@@ -79,7 +79,23 @@ class PalantirDockerPlugin implements Plugin<Project> {
                     }
                 }
                 from ext.dependencies*.outputs
-                from ext.resolvedFiles
+                if (!ext.resolvedFiles.isEmpty()) {
+                    // provide compatibility with optional 'files' parameter:
+                    from ext.resolvedFiles
+                } else {
+                    // default: copy all files that are NOT excluded by '.dockerignore'
+                    // NOTE:
+                    //  the patterns from .dockeringore DO NOT EXACTLY match gradles exclude patterns
+                    //  ... but for many cases it provides a reasonable solution :)
+                    // TODO: translate golangs filepath.Match pattern to gradles exclude pattern
+                    File dockerignore = new File("${project.projectDir}/.dockerignore")
+                    from(project.projectDir) {
+                        exclude "${project.buildDir.name}"
+                        if (dockerignore.exists()) {
+                            exclude dockerignore.text.split()
+                        }
+                    }
+                }
                 into dockerDir
             }
 
