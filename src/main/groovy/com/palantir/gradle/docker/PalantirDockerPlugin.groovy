@@ -79,7 +79,7 @@ class PalantirDockerPlugin implements Plugin<Project> {
                     }
                 }
                 from ext.dependencies*.outputs
-                if (!ext.resolvedFiles.isEmpty()) {
+                if (ext.resolvedFiles) {
                     // provide compatibility with optional 'files' parameter:
                     from ext.resolvedFiles
                 } else {

@@ -388,4 +388,34 @@ class PalantirDockerPluginTests extends AbstractPluginTest {
         execCond("docker rmi -f ${id}") || true
     }
 
+    def 'check files are correctly added to docker context using default'() {
+        given:
+        String id = 'id9'
+        String filename = "bar.txt"
+        temporaryFolder.newFile('Dockerfile') << """
+            FROM alpine:3.2
+            MAINTAINER ${id}
+            ADD ${filename} /tmp/
+        """.stripIndent()
+        buildFile << """
+            plugins {
+                id 'com.palantir.docker'
+            }
+
+            docker {
+                name '${id}'
+            }
+        """.stripIndent()
+        new File(projectDir, filename).createNewFile()
+        when:
+        BuildResult buildResult = with('docker').build()
+
+        then:
+        buildResult.task(':dockerPrepare').outcome == TaskOutcome.SUCCESS
+        buildResult.task(':docker').outcome == TaskOutcome.SUCCESS
+        exec("docker inspect --format '{{.Author}}' ${id}") == "'${id}'\n"
+        execCond("docker rmi -f ${id}") || true
+    }
+
 }
+
