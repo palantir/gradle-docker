@@ -79,12 +79,20 @@ class PalantirDockerPlugin implements Plugin<Project> {
                     }
                 }
                 from ext.dependencies*.outputs
-                from ext.resolvedFiles
+                if (ext.resolvedFiles) {
+                    // provide compatibility with optional 'files' parameter:
+                    from ext.resolvedFiles
+                } else {
+                    // default: copy all files excluding the project buildDir
+                    from(project.projectDir) {
+                        exclude "${project.buildDir.name}"
+                    }
+                }
                 into dockerDir
             }
 
             List<String> buildCommandLine = ['docker', 'build']
-            if (! ext.buildArgs.isEmpty()) {
+            if (!ext.buildArgs.isEmpty()) {
                 for (Map.Entry<String, String> buildArg : ext.buildArgs.entrySet()) {
                     buildCommandLine.addAll('--build-arg', "${buildArg.getKey()}=${buildArg.getValue()}")
                 }
