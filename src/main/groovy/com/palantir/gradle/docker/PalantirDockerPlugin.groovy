@@ -146,7 +146,14 @@ class PalantirDockerPlugin implements Plugin<Project> {
     }
 
     private String computeName(String name, String tag) {
-        return name.replaceAll(":.*", "") + ":" + tag
+        def lastBackSlashIndex = name.lastIndexOf("/");
+        if (lastBackSlashIndex == -1)
+            lastBackSlashIndex = 0;
+        def tagSeparatorIndex = name.indexOf(":", lastBackSlashIndex)
+        if (tagSeparatorIndex == -1) {
+            return name + ":" + tag;
+        }
+        return name.substring(0, tagSeparatorIndex) + ":" + tag;
     }
 
     private String ucfirst(String str) {
