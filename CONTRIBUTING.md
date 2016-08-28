@@ -6,11 +6,8 @@ you follow these simple guidelines:
 
 Legal
 -----
-Fill out the a Contributor License Agreement and send it to opensource@palantir.com:
-
-- [Individual Contributor License Agreement](cla/palantir_individual_cla.pdf?raw=true)
-- [Corporate Contributor License Agreement](cla/palantir_corporate_cla.pdf?raw=true)
-
+When submitting a PR for the first time you will be asked to agree to the Contributor License Agreement. This
+agreement is required for contributions to be accepted.
 
 Code Style
 ----------
