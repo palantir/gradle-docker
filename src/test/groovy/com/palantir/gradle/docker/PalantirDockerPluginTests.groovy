@@ -330,38 +330,6 @@ class PalantirDockerPluginTests extends AbstractPluginTest {
         execCond("docker rmi -f ${id}:another")
     }
 
-    def 'tags are correctly processed'() {
-        given:
-        String id = 'foobar:8443/foo/bar'
-        temporaryFolder.newFile('Dockerfile') << """
-            FROM alpine:3.2
-            MAINTAINER ${id}
-        """.stripIndent()
-        buildFile << """
-            plugins {
-                id 'com.palantir.docker'
-            }
-
-            docker {
-                name '${id}'
-                tags 'latest', 'another'
-            }
-        """.stripIndent()
-
-        when:
-        BuildResult buildResult = with('dockerTag').build()
-
-        then:
-        buildResult.task(':dockerPrepare').outcome == TaskOutcome.SUCCESS
-        buildResult.task(':docker').outcome == TaskOutcome.SUCCESS
-        buildResult.task(':dockerTag').outcome == TaskOutcome.SUCCESS
-        exec("docker inspect --format '{{.Author}}' ${id}") == "'${id}'\n"
-        exec("docker inspect --format '{{.Author}}' ${id}:latest") == "'${id}'\n"
-        exec("docker inspect --format '{{.Author}}' ${id}:another") == "'${id}'\n"
-        execCond("docker rmi -f ${id}")
-        execCond("docker rmi -f ${id}:another")
-    }
-
     def 'build args are correctly processed'() {
         given:
         String id = 'id7'
@@ -447,6 +415,19 @@ class PalantirDockerPluginTests extends AbstractPluginTest {
         buildResult.task(':docker').outcome == TaskOutcome.SUCCESS
         exec("docker inspect --format '{{.Author}}' ${id}") == "'${id}'\n"
         execCond("docker rmi -f ${id}") || true
+    }
+
+    def 'check imageName correctly processed'() {
+        given:
+        def palantirDockerPlugin = new PalantirDockerPlugin();
+        when:
+        def noDefaultPortImageName = palantirDockerPlugin.getImageNameByTag('foobar.com:8433/foo/bar', 'version')
+        def imageName = palantirDockerPlugin.getImageNameByTag('foo/bar', 'version')
+        def linkedTagImageName = palantirDockerPlugin.getImageNameByTag('foo/bar:test', 'version')
+        then:
+        noDefaultPortImageName == 'foobar.com:8433/foo/bar:version'
+        imageName == 'foo/bar:version'
+        linkedTagImageName == 'foo/bar:version'
     }
 
 }
