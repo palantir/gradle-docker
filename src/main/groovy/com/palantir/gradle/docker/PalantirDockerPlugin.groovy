@@ -119,7 +119,7 @@ class PalantirDockerPlugin implements Plugin<Project> {
                         group = 'Docker'
                         description = "Tags Docker image with tag '${tagName}'"
                         workingDir dockerDir
-                        commandLine 'docker', 'tag', ext.name, computeName(ext.name, tagName)
+                        commandLine 'docker', 'tag', ext.name, getImageNameByTag(ext.name, tagName)
                         dependsOn exec
                     })
                     tag.dependsOn subTask
@@ -128,7 +128,7 @@ class PalantirDockerPlugin implements Plugin<Project> {
                         group = 'Docker'
                         description = "Pushes the Docker image with tag '${tagName}' to configured Docker Hub"
                         workingDir dockerDir
-                        commandLine 'docker', 'push', computeName(ext.name, tagName)
+                        commandLine 'docker', 'push', getImageNameByTag(ext.name, tagName)
                         dependsOn tag
                     })
                 }
@@ -145,8 +145,16 @@ class PalantirDockerPlugin implements Plugin<Project> {
         }
     }
 
-    private String computeName(String name, String tag) {
-        return name.replaceAll(":.*", "") + ":" + tag
+    static String getImageNameByTag(String name, String tag) {
+        def lastBackSlashIndex = name.lastIndexOf("/");
+        if (lastBackSlashIndex == -1) {
+            lastBackSlashIndex = 0;
+        }
+        def tagSeparatorIndex = name.indexOf(":", lastBackSlashIndex)
+        if (tagSeparatorIndex == -1) {
+            return name + ":" + tag;
+        }
+        return name.substring(0, tagSeparatorIndex) + ":" + tag;
     }
 
     private String ucfirst(String str) {

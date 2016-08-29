@@ -417,5 +417,12 @@ class PalantirDockerPluginTests extends AbstractPluginTest {
         execCond("docker rmi -f ${id}") || true
     }
 
+    def 'check imageName correctly processed'() {
+        expect:
+        PalantirDockerPlugin.getImageNameByTag('foobar.com:8433/foo/bar', 'version') == 'foobar.com:8433/foo/bar:version'
+        PalantirDockerPlugin.getImageNameByTag('foo/bar', 'version') == 'foo/bar:version'
+        PalantirDockerPlugin.getImageNameByTag('foo/bar:test', 'version') == 'foo/bar:version'
+    }
+
 }
 
