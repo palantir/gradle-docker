@@ -418,16 +418,10 @@ class PalantirDockerPluginTests extends AbstractPluginTest {
     }
 
     def 'check imageName correctly processed'() {
-        given:
-        def palantirDockerPlugin = new PalantirDockerPlugin();
-        when:
-        def noDefaultPortImageName = palantirDockerPlugin.getImageNameByTag('foobar.com:8433/foo/bar', 'version')
-        def imageName = palantirDockerPlugin.getImageNameByTag('foo/bar', 'version')
-        def linkedTagImageName = palantirDockerPlugin.getImageNameByTag('foo/bar:test', 'version')
-        then:
-        noDefaultPortImageName == 'foobar.com:8433/foo/bar:version'
-        imageName == 'foo/bar:version'
-        linkedTagImageName == 'foo/bar:version'
+        expect:
+        PalantirDockerPlugin.getImageNameByTag('foobar.com:8433/foo/bar', 'version') == 'foobar.com:8433/foo/bar:version'
+        PalantirDockerPlugin.getImageNameByTag('foo/bar', 'version') == 'foo/bar:version'
+        PalantirDockerPlugin.getImageNameByTag('foo/bar:test', 'version') == 'foo/bar:version'
     }
 
 }

@@ -15,7 +15,6 @@
  */
 package com.palantir.gradle.docker
 
-import groovy.transform.PackageScope
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.Task
@@ -146,8 +145,7 @@ class PalantirDockerPlugin implements Plugin<Project> {
         }
     }
 
-    @PackageScope
-    String getImageNameByTag(String name, String tag) {
+    static String getImageNameByTag(String name, String tag) {
         def lastBackSlashIndex = name.lastIndexOf("/");
         if (lastBackSlashIndex == -1) {
             lastBackSlashIndex = 0;
