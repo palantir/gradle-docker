@@ -20,6 +20,7 @@ import org.gradle.api.internal.artifacts.mvnsettings.DefaultMavenFileLocations
 import org.gradle.api.internal.artifacts.mvnsettings.DefaultMavenSettingsProvider
 import org.gradle.testkit.runner.BuildResult
 import org.gradle.testkit.runner.TaskOutcome
+import spock.lang.Unroll
 
 class PalantirDockerPluginTests extends AbstractPluginTest {
 
@@ -417,5 +418,18 @@ class PalantirDockerPluginTests extends AbstractPluginTest {
         execCond("docker rmi -f ${id}") || true
     }
 
+    def 'check if compute name replaces the name correctly'() {
+        expect:
+        PalantirDockerPlugin.computeName(name, tag) == result
+
+        where:
+        name                |  tag         | result
+        "v1"                | "latest"     | "v1:latest"
+        "v1:1"              | "latest"     | "v1:latest"
+        "host/v1"           | "latest"     | "host/v1:latest"
+        "host/v1:1"         | "latest"     | "host/v1:latest"
+        "host:port/v1"      | "latest"     | "host:port/v1:latest"
+        "host:port/v1:1"    | "latest"     | "host:port/v1:latest"
+    }
 }
 

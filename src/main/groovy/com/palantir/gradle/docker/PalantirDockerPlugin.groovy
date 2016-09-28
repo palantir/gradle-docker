@@ -145,11 +145,22 @@ class PalantirDockerPlugin implements Plugin<Project> {
         }
     }
 
-    private String computeName(String name, String tag) {
-        return name.replaceAll(":.*", "") + ":" + tag
+    private static String computeName(String name, String tag) {
+        int lastColon = name.lastIndexOf(':')
+        int lastSlash = name.lastIndexOf('/')
+
+        int endIndex;
+
+        // image_name -> this should remain
+        // host:port/image_name -> this should remain.
+        // host:port/image_name:v1 -> v1 should be replaced
+        if (lastColon > lastSlash) endIndex = lastColon
+        else endIndex = name.length()
+
+        return name.substring(0, endIndex) + ":" + tag
     }
 
-    private String ucfirst(String str) {
+    private static String ucfirst(String str) {
         StringBuffer sb = new StringBuffer(str);
         sb.replace(0, 1, str.substring(0, 1).toUpperCase());
         return sb.toString();
