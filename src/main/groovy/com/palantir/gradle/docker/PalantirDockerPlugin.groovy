@@ -91,7 +91,7 @@ class PalantirDockerPlugin implements Plugin<Project> {
                 into dockerDir
             }
 
-            List<String> buildCommandLine = ['docker', 'build']
+            List<String> buildCommandLine = ['docker', 'build', '--quiet']
             if (!ext.buildArgs.isEmpty()) {
                 for (Map.Entry<String, String> buildArg : ext.buildArgs.entrySet()) {
                     buildCommandLine.addAll('--build-arg', "${buildArg.getKey()}=${buildArg.getValue()}")
