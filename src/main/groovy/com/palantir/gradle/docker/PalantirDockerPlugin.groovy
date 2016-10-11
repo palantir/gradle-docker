@@ -21,12 +21,18 @@ import org.gradle.api.Task
 import org.gradle.api.artifacts.Configuration
 import org.gradle.api.artifacts.PublishArtifact
 import org.gradle.api.internal.artifacts.publish.ArchivePublishArtifact
+import org.gradle.api.logging.LogLevel
+import org.gradle.api.logging.Logger
+import org.gradle.api.logging.Logging
 import org.gradle.api.tasks.Copy
 import org.gradle.api.tasks.Delete
 import org.gradle.api.tasks.Exec
 import org.gradle.api.tasks.bundling.Zip
 
 class PalantirDockerPlugin implements Plugin<Project> {
+
+    private static final Logger log = Logging.getLogger(PalantirDockerPlugin.class)
+
     @Override
     void apply(Project project) {
         DockerExtension ext = project.extensions.create('docker', DockerExtension, project)
@@ -91,7 +97,7 @@ class PalantirDockerPlugin implements Plugin<Project> {
                 into dockerDir
             }
 
-            List<String> buildCommandLine = ['docker', 'build', '--quiet']
+            List<String> buildCommandLine = ['docker', 'build']
             if (!ext.buildArgs.isEmpty()) {
                 for (Map.Entry<String, String> buildArg : ext.buildArgs.entrySet()) {
                     buildCommandLine.addAll('--build-arg', "${buildArg.getKey()}=${buildArg.getValue()}")
@@ -105,6 +111,8 @@ class PalantirDockerPlugin implements Plugin<Project> {
                 workingDir dockerDir
                 commandLine buildCommandLine
                 dependsOn ext.getDependencies()
+                logging.captureStandardOutput LogLevel.INFO
+                logging.captureStandardError  LogLevel.ERROR
             }
 
             if (!ext.tags.isEmpty()) {
