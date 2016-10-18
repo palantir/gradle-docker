@@ -20,7 +20,6 @@ import org.gradle.api.internal.artifacts.mvnsettings.DefaultMavenFileLocations
 import org.gradle.api.internal.artifacts.mvnsettings.DefaultMavenSettingsProvider
 import org.gradle.testkit.runner.BuildResult
 import org.gradle.testkit.runner.TaskOutcome
-import spock.lang.Unroll
 
 class PalantirDockerPluginTests extends AbstractPluginTest {
 
@@ -381,7 +380,7 @@ class PalantirDockerPluginTests extends AbstractPluginTest {
 
         when:
         execCond("docker pull alpine:3.2")
-        BuildResult buildResult = with('docker').build()
+        BuildResult buildResult = with('-i', 'docker').build()
 
         then:
         buildResult.task(':docker').outcome == TaskOutcome.SUCCESS

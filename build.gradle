@@ -25,6 +25,7 @@ repositories {
     jcenter()
 }
 
+
 dependencies {
     compile 'com.google.guava:guava:18.0'
     compile gradleApi()
