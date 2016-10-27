@@ -134,10 +134,25 @@ class PalantirDockerPluginTests extends AbstractPluginTest {
         given:
         String id = 'id3'
         String filename = "foo.txt"
+        String folder1Name = "folder_1"
+        String folder2Name = "folder_2"
+        String subFile1Name = "subFile_1.txt"
+        String subFile2Name = "subFile_2.txt"
+
+        new File(projectDir, filename).createNewFile()
+        def temp1Folder = new File(projectDir, folder1Name)
+        def temp2Folder = new File(projectDir, folder2Name)
+        temp1Folder.mkdir()
+        temp2Folder.mkdir()
+        new File(temp1Folder, subFile1Name).createNewFile()
+        new File(temp2Folder, subFile2Name).createNewFile()
+
         temporaryFolder.newFile('Dockerfile') << """
             FROM alpine:3.2
             MAINTAINER ${id}
             ADD ${filename} /tmp/
+            ADD ${folder1Name} /tmp/
+            ADD ${subFile2Name} /tmp/
         """.stripIndent()
         buildFile << """
             plugins {
@@ -146,16 +161,23 @@ class PalantirDockerPluginTests extends AbstractPluginTest {
 
             docker {
                 name '${id}'
-                files "${filename}"
+                files "${filename}", "${folder1Name}", "${folder2Name}/*"
             }
         """.stripIndent()
-        new File(projectDir, filename).createNewFile()
+
         when:
         BuildResult buildResult = with('docker').build()
 
         then:
         buildResult.task(':dockerPrepare').outcome == TaskOutcome.SUCCESS
         buildResult.task(':docker').outcome == TaskOutcome.SUCCESS
+
+        new File(dockerDir, filename).isFile()
+        new File(dockerDir, folder1Name).isDirectory()
+        new File(dockerDir, "$folder1Name/$subFile1Name").isFile()
+        !new File(dockerDir, "$folder2Name").exists()
+        new File(dockerDir, "$subFile2Name").isFile()
+
         exec("docker inspect --format '{{.Author}}' ${id}") == "'${id}'\n"
         execCond("docker rmi -f ${id}") || true
     }
@@ -429,6 +451,63 @@ class PalantirDockerPluginTests extends AbstractPluginTest {
         "host/v1:1"         | "latest"     | "host/v1:latest"
         "host:port/v1"      | "latest"     | "host:port/v1:latest"
         "host:port/v1:1"    | "latest"     | "host:port/v1:latest"
+    }
+
+    def 'check task outputs are correctly added to docker context'() {
+        given:
+        String id = 'id10'
+        String filename = "foo.txt"
+        String folder1Name = "folder_1"
+        String folder2Name = "folder_2"
+        String subFile1Name = "subFile_1.txt"
+        String subFile2Name = "subFile_2.txt"
+
+        new File(projectDir, filename).createNewFile()
+        def temp1Folder = new File(projectDir, folder1Name)
+        def temp2Folder = new File(projectDir, folder2Name)
+        temp1Folder.mkdir()
+        temp2Folder.mkdir()
+        new File(temp1Folder, subFile1Name).createNewFile()
+        new File(temp2Folder, subFile2Name).createNewFile()
+
+        temporaryFolder.newFile('Dockerfile') << """
+            FROM alpine:3.2
+            MAINTAINER ${id}
+            ADD ${filename} /tmp/
+            ADD ${folder1Name} /tmp/
+            ADD ${subFile2Name} /tmp/
+        """.stripIndent()
+        buildFile << """
+            plugins {
+                id 'com.palantir.docker'
+            }
+
+            task outputTask() {
+                outputs.files("${temp1Folder.absolutePath}", "${temp2Folder.absolutePath}/*")
+            }
+
+            docker {
+                dependsOn outputTask
+                name '${id}'
+                files "${filename}"
+            }
+        """.stripIndent()
+
+        when:
+        BuildResult buildResult = with('docker').build()
+
+        then:
+        buildResult.task(':dockerPrepare').outcome == TaskOutcome.SUCCESS
+        buildResult.task(':docker').outcome == TaskOutcome.SUCCESS
+
+        new File(dockerDir, filename).isFile()
+        new File(dockerDir, folder1Name).isDirectory()
+        new File(dockerDir, "$folder1Name/$subFile1Name").isFile()
+        !new File(dockerDir, "$folder2Name").exists()
+        new File(dockerDir, "$subFile2Name").isFile()
+
+        exec("docker inspect --format '{{.Author}}' ${id}") == "'${id}'\n"
+        execCond("docker rmi -f ${id}") || true
     }
 }
 

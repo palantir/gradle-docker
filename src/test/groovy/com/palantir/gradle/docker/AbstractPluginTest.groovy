@@ -27,6 +27,7 @@ class AbstractPluginTest extends Specification {
     TemporaryFolder temporaryFolder = new TemporaryFolder()
 
     File projectDir
+    File dockerDir
     File buildFile
     List<File> pluginClasspath
 
@@ -55,6 +56,7 @@ class AbstractPluginTest extends Specification {
 
     def setup() {
         projectDir = temporaryFolder.root
+        dockerDir = new File(projectDir, "build/docker")
         buildFile = temporaryFolder.newFile('build.gradle')
 
         def pluginClasspathResource = getClass().classLoader.findResource("plugin-classpath.txt")
