@@ -87,7 +87,7 @@ class PalantirDockerPlugin implements Plugin<Project> {
                     }
                 }
 
-                ([] + ext.dependencies*.outputs*.getFiles()*.getFiles().flatten() + ext.resolvedFiles).forEach { File file ->
+                ([] + ext.dependencies*.outputs*.getFiles()*.getFiles().flatten() + ext.resolvedFiles).each { File file ->
                     def wildcardDirectory = isWildcardDirectory(file)
 
                     /**
