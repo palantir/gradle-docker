@@ -17,41 +17,31 @@ package com.palantir.gradle.docker
 
 import org.gradle.api.Project
 
-import com.google.common.base.Preconditions
-
 class DockerComposeExtension {
-    Project project
+    private Project project
 
-    private String template = 'docker-compose.yml.template'
-    private String dockerComposeFile = 'docker-compose.yml'
-
-    private File resolvedDockerComposeTemplate = null
-    private File resolvedDockerComposeFile = null
+    private File template
+    private File dockerComposeFile
 
     public DockerComposeExtension(Project project) {
         this.project = project
+        this.template = project.file('docker-compose.yml.template')
+        this.dockerComposeFile = project.file('docker-compose.yml')
     }
 
-    public void setTemplate(String dockerComposeTemplate) {
-        this.template = dockerComposeTemplate
-        Preconditions.checkArgument(project.file(dockerComposeTemplate).exists(),
-            "Could not find specified template file: %s", project.file(dockerComposeTemplate))
+    public void setTemplate(Object dockerComposeTemplate) {
+        this.template = project.file(dockerComposeTemplate)
     }
 
-    public void setDockerComposeFile(String dockerComposeFile) {
-        this.dockerComposeFile = dockerComposeFile
+    public void setDockerComposeFile(Object dockerComposeFile) {
+        this.dockerComposeFile = project.file(dockerComposeFile)
     }
 
-    File getResolvedDockerComposeTemplate() {
-        return resolvedDockerComposeTemplate
+    File getTemplate() {
+        return template
     }
 
-    File getResolvedDockerComposeFile() {
-        return resolvedDockerComposeFile
-    }
-
-    public void resolvePathsAndValidate() {
-        resolvedDockerComposeFile = project.file(dockerComposeFile)
-        resolvedDockerComposeTemplate = project.file(template)
+    File getDockerComposeFile() {
+        return dockerComposeFile
     }
 }
