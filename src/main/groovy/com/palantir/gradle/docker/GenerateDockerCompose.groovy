@@ -17,6 +17,10 @@ class GenerateDockerCompose extends DefaultTask {
     DockerComposeExtension ext
     Configuration configuration
 
+    GenerateDockerCompose() {
+        group = 'Docker'
+    }
+
     @TaskAction
     void run() {
         if (!template.file) {
