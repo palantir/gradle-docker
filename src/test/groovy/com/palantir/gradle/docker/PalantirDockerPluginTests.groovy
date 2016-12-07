@@ -498,6 +498,31 @@ class PalantirDockerPluginTests extends AbstractPluginTest {
         execCond("docker rmi -f ${id}") || true
     }
 
+    def 'check lables are correctly applied to build'() {
+        given:
+        String id = 'id10'
+        temporaryFolder.newFile('Dockerfile') << """
+            FROM alpine:3.2
+        """.stripIndent()
+        buildFile << """
+            plugins {
+                id 'com.palantir.docker'
+            }
+
+            docker {
+                name '${id}'
+                labels(['test_label': 'test_value'])
+            }
+        """.stripIndent()
+        when:
+        BuildResult buildResult = with('docker').build()
+
+        then:
+        buildResult.task(':docker').outcome == TaskOutcome.SUCCESS
+        exec("docker inspect --format '{{.Config.Labels}}' ${id}").contains("test_label")
+        execCond("docker rmi -f ${id}") || true
+    }
+
     def 'check if compute name replaces the name correctly'() {
         expect:
         PalantirDockerPlugin.computeName(name, tag) == result

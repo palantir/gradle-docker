@@ -37,6 +37,8 @@ automatically include outputs of task dependencies in the Docker build context.
 - `files` (optional) an argument list of files to be included in the Docker build context, evaluated per `Project#files`. For example, `files tasks.distTar.outputs` adds the TAR/TGZ file produced by the `distTar` tasks, and `files tasks.distTar.outputs, 'my-file.txt'` adds the archive in addition to file `my-file.txt` from the project root directory.
 - `buildArgs` (optional) an argument map of string to string which will set --build-arg
   arguments to the docker build command; defaults to empty, which results in no --build-arg parameters
+- `labels` (optional) a map of string to string which will set --label arguments
+  to the docker build command; defaults to empty, which results in no labels applied.
 - `pull` (optional) a boolean argument which defines whether Docker should attempt to pull
   a newer version of the base image before building; defaults to `false`
 
@@ -74,6 +76,7 @@ docker {
     dockerfile 'Dockerfile'
     files tasks.distTar.outputs, 'file1.txt', 'file2.txt'
     buildArgs([BUILD_VERSION: 'version'])
+    labels(['key': 'value'])
     pull true
 }
 ```
