@@ -33,6 +33,7 @@ class DockerExtension {
     private Set<Task> dependencies = ImmutableSet.of()
     private Set<String> files = ImmutableSet.of()
     private Set<String> tags = ImmutableSet.of()
+    private Map<String, String> labels = ImmutableMap.of()
     private Map<String, String> buildArgs = ImmutableMap.of()
     private boolean pull = false
 
@@ -85,6 +86,14 @@ class DockerExtension {
 
     public void tags(String... args) {
         this.tags = ImmutableSet.copyOf(args)
+    }
+
+    public Map<String, String> getLabels() {
+        return labels
+    }
+
+    public void labels(Map<String, String> labels) {
+        this.labels = ImmutableMap.copyOf(labels)
     }
 
     public File getResolvedDockerfile() {

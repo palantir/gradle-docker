@@ -103,6 +103,11 @@ class PalantirDockerPlugin implements Plugin<Project> {
                     buildCommandLine.addAll('--build-arg', "${buildArg.getKey()}=${buildArg.getValue()}")
                 }
             }
+            if (!ext.labels.isEmpty()) {
+                for (Map.Entry<String, String> label : ext.labels.entrySet()) {
+                    buildCommandLine.addAll('--label', "${label.getKey()}=${label.getValue()}")
+                }
+            }
             if (ext.pull) {
                 buildCommandLine.add '--pull'
             }
