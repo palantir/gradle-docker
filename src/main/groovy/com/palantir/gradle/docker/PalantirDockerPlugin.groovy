@@ -85,14 +85,17 @@ class PalantirDockerPlugin implements Plugin<Project> {
                     }
                 }
                 from ext.dependencies*.outputs
+                def files
                 if (ext.resolvedFiles) {
                     // provide compatibility with optional 'files' parameter:
-                    from ext.resolvedFiles
+                    files = ext.resolvedFiles
                 } else {
-                    // default: copy all files excluding the project buildDir
-                    from(project.projectDir) {
-                        exclude "${project.buildDir.name}"
-                    }
+                    // default: copy all files
+                    files = project.projectDir
+                }
+                from(files) {
+                    // excluding project.buildDir/docker
+                    exclude "${project.buildDir.name}/docker"
                 }
                 into dockerDir
             }
