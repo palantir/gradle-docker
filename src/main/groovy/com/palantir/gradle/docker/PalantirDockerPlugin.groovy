@@ -85,17 +85,14 @@ class PalantirDockerPlugin implements Plugin<Project> {
                     }
                 }
                 from ext.dependencies*.outputs
-	            def files
                 if (ext.resolvedFiles) {
                     // provide compatibility with optional 'files' parameter:
-	                files = ext.resolvedFiles
+                    from ext.resolvedFiles
                 } else {
-	                // default: copy all files
-	                files = project.projectDir
-                }
-	            from(files) {
-		            // excluding project.buildDir/docker
-		            exclude "${project.buildDir.name}/docker"
+                    // default: copy all files excluding the project buildDir
+                    from(project.projectDir) {
+                        exclude "${project.buildDir.name}"
+                    }
                 }
                 into dockerDir
             }
@@ -160,9 +157,9 @@ class PalantirDockerPlugin implements Plugin<Project> {
         int lastColon = name.lastIndexOf(':')
         int lastSlash = name.lastIndexOf('/')
 
-	    int endIndex
+        int endIndex;
 
-	    // image_name -> this should remain
+        // image_name -> this should remain
         // host:port/image_name -> this should remain.
         // host:port/image_name:v1 -> v1 should be replaced
         if (lastColon > lastSlash) endIndex = lastColon
@@ -172,9 +169,9 @@ class PalantirDockerPlugin implements Plugin<Project> {
     }
 
     private static String ucfirst(String str) {
-	    StringBuffer sb = new StringBuffer(str)
-	    sb.replace(0, 1, str.substring(0, 1).toUpperCase())
-	    return sb.toString()
+        StringBuffer sb = new StringBuffer(str);
+        sb.replace(0, 1, str.substring(0, 1).toUpperCase());
+        return sb.toString();
     }
 
 }
