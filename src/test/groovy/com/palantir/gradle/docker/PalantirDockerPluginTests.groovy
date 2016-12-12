@@ -98,7 +98,7 @@ class PalantirDockerPluginTests extends AbstractPluginTest {
         then:
         buildResult.task(':dockerPrepare').outcome == TaskOutcome.SUCCESS
         buildResult.task(':docker').outcome == TaskOutcome.SUCCESS
-        exec("docker inspect --format '{{.Author}}' ${id}") == "'${id}'\n"
+        exec("docker inspect --format '{{.Author}}' ${id}") == "'${id}'\n" as String
         execCond("docker rmi -f ${id}")
     }
 
@@ -126,7 +126,7 @@ class PalantirDockerPluginTests extends AbstractPluginTest {
         then:
         buildResult.task(':dockerPrepare').outcome == TaskOutcome.SUCCESS
         buildResult.task(':docker').outcome == TaskOutcome.SUCCESS
-        exec("docker inspect --format '{{.Author}}' ${id}") == "'${id}'\n"
+        exec("docker inspect --format '{{.Author}}' ${id}") == "'${id}'\n" as String
         execCond("docker rmi -f ${id}")
     }
 
@@ -156,7 +156,7 @@ class PalantirDockerPluginTests extends AbstractPluginTest {
         then:
         buildResult.task(':dockerPrepare').outcome == TaskOutcome.SUCCESS
         buildResult.task(':docker').outcome == TaskOutcome.SUCCESS
-        exec("docker inspect --format '{{.Author}}' ${id}") == "'${id}'\n"
+        exec("docker inspect --format '{{.Author}}' ${id}") == "'${id}'\n" as String
         execCond("docker rmi -f ${id}") || true
     }
 
@@ -299,8 +299,10 @@ class PalantirDockerPluginTests extends AbstractPluginTest {
     }
 
     def 'running tag task creates images with specified tags'() {
+
         given:
         String id = 'id6'
+        String imageId = "'${id}'\n"
         temporaryFolder.newFile('Dockerfile') << """
             FROM alpine:3.2
             MAINTAINER ${id}
@@ -323,9 +325,11 @@ class PalantirDockerPluginTests extends AbstractPluginTest {
         buildResult.task(':dockerPrepare').outcome == TaskOutcome.SUCCESS
         buildResult.task(':docker').outcome == TaskOutcome.SUCCESS
         buildResult.task(':dockerTag').outcome == TaskOutcome.SUCCESS
-        exec("docker inspect --format '{{.Author}}' ${id}") == "'${id}'\n"
-        exec("docker inspect --format '{{.Author}}' ${id}:latest") == "'${id}'\n"
-        exec("docker inspect --format '{{.Author}}' ${id}:another") == "'${id}'\n"
+        exec("docker inspect --format '{{.Author}}' ${id}") == imageId
+        exec("docker inspect --format '{{.Author}}' ${id}:latest") == imageId
+        exec("docker inspect --format '{{.Author}}' ${id}:another") == imageId
+
+        cleanup:
         execCond("docker rmi -f ${id}")
         execCond("docker rmi -f ${id}:another")
     }
