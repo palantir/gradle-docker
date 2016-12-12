@@ -99,7 +99,7 @@ class DockerExtension {
         return resolvedDockerComposeFile
     }
 
-    public Set<String> getResolvedFiles() {
+    public Set<File> getResolvedFiles() {
         return resolvedFiles
     }
 
@@ -115,7 +115,8 @@ class DockerExtension {
         ImmutableSet.Builder<File> builder = ImmutableSet.builder()
         for (String file : files) {
             def resFile = project.file(file)
-            Preconditions.checkArgument(resFile.exists(), "file '%s' does not exist.", file)
+            def nonWildcardFile = isWildcardDirectory(resFile) ? resFile.getParentFile() : resFile
+            Preconditions.checkArgument(nonWildcardFile.exists(), "file '%s' does not exist.", file)
             builder.add(resFile)
         }
 
@@ -136,5 +137,9 @@ class DockerExtension {
 
     public void pull(boolean pull) {
         this.pull = pull
+    }
+
+    public static boolean isWildcardDirectory(File folder) {
+        folder.getName().equals("*")
     }
 }

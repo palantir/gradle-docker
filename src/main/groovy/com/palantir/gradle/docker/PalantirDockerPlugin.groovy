@@ -29,6 +29,8 @@ import org.gradle.api.tasks.Delete
 import org.gradle.api.tasks.Exec
 import org.gradle.api.tasks.bundling.Zip
 
+import static com.palantir.gradle.docker.DockerExtension.isWildcardDirectory
+
 class PalantirDockerPlugin implements Plugin<Project> {
 
     private static final Logger log = Logging.getLogger(PalantirDockerPlugin.class)
@@ -84,11 +86,27 @@ class PalantirDockerPlugin implements Plugin<Project> {
                         fileName.replace(ext.resolvedDockerfile.getName(), 'Dockerfile')
                     }
                 }
-                from ext.dependencies*.outputs
-                if (ext.resolvedFiles) {
-                    // provide compatibility with optional 'files' parameter:
-                    from ext.resolvedFiles
-                } else {
+
+                ([] + ext.dependencies*.outputs*.getFiles()*.getFiles().flatten() + ext.resolvedFiles).each { File file ->
+                    def wildcardDirectory = isWildcardDirectory(file)
+
+                    /**
+                     * Supports copying of directories (preserving the directory itself) and also just copying the
+                     * content of a directory by using a '*' wildcard (e.g. /tmp/*)
+                     */
+                    if (wildcardDirectory) {
+                        file = file.getParentFile()
+                    }
+
+                    from (file) {
+                        // Preserve a copied folder if no wildcard is used at the very end
+                        if (file.isDirectory() && !wildcardDirectory) {
+                            into(file.getName())
+                        }
+                    }
+                }
+
+                if (!ext.resolvedFiles) {
                     // default: copy all files excluding the project buildDir
                     from(project.projectDir) {
                         exclude "${project.buildDir.name}"
