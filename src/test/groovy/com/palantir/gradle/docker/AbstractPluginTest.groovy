@@ -15,26 +15,29 @@
  */
 package com.palantir.gradle.docker
 
+import com.energizedwork.spock.extensions.TempDirectory
+import groovy.transform.CompileStatic
+import groovy.transform.TypeCheckingMode
 import org.gradle.testkit.runner.GradleRunner
-import org.junit.Rule
-import org.junit.rules.TemporaryFolder
-
 import spock.lang.Specification
 
 class AbstractPluginTest extends Specification {
 
-    @Rule
-    TemporaryFolder temporaryFolder = new TemporaryFolder()
-
+    @TempDirectory(clean = false)
     File projectDir
     File buildFile
-    List<File> pluginClasspath
+
+    def setup() {
+        buildFile = file('build.gradle')
+        println("Build directory: \n" + projectDir.absolutePath)
+    }
 
     GradleRunner with(String... tasks) {
-        GradleRunner.create()
-            .withPluginClasspath(pluginClasspath)
+        return GradleRunner.create()
             .withProjectDir(projectDir)
             .withArguments(tasks)
+            .withPluginClasspath()
+            .withDebug(true)
     }
 
     String exec(String task) {
@@ -53,17 +56,26 @@ class AbstractPluginTest extends Specification {
         return proc.exitValue() == 0
     }
 
-    def setup() {
-        projectDir = temporaryFolder.root
-        buildFile = temporaryFolder.newFile('build.gradle')
+    @CompileStatic(TypeCheckingMode.SKIP)
+    protected File createFile(String path, File baseDir = projectDir) {
+        File file = file(path, baseDir)
+        assert !file.exists()
+        file.parentFile.mkdirs()
+        assert file.createNewFile()
+        return file
+    }
 
-        def pluginClasspathResource = getClass().classLoader.findResource("plugin-classpath.txt")
-        if (pluginClasspathResource == null) {
-            throw new IllegalStateException("Did not find plugin classpath resource, run `testClasses` build task.")
+    protected File file(String path, File baseDir = projectDir) {
+        def splitted = path.split('/')
+        def directory = splitted.size() > 1 ? directory(splitted[0..-2].join('/'), baseDir) : baseDir
+        def file = new File(directory, splitted[-1])
+        return file
+    }
+
+    protected File directory(String path, File baseDir = projectDir) {
+        return new File(baseDir, path).with {
+            mkdirs()
+            return it
         }
-
-        pluginClasspath = pluginClasspathResource.readLines()
-            .collect { it.replace('\\', '\\\\') } // escape backslashes in Windows paths
-            .collect { new File(it) }
     }
 }

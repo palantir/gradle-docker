@@ -22,7 +22,7 @@ class DockerRunPluginTests extends AbstractPluginTest {
 
     def 'can run, status, and stop a container made by the docker plugin' () {
         given:
-        temporaryFolder.newFile('Dockerfile') << '''
+        file('Dockerfile') << '''
             FROM alpine:3.2
             CMD sleep 1000
         '''.stripIndent()
@@ -143,8 +143,8 @@ class DockerRunPluginTests extends AbstractPluginTest {
         }
 
         given:
-        File testFolder = temporaryFolder.newFolder("test")
-        temporaryFolder.newFile('Dockerfile') << '''
+        File testFolder = directory("test")
+        file('Dockerfile', testFolder) << '''
             FROM alpine:3.2
 
             RUN mkdir /test
@@ -184,7 +184,7 @@ class DockerRunPluginTests extends AbstractPluginTest {
 
     def 'can run with environment variables'() {
         given:
-        temporaryFolder.newFile('Dockerfile') << '''
+        file('Dockerfile') << '''
             FROM alpine:3.2
 
             RUN mkdir /test
