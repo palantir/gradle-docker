@@ -417,6 +417,65 @@ class PalantirDockerPluginTests extends AbstractPluginTest {
         execCond("docker rmi -f ${id}") || true
     }
 
+    def 'outputs from default distribution locations are added to the docker context'() {
+        given:
+        String id = 'id11'
+        File distributions = new File(projectDir, 'build/distributions');
+        distributions.mkdirs();
+        new File(distributions, 'dist.txt').createNewFile();
+
+        file('Dockerfile') << """
+            FROM alpine:3.2
+            MAINTAINER id
+            ADD build/distributions/dist.txt /tmp/
+        """.stripIndent()
+        buildFile << """
+            plugins {
+                id 'com.palantir.docker'
+            }
+            docker {
+                name '${id}'
+            }
+        """.stripIndent()
+        when:
+        BuildResult buildResult = with('docker').build()
+
+        then:
+        buildResult.task(':dockerPrepare').outcome == TaskOutcome.SUCCESS
+        buildResult.task(':docker').outcome == TaskOutcome.SUCCESS
+        execCond("docker rmi -f ${id}") || true
+    }
+
+    def 'explicitly adding everything does not crash due to recursive overflow'() {
+        given:
+        String id = 'id12'
+        File distributions = new File(projectDir, 'build/distributions');
+        distributions.mkdirs();
+        new File(distributions, 'dist.txt').createNewFile();
+
+        file('Dockerfile') << """
+            FROM alpine:3.2
+            MAINTAINER id
+            ADD build/distributions/dist.txt /tmp/
+        """.stripIndent()
+        buildFile << """
+            plugins {
+                id 'com.palantir.docker'
+            }
+            docker {
+                name '${id}'
+                files '.'
+            }
+        """.stripIndent()
+        when:
+        BuildResult buildResult = with('docker').build()
+
+        then:
+        buildResult.task(':dockerPrepare').outcome == TaskOutcome.SUCCESS
+        buildResult.task(':docker').outcome == TaskOutcome.SUCCESS
+        execCond("docker rmi -f ${id}") || true
+    }
+
     def 'check if compute name replaces the name correctly'() {
         expect:
         PalantirDockerPlugin.computeName(name, tag) == result
