@@ -78,7 +78,7 @@ class PalantirDockerPluginTests extends AbstractPluginTest {
     def 'check plugin creates a docker container with default configuration'() {
         given:
         String id = 'id1'
-        temporaryFolder.newFile('Dockerfile') << """
+        file('Dockerfile') << """
             FROM alpine:3.2
             MAINTAINER ${id}
         """.stripIndent()
@@ -105,7 +105,7 @@ class PalantirDockerPluginTests extends AbstractPluginTest {
     def 'check plugin creates a docker container with non-standard Dockerfile name'() {
         given:
         String id = 'id2'
-        temporaryFolder.newFile('foo') << """
+        file('foo') << """
             FROM alpine:3.2
             MAINTAINER ${id}
         """.stripIndent()
@@ -134,7 +134,7 @@ class PalantirDockerPluginTests extends AbstractPluginTest {
         given:
         String id = 'id3'
         String filename = "foo.txt"
-        temporaryFolder.newFile('Dockerfile') << """
+        file('Dockerfile') << """
             FROM alpine:3.2
             MAINTAINER ${id}
             ADD ${filename} /tmp/
@@ -162,7 +162,7 @@ class PalantirDockerPluginTests extends AbstractPluginTest {
 
     def 'Publishes "docker" dependencies via "docker" component'() {
         given:
-        temporaryFolder.newFile('Dockerfile') << "Foo"
+        file('Dockerfile') << "Foo"
         buildFile << '''
             plugins {
                 id 'java'
@@ -208,27 +208,27 @@ class PalantirDockerPluginTests extends AbstractPluginTest {
             .resolve("testgroup")
 
         // Check java publication has the right dependencies
-        def javaPublishFolder = publishFolder.resolve(temporaryFolder.root.name).resolve("2.3.4")
-        def javaPomFile = javaPublishFolder.resolve(temporaryFolder.root.name + "-2.3.4.pom")
+        def javaPublishFolder = publishFolder.resolve(projectDir.name).resolve("2.3.4")
+        def javaPomFile = javaPublishFolder.resolve(projectDir.name + "-2.3.4.pom")
         def javaPom = javaPomFile.toFile().text
         ["com.google.guava", "guava", "18.0"].each { javaPom.contains(it) }
         ["foogroup", "barmodule"].each { !javaPom.contains(it) }
 
         // Check docker publication has the right dependencies
         def dockerPublishFolder = publishFolder
-            .resolve(temporaryFolder.root.name + "-docker")
+            .resolve(projectDir.name + "-docker")
             .resolve("2.3.4")
-        def zipFile = dockerPublishFolder.resolve(temporaryFolder.root.name + "-docker-2.3.4.zip")
+        def zipFile = dockerPublishFolder.resolve(projectDir.name + "-docker-2.3.4.zip")
         zipFile.toFile().exists()
-        def dockerPomFile = dockerPublishFolder.resolve(temporaryFolder.root.name + "-docker-2.3.4.pom")
+        def dockerPomFile = dockerPublishFolder.resolve(projectDir.name + "-docker-2.3.4.pom")
         def dockerPom = dockerPomFile.toFile().text
-        ["foogroup", "barmodule", "0.1.2", temporaryFolder.root.name, "2.3.4"].each { dockerPom.contains(it) }
+        ["foogroup", "barmodule", "0.1.2", projectDir.name, "2.3.4"].each { dockerPom.contains(it) }
         !dockerPom.contains("guava")
     }
 
     def 'Can apply both "docker" and "docker-compose" plugins'() {
         given:
-        temporaryFolder.newFile('Dockerfile') << "Foo"
+        file('Dockerfile') << "Foo"
         buildFile << '''
             plugins {
                 id 'com.palantir.docker'
@@ -249,7 +249,7 @@ class PalantirDockerPluginTests extends AbstractPluginTest {
     def 'no tag task when no tags defined'() {
         given:
         String id = 'id4'
-        temporaryFolder.newFile('Dockerfile') << """
+        file('Dockerfile') << """
             FROM alpine:3.2
             MAINTAINER ${id}
         """.stripIndent()
@@ -273,7 +273,7 @@ class PalantirDockerPluginTests extends AbstractPluginTest {
     def 'tag and push tasks created for each tag'() {
         given:
         String id = 'id5'
-        temporaryFolder.newFile('Dockerfile') << """
+        file('Dockerfile') << """
             FROM alpine:3.2
             MAINTAINER ${id}
         """.stripIndent()
@@ -301,7 +301,7 @@ class PalantirDockerPluginTests extends AbstractPluginTest {
     def 'running tag task creates images with specified tags'() {
         given:
         String id = 'id6'
-        temporaryFolder.newFile('Dockerfile') << """
+        file('Dockerfile') << """
             FROM alpine:3.2
             MAINTAINER ${id}
         """.stripIndent()
@@ -333,7 +333,7 @@ class PalantirDockerPluginTests extends AbstractPluginTest {
     def 'build args are correctly processed'() {
         given:
         String id = 'id7'
-        temporaryFolder.newFile('Dockerfile') << '''
+        file('Dockerfile') << '''
             FROM alpine:3.2
             ARG BUILD_ARG_NO_DEFAULT
             ARG BUILD_ARG_WITH_DEFAULT=defaultBuildArg
@@ -364,7 +364,7 @@ class PalantirDockerPluginTests extends AbstractPluginTest {
     def 'base image is pulled when "pull" parameter is set'() {
         given:
         String id = 'id8'
-        temporaryFolder.newFile('Dockerfile') << '''
+        file('Dockerfile') << '''
             FROM alpine:3.2
         '''.stripIndent()
         buildFile << """
@@ -388,11 +388,11 @@ class PalantirDockerPluginTests extends AbstractPluginTest {
         execCond("docker rmi -f ${id}") || true
     }
 
-    def 'check files are correctly added to docker context using default'() {
+    def 'when no files are specified, then all files from the project directory are added to the docker context'() {
         given:
         String id = 'id9'
         String filename = "bar.txt"
-        temporaryFolder.newFile('Dockerfile') << """
+        file('Dockerfile') << """
             FROM alpine:3.2
             MAINTAINER ${id}
             ADD ${filename} /tmp/
@@ -406,7 +406,7 @@ class PalantirDockerPluginTests extends AbstractPluginTest {
                 name '${id}'
             }
         """.stripIndent()
-        new File(projectDir, filename).createNewFile()
+        createFile(filename)
         when:
         BuildResult buildResult = with('docker').build()
 
