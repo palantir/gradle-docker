@@ -417,18 +417,60 @@ class PalantirDockerPluginTests extends AbstractPluginTest {
         execCond("docker rmi -f ${id}") || true
     }
 
+    def 'project files and outputs from dependencies are added to the docker context'() {
+        given:
+        String id = 'id10'
+        createFile('from_project')
+        createFile('from_tgz')
+
+        file('Dockerfile') << """
+            FROM alpine:3.2
+            MAINTAINER id
+            ADD foo.tgz /tmp/
+            ADD from_project /tmp/
+        """.stripIndent()
+        buildFile << """
+            plugins {
+                id 'com.palantir.docker'
+            }
+
+            task myTgz(type: Tar) {
+                destinationDir project.buildDir
+                baseName 'foo'
+                extension = 'tgz'
+                compression = Compression.GZIP
+                into('.') {
+                    from 'from_tgz'
+                }
+            }
+
+            docker {
+                name '${id}'
+                dependsOn myTgz
+            }
+        """.stripIndent()
+        when:
+        BuildResult buildResult = with('docker').build()
+
+        then:
+        buildResult.task(':myTgz').outcome == TaskOutcome.SUCCESS
+        buildResult.task(':dockerPrepare').outcome == TaskOutcome.SUCCESS
+        buildResult.task(':docker').outcome == TaskOutcome.SUCCESS
+        execCond("docker rmi -f ${id}") || true
+    }
+
     def 'check if compute name replaces the name correctly'() {
         expect:
         PalantirDockerPlugin.computeName(name, tag) == result
 
         where:
-        name                |  tag         | result
-        "v1"                | "latest"     | "v1:latest"
-        "v1:1"              | "latest"     | "v1:latest"
-        "host/v1"           | "latest"     | "host/v1:latest"
-        "host/v1:1"         | "latest"     | "host/v1:latest"
-        "host:port/v1"      | "latest"     | "host:port/v1:latest"
-        "host:port/v1:1"    | "latest"     | "host:port/v1:latest"
+        name             | tag      | result
+        "v1"             | "latest" | "v1:latest"
+        "v1:1"           | "latest" | "v1:latest"
+        "host/v1"        | "latest" | "host/v1:latest"
+        "host/v1:1"      | "latest" | "host/v1:latest"
+        "host:port/v1"   | "latest" | "host:port/v1:latest"
+        "host:port/v1:1" | "latest" | "host:port/v1:latest"
     }
 }
 
