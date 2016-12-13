@@ -423,7 +423,7 @@ class PalantirDockerPluginTests extends AbstractPluginTest {
         File distributions = temporaryFolder.newFolder('build', 'distributions');
         new File(distributions, 'dist.txt').createNewFile();
 
-        temporaryFolder.newFile('Dockerfile') << """
+        file('Dockerfile') << """
             FROM alpine:3.2
             MAINTAINER id
             ADD build/distributions/dist.txt /tmp/
@@ -451,7 +451,7 @@ class PalantirDockerPluginTests extends AbstractPluginTest {
         File distributions = temporaryFolder.newFolder('build', 'distributions');
         new File(distributions, 'dist.txt').createNewFile();
 
-        temporaryFolder.newFile('Dockerfile') << """
+        file('Dockerfile') << """
             FROM alpine:3.2
             MAINTAINER id
             ADD build/distributions/dist.txt /tmp/
