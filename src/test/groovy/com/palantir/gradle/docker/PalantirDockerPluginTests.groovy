@@ -420,7 +420,8 @@ class PalantirDockerPluginTests extends AbstractPluginTest {
     def 'outputs from default distribution locations are added to the docker context'() {
         given:
         String id = 'id11'
-        File distributions = temporaryFolder.newFolder('build', 'distributions');
+        File distributions = new File(projectDir, 'build/distributions');
+        distributions.mkdirs();
         new File(distributions, 'dist.txt').createNewFile();
 
         file('Dockerfile') << """
@@ -448,7 +449,8 @@ class PalantirDockerPluginTests extends AbstractPluginTest {
     def 'explicitly adding everything does not crash due to recursive overflow'() {
         given:
         String id = 'id12'
-        File distributions = temporaryFolder.newFolder('build', 'distributions');
+        File distributions = new File(projectDir, 'build/distributions');
+        distributions.mkdirs();
         new File(distributions, 'dist.txt').createNewFile();
 
         file('Dockerfile') << """
