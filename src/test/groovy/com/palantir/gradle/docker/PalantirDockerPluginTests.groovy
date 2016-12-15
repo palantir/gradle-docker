@@ -459,6 +459,44 @@ class PalantirDockerPluginTests extends AbstractPluginTest {
         execCond("docker rmi -f ${id}") || true
     }
 
+    def 'can build Docker image from standard Gradle distribution plugin'() {
+        given:
+        String id = 'id11'
+
+        file('Dockerfile') << """
+            FROM alpine:3.2
+            MAINTAINER id
+            ADD can-build-Docker-image-from-standard-Gradle-distribution-plugin* /tmp/
+        """.stripIndent()
+
+        file('src/main/java/test/Test.java') << '''
+        package test;
+        public class Test { public static void main(String[] args) {} }
+        '''.stripIndent()
+
+        buildFile << """
+            plugins {
+                id 'com.palantir.docker'
+                id 'java'
+                id 'application'
+            }
+            mainClassName = "test.Test"
+
+            docker {
+                name '${id}'
+                dependsOn distTar
+            }
+        """.stripIndent()
+        when:
+        BuildResult buildResult = with('docker').build()
+
+        then:
+        buildResult.task(':distTar').outcome == TaskOutcome.SUCCESS
+        buildResult.task(':dockerPrepare').outcome == TaskOutcome.SUCCESS
+        buildResult.task(':docker').outcome == TaskOutcome.SUCCESS
+        execCond("docker rmi -f ${id}") || true
+    }
+
     def 'check if compute name replaces the name correctly'() {
         expect:
         PalantirDockerPlugin.computeName(name, tag) == result
