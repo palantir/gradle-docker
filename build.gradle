@@ -6,19 +6,8 @@ plugins {
     id 'eclipse'
     id 'groovy'
     id 'idea'
+    id 'java-gradle-plugin'
     id 'maven-publish'
-}
-
-task createClasspathManifest {
-    def outputDir = file("$buildDir/$name")
-
-    inputs.files sourceSets.main.runtimeClasspath
-    outputs.dir outputDir
-
-    doLast {
-        outputDir.mkdirs()
-        file("$outputDir/plugin-classpath.txt").text = sourceSets.main.runtimeClasspath.join("\n")
-    }
 }
 
 repositories {
@@ -27,14 +16,11 @@ repositories {
 
 
 dependencies {
-    compile 'com.google.guava:guava:18.0'
     compile gradleApi()
+    compile 'com.google.guava:guava:18.0'
 
     testCompile gradleTestKit()
-    testCompile('org.spockframework:spock-core:1.0-groovy-2.4') {
-        exclude module: 'groovy-all'
-    }
-    testCompile files(createClasspathManifest)
+    testCompile "com.netflix.nebula:nebula-test:4.0.0" // for better temp directory junit rule only
 }
 
 if (System.env.CIRCLE_TEST_REPORTS) {
@@ -42,7 +28,7 @@ if (System.env.CIRCLE_TEST_REPORTS) {
 }
 
 group 'com.palantir.gradle.docker'
-version '0.9.3'
+version gitVersion()
 
 task sourceJar(type: Jar) {
     from sourceSets.main.allSource
@@ -51,21 +37,10 @@ task sourceJar(type: Jar) {
 
 publishing {
     publications {
-        mavenJava(MavenPublication) {
+        bintray(MavenPublication) {
             from components.java
-        }
-    }
-}
-
-publishing {
-    repositories {
-        mavenLocal()
-        maven {
-            url "http://israproductions.com:8081/repository/maven-releases"
-            credentials {
-                username "admin"
-                password "admin123"
-            }
+            artifact(sourceJar)
+            artifact(publishPluginJavaDocsJar)
         }
     }
 }
@@ -82,7 +57,7 @@ bintray {
         publications = ['bintray']
     }
 }
-  
+
 bintrayUpload.dependsOn 'generatePomFileForBintrayPublication', 'sourceJar', 'build'
 
 bintrayUpload.onlyIf {

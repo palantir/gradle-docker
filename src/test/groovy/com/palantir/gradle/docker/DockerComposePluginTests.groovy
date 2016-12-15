@@ -22,8 +22,8 @@ class DockerComposePluginTests extends AbstractPluginTest {
 
     def 'Generates docker-compose.yml from template with version strings replaced'() {
         given:
-        temporaryFolder.newFile('Dockerfile') << "Foo"
-        temporaryFolder.newFile("docker-compose.yml.template") << '''
+        file('Dockerfile') << "Foo"
+        file("docker-compose.yml.template") << '''
             service1:
               image: 'repository/service1:{{com.google.guava:guava}}'
             service2:
@@ -50,15 +50,15 @@ class DockerComposePluginTests extends AbstractPluginTest {
         BuildResult buildResult = with('generateDockerCompose', "--stacktrace").build()
         then:
         buildResult.task(':generateDockerCompose').outcome == TaskOutcome.SUCCESS
-        def dockerComposeText = temporaryFolder.root.toPath().resolve("docker-compose.yml").text
+        def dockerComposeText = file("docker-compose.yml").text
         dockerComposeText.contains("repository/service1:18.0")
         dockerComposeText.contains("repository/service2:1.7.10")
     }
 
     def 'Fails if docker-compose.yml.template has unmatched version tokens'() {
         given:
-        temporaryFolder.newFile('Dockerfile') << "Foo"
-        temporaryFolder.newFile("docker-compose.yml.template") << '''
+        file('Dockerfile') << "Foo"
+        file("docker-compose.yml.template") << '''
             service1:
               image: 'repository/service1:{{foo:bar}}'
         '''.stripIndent()
@@ -86,8 +86,8 @@ class DockerComposePluginTests extends AbstractPluginTest {
 
     def 'docker-compose template and file can have custom locations'() {
         given:
-        temporaryFolder.newFile('Dockerfile') << "Foo"
-        new File(temporaryFolder.newFolder("templates"), "customTemplate.yml") << '''
+        file('Dockerfile') << "Foo"
+        file("templates/customTemplate.yml") << '''
             nothing
         '''.stripIndent()
         buildFile << '''
@@ -109,12 +109,12 @@ class DockerComposePluginTests extends AbstractPluginTest {
         BuildResult buildResult = with('generateDockerCompose', "--stacktrace").build()
         then:
         buildResult.task(':generateDockerCompose').outcome == TaskOutcome.SUCCESS
-        temporaryFolder.root.toPath().resolve("compose-files").resolve("customDockerCompose.yml").toFile().exists()
+        file("compose-files/customDockerCompose.yml").exists()
     }
 
     def 'Fails if template is configured but does not exist'() {
         given:
-        temporaryFolder.newFile('Dockerfile') << "Foo"
+        file('Dockerfile') << "Foo"
         buildFile << '''
             plugins {
                 id 'com.palantir.docker-compose'
