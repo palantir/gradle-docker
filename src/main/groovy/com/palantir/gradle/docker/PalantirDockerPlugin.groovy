@@ -132,13 +132,14 @@ class PalantirDockerPlugin implements Plugin<Project> {
                     })
                     tag.dependsOn subTask
 
-                    project.tasks.create('dockerPush' + taskTagName, Exec, {
+                    Exec pushSubTask = project.tasks.create('dockerPush' + taskTagName, Exec, {
                         group = 'Docker'
                         description = "Pushes the Docker image with tag '${tagName}' to configured Docker Hub"
                         workingDir dockerDir
                         commandLine 'docker', 'push', computeName(ext.name, tagName)
                         dependsOn tag
                     })
+                    push.dependsOn pushSubTask
                 }
             }
 
