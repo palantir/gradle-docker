@@ -35,8 +35,8 @@ automatically include outputs of task dependencies in the Docker build context.
 - `dockerfile` (optional) dockerfile to use for building the image; defaults to
   `${projectDir}/Dockerfile`
 - `dependsOn` (optional) an argument list of tasks that docker builds must depend on;
-  defaults to the empty set
-- `files` (optional) an argument list of files to be included in the docker build context; if this parameter is omitted, all files in `${projectDir}` are included
+  defaults to the empty set. All task outputs are added to the Docker build context. A standard use of the plugin is to specify `dependsOn distTar` without any additional `files` (see below).
+- `files` (optional) an argument list of files to be included in the Docker build context; if this parameter is omitted, all files in `${projectDir}` are included
 - `buildArgs` (optional) an argument map of string to string which will set --build-arg
   arguments to the docker build command; defaults to empty, which results in no --build-arg parameters
 - `pull` (optional) a boolean argument which defines whether Docker should attempt to pull
@@ -54,6 +54,16 @@ Simplest configuration:
 ````gradle
 docker {
     name 'hub.docker.com/username/my-app:version'
+}
+```
+
+Canonical configuration for building a Docker image from a distribution archive:
+
+````gradle
+// Assumes that Gradle "distribution" plugin is applied
+docker {
+    name 'hub.docker.com/username/my-app:version'
+    dependsOn tasks.distTar   // adds resulting *.tgz to the build context
 }
 ```
 
