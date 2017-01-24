@@ -1,6 +1,6 @@
 plugins {
     id 'com.gradle.plugin-publish' version '0.9.2'
-    id 'com.jfrog.bintray' version '1.5'
+    id 'com.jfrog.bintray' version '1.6'
     id 'com.palantir.git-version' version '0.4.0'
 
     id 'eclipse'
@@ -59,10 +59,6 @@ bintray {
 }
 
 bintrayUpload.dependsOn 'generatePomFileForBintrayPublication', 'sourceJar', 'build'
-
-bintrayUpload.onlyIf {
-    System.env.BINTRAY_USER && System.env.BINTRAY_KEY && project.version ==~ /\d+\.\d+\.\d+/
-}
 
 pluginBundle {
     website = 'https://github.com/palantir/gradle-docker'
