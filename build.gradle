@@ -28,7 +28,7 @@ if (System.env.CIRCLE_TEST_REPORTS) {
 }
 
 group 'com.palantir.gradle.docker'
-version gitVersion()
+version System.env.CIRCLE_TAG ?: gitVersion()
 
 task sourceJar(type: Jar) {
     from sourceSets.main.allSource
