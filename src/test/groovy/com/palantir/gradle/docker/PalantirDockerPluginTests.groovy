@@ -489,7 +489,7 @@ class PalantirDockerPluginTests extends AbstractPluginTest {
             }
         """.stripIndent()
         when:
-        BuildResult buildResult = with('distTar', 'docker', '--stacktrace').build()
+        BuildResult buildResult = with('docker').build()
 
         then:
         buildResult.task(':distTar').outcome == TaskOutcome.SUCCESS
