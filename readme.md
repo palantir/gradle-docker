@@ -34,9 +34,7 @@ automatically include outputs of task dependencies in the Docker build context.
   be stripped before applying a specific tag; defaults to the empty set
 - `dockerfile` (optional) dockerfile to use for building the image; defaults to
   `${projectDir}/Dockerfile`
-- `dependsOn` (optional) an argument list of tasks that docker builds must depend on;
-  defaults to the empty set. All task outputs are added to the Docker build context. A standard use of the plugin is to specify `dependsOn distTar` without any additional `files` (see below).
-- `files` (optional) an argument list of files to be included in the Docker build context; if this parameter is omitted, all files in `${projectDir}` are included
+- `files` (optional) an argument list of files to be included in the Docker build context, evaluated per `Project#files`. For example, `files tasks.distTar.outputs` adds the TAR/TGZ file produced by the `distTar` tasks, and `files tasks.distTar.outputs, 'my-file.txt'` adds the archive in addition to file `my-file.txt` from the project root directory.
 - `buildArgs` (optional) an argument map of string to string which will set --build-arg
   arguments to the docker build command; defaults to empty, which results in no --build-arg parameters
 - `pull` (optional) a boolean argument which defines whether Docker should attempt to pull
@@ -63,7 +61,7 @@ Canonical configuration for building a Docker image from a distribution archive:
 // Assumes that Gradle "distribution" plugin is applied
 docker {
     name 'hub.docker.com/username/my-app:version'
-    dependsOn tasks.distTar   // adds resulting *.tgz to the build context
+    files tasks.distTar.outputs   // adds resulting *.tgz to the build context
 }
 ```
 
@@ -74,8 +72,7 @@ docker {
     name 'hub.docker.com/username/my-app:version'
     tags 'latest'
     dockerfile 'Dockerfile'
-    dependsOn tasks.distTar
-    files 'file1.txt', 'file2.txt'
+    files tasks.distTar.outputs, 'file1.txt', 'file2.txt'
     buildArgs([BUILD_VERSION: 'version'])
     pull true
 }
