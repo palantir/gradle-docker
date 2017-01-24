@@ -79,19 +79,10 @@ class PalantirDockerPlugin implements Plugin<Project> {
             clean.delete dockerDir
 
             prepare.with {
+                with ext.copySpec
                 from(ext.resolvedDockerfile) {
                     rename { fileName ->
                         fileName.replace(ext.resolvedDockerfile.getName(), 'Dockerfile')
-                    }
-                }
-                from ext.dependencies*.outputs
-                if (ext.resolvedFiles) {
-                    // provide compatibility with optional 'files' parameter:
-                    from ext.resolvedFiles
-                } else {
-                    // default: copy all files excluding the project buildDir
-                    from(project.projectDir) {
-                        exclude "${project.buildDir.name}"
                     }
                 }
                 into dockerDir
@@ -112,7 +103,7 @@ class PalantirDockerPlugin implements Plugin<Project> {
                 commandLine buildCommandLine
                 dependsOn ext.getDependencies()
                 logging.captureStandardOutput LogLevel.INFO
-                logging.captureStandardError  LogLevel.ERROR
+                logging.captureStandardError LogLevel.ERROR
             }
 
             if (!ext.tags.isEmpty()) {

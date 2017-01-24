@@ -388,7 +388,7 @@ class PalantirDockerPluginTests extends AbstractPluginTest {
         execCond("docker rmi -f ${id}") || true
     }
 
-    def 'when no files are specified, then all files from the project directory are added to the docker context'() {
+    def 'can add files from project directory to build context'() {
         given:
         String id = 'id9'
         String filename = "bar.txt"
@@ -404,6 +404,7 @@ class PalantirDockerPluginTests extends AbstractPluginTest {
 
             docker {
                 name '${id}'
+                files "bar.txt"
             }
         """.stripIndent()
         createFile(filename)
@@ -417,7 +418,7 @@ class PalantirDockerPluginTests extends AbstractPluginTest {
         execCond("docker rmi -f ${id}") || true
     }
 
-    def 'project files and outputs from dependencies are added to the docker context'() {
+    def 'when adding a project-dir file and a Tar file, then they both end up (unzipped) in the docker image'() {
         given:
         String id = 'id10'
         createFile('from_project')
@@ -446,7 +447,7 @@ class PalantirDockerPluginTests extends AbstractPluginTest {
 
             docker {
                 name '${id}'
-                dependsOn myTgz
+                files tasks.myTgz.outputs, 'from_project'
             }
         """.stripIndent()
         when:
@@ -484,11 +485,11 @@ class PalantirDockerPluginTests extends AbstractPluginTest {
 
             docker {
                 name '${id}'
-                dependsOn distTar
+                files tasks.distTar.outputs
             }
         """.stripIndent()
         when:
-        BuildResult buildResult = with('docker').build()
+        BuildResult buildResult = with('distTar', 'docker', '--stacktrace').build()
 
         then:
         buildResult.task(':distTar').outcome == TaskOutcome.SUCCESS
@@ -511,4 +512,3 @@ class PalantirDockerPluginTests extends AbstractPluginTest {
         "host:port/v1:1" | "latest" | "host:port/v1:latest"
     }
 }
-

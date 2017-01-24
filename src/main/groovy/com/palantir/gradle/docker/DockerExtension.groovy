@@ -15,13 +15,13 @@
  */
 package com.palantir.gradle.docker
 
-import org.gradle.api.Project
-import org.gradle.api.Task
-
 import com.google.common.base.Preconditions
 import com.google.common.base.Strings
 import com.google.common.collect.ImmutableMap
 import com.google.common.collect.ImmutableSet
+import org.gradle.api.Project
+import org.gradle.api.Task
+import org.gradle.api.file.CopySpec
 
 class DockerExtension {
     Project project
@@ -31,7 +31,6 @@ class DockerExtension {
     private String dockerComposeTemplate = 'docker-compose.yml.template'
     private String dockerComposeFile = 'docker-compose.yml'
     private Set<Task> dependencies = ImmutableSet.of()
-    private Set<String> files = ImmutableSet.of()
     private Set<String> tags = ImmutableSet.of()
     private Map<String, String> buildArgs = ImmutableMap.of()
     private boolean pull = false
@@ -39,10 +38,13 @@ class DockerExtension {
     private File resolvedDockerfile = null
     private File resolvedDockerComposeTemplate = null
     private File resolvedDockerComposeFile = null
-    private Set<File> resolvedFiles = null
+
+    // The CopySpec defining the Docker Build Context files
+    private final CopySpec copySpec
 
     public DockerExtension(Project project) {
         this.project = project
+        this.copySpec = project.copySpec()
     }
 
     public void setName(String name) {
@@ -75,8 +77,8 @@ class DockerExtension {
         return dependencies
     }
 
-    public void files(String... args) {
-        this.files = ImmutableSet.copyOf(args)
+    public void files(Object... files) {
+        copySpec.from(files)
     }
 
     public Set<String> getTags() {
@@ -99,8 +101,8 @@ class DockerExtension {
         return resolvedDockerComposeFile
     }
 
-    public Set<String> getResolvedFiles() {
-        return resolvedFiles
+    public CopySpec getCopySpec() {
+        return copySpec
     }
 
     public void resolvePathsAndValidate() {
@@ -111,15 +113,6 @@ class DockerExtension {
         Preconditions.checkArgument(resolvedDockerfile.exists(), "dockerfile '%s' does not exist.", dockerfile)
         resolvedDockerComposeFile = project.file(dockerComposeFile)
         resolvedDockerComposeTemplate = project.file(dockerComposeTemplate)
-
-        ImmutableSet.Builder<File> builder = ImmutableSet.builder()
-        for (String file : files) {
-            def resFile = project.file(file)
-            Preconditions.checkArgument(resFile.exists(), "file '%s' does not exist.", file)
-            builder.add(resFile)
-        }
-
-        resolvedFiles = builder.build()
     }
 
     public Map<String, String> getBuildArgs() {
