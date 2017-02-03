@@ -15,18 +15,19 @@
  */
 package com.palantir.gradle.docker;
 
+import org.gradle.api.artifacts.DependencySet;
+import org.gradle.api.artifacts.ModuleDependency;
+import org.gradle.api.artifacts.PublishArtifact;
+import org.gradle.api.attributes.Usage;
+import org.gradle.api.internal.component.SoftwareComponentInternal;
+import org.gradle.api.internal.component.UsageContext;
+
 import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
-import org.gradle.api.artifacts.DependencySet;
-import org.gradle.api.artifacts.ModuleDependency;
-import org.gradle.api.artifacts.PublishArtifact;
-import org.gradle.api.internal.component.SoftwareComponentInternal;
-import org.gradle.api.internal.component.Usage;
-
 public class DockerComponent implements SoftwareComponentInternal {
-    private final Usage runtimeUsage = new RuntimeUsage();
+    private final UsageContext runtimeUsage = new RuntimeUsageContext();
     private final LinkedHashSet<PublishArtifact> artifacts = new LinkedHashSet<>();
     private final DependencySet runtimeDependencies;
 
@@ -41,14 +42,14 @@ public class DockerComponent implements SoftwareComponentInternal {
     }
 
     @Override
-    public Set<Usage> getUsages() {
+    public Set<UsageContext> getUsages() {
         return Collections.singleton(runtimeUsage);
     }
 
-    private class RuntimeUsage implements Usage {
+    private class RuntimeUsageContext implements UsageContext {
         @Override
-        public String getName() {
-            return "runtime";
+        public Usage getUsage() {
+            return Usage.FOR_RUNTIME;
         }
 
         @Override
