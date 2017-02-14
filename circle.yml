@@ -14,7 +14,7 @@ stages:
         path: $CIRCLE_TEST_REPORTS
       - type: deploy
         shell: /bin/bash
-        command: ./gradlew bintrayUpload
+        command: ./gradlew -i bintrayUpload
       - type: deploy
         shell: /bin/bash
         command: ./gradlew -i -Dgradle.publish.key=$GRADLE_KEY -Dgradle.publish.secret=$GRADLE_SECRET publishPlugins
