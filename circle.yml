@@ -1,26 +1,20 @@
-machine:
-  java:
-    version: openjdk7
-  pre:
-    - curl -sSL https://s3.amazonaws.com/circle-downloads/install-circleci-docker.sh | bash -s -- 1.10.0
-    - sudo wget -O /usr/local/bin/docker-compose 'https://github.com/docker/compose/releases/download/1.6.2/docker-compose-Linux-x86_64'
-    - sudo chmod 0755 /usr/local/bin/docker-compose
-  services:
-    - docker
-  environment:
-    TERM: dumb
-
-general:
-  artifacts:
-    - build/libs
-
-test:
-  override:
-    - ./gradlew --parallel -i build
-
-deployment:
-  release:
-    tag: /[0-9]+(\.[0-9]+)+((-(beta|rc)[0-9]{1,2})(\.[0-9])?)?/
-    commands:
-      - ./gradlew -i bintrayUpload
-      - ./gradlew -i -Dgradle.publish.key=$GRADLE_KEY -Dgradle.publish.secret=$GRADLE_SECRET publishPlugins
+version: 2
+executorType: machine
+stages:
+  build:
+    workDir: ~/gradle-docker
+    environment:
+      TERM: dumb
+    steps:
+      - type: checkout
+      - type: shell
+        shell: /bin/bash
+        command: ./gradlew --parallel -i build
+      - type: test-results-store
+        path: $CIRCLE_TEST_REPORTS
+      - type: deploy
+        shell: /bin/bash
+        command: ./gradlew bintrayUpload
+      - type: deploy
+        shell: /bin/bash
+        command: ./gradlew -i -Dgradle.publish.key=$GRADLE_KEY -Dgradle.publish.secret=$GRADLE_SECRET publishPlugins
