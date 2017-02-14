@@ -46,8 +46,8 @@ publishing {
 }
 
 bintray {
-    user = System.env.BINTRAY_USER
-    key = System.env.BINTRAY_KEY
+    user = System.env.BINTRAY_USERNAME
+    key = System.env.BINTRAY_PASSWORD
     publish = true
     pkg {
         repo = 'releases'
@@ -59,6 +59,10 @@ bintray {
 }
 
 bintrayUpload.dependsOn 'generatePomFileForBintrayPublication', 'sourceJar', 'build'
+
+bintrayUpload.onlyIf {
+    project.version ==~ /[0-9]+(\.[0-9]+)+((-(beta|rc)[0-9]{1,2})(\.[0-9])?)?/
+}
 
 pluginBundle {
     website = 'https://github.com/palantir/gradle-docker'
