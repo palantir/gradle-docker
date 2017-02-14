@@ -498,6 +498,53 @@ class PalantirDockerPluginTests extends AbstractPluginTest {
         execCond("docker rmi -f ${id}") || true
     }
 
+    def 'check labels are correctly applied to image'() {
+        given:
+        String id = 'id10'
+        file('Dockerfile') << """
+            FROM alpine:3.2
+        """.stripIndent()
+        buildFile << """
+            plugins {
+                id 'com.palantir.docker'
+            }
+
+            docker {
+                name '${id}'
+                labels 'test-label': 'test-value', 'another.label': 'another.value'
+            }
+        """.stripIndent()
+        when:
+        BuildResult buildResult = with('docker').build()
+
+        then:
+        buildResult.task(':docker').outcome == TaskOutcome.SUCCESS
+        exec("docker inspect --format '{{.Config.Labels}}' ${id}").contains("test-label")
+        execCond("docker rmi -f ${id}") || true
+    }
+
+    def 'fail with bad labels'() {
+        given:
+        file('Dockerfile') << """
+            FROM alpine:3.2
+        """.stripIndent()
+        buildFile << """
+            plugins {
+                id 'com.palantir.docker'
+            }
+
+            docker {
+                name 'test-bad-labels'
+                labels 'test_label': 'test_value'
+            }
+        """.stripIndent()
+        when:
+        BuildResult buildResult = with('docker').buildAndFail()
+
+        then:
+        buildResult.output.contains("Docker label 'test_label' contains illegal characters.")
+    }
+
     def 'check if compute name replaces the name correctly'() {
         expect:
         PalantirDockerPlugin.computeName(name, tag) == result
