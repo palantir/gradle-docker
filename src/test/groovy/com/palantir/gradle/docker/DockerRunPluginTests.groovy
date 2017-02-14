@@ -144,7 +144,7 @@ class DockerRunPluginTests extends AbstractPluginTest {
 
         given:
         File testFolder = directory("test")
-        file('Dockerfile', testFolder) << '''
+        file('Dockerfile') << '''
             FROM alpine:3.2
 
             RUN mkdir /test
