@@ -131,11 +131,6 @@ class DockerRunPluginTests extends AbstractPluginTest {
     }
 
     def 'can mount volumes'() {
-        if (!isLinux()) {
-            // whenever Docker on Windows/OSX is able to mount volumes outside of /User,
-            // this should be removed
-            return
-        }
         if (isCi()) {
             // circleci has problems removing volumes:
             // see: https://discuss.circleci.com/t/docker-error-removing-intermediate-container/70/10
