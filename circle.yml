@@ -11,7 +11,7 @@ stages:
         shell: /bin/bash
         command: ./gradlew --parallel -i build
       - type: test-results-store
-        path: $CIRCLE_TEST_REPORTS
+        path: build/test-results
       - type: deploy
         shell: /bin/bash
         command: ./gradlew -i bintrayUpload
