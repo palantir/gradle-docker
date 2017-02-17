@@ -523,7 +523,7 @@ class PalantirDockerPluginTests extends AbstractPluginTest {
         execCond("docker rmi -f ${id}") || true
     }
 
-    def 'fail with bad labels'() {
+    def 'fail with bad label key character'() {
         given:
         file('Dockerfile') << """
             FROM alpine:3.2
@@ -542,7 +542,9 @@ class PalantirDockerPluginTests extends AbstractPluginTest {
         BuildResult buildResult = with('docker').buildAndFail()
 
         then:
-        buildResult.output.contains("Docker label 'test_label' contains illegal characters.")
+        buildResult.output.contains("Docker label 'test_label' contains illegal characters. Label keys " +
+                "must only contain lowercase alphanumberic, `.`, or `-` characters (must match " +
+                "^[a-z0-9.-]*\$).")
     }
 
     def 'check if compute name replaces the name correctly'() {

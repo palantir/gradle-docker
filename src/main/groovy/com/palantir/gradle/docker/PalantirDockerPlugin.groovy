@@ -35,7 +35,7 @@ import java.util.regex.Pattern
 class PalantirDockerPlugin implements Plugin<Project> {
 
     private static final Logger log = Logging.getLogger(PalantirDockerPlugin.class)
-    private static final Pattern labelKeyPattern = Pattern.compile("^[a-z0-9.-]*\$")
+    private static final Pattern LABEL_KEY_PATTERN = Pattern.compile('^[a-z0-9.-]*$')
 
     @Override
     void apply(Project project) {
@@ -100,9 +100,10 @@ class PalantirDockerPlugin implements Plugin<Project> {
             }
             if (!ext.labels.isEmpty()) {
                 for (Map.Entry<String, String> label : ext.labels.entrySet()) {
-                    if (!label.getKey().matches(labelKeyPattern)) {
+                    if (!label.getKey().matches(LABEL_KEY_PATTERN)) {
                         throw new GradleException(String.format("Docker label '%s' contains illegal characters. " +
-                                "Label keys must only contain lowercase alphanumberic, `.`, or `-` characters.", label.getKey()))
+                                "Label keys must only contain lowercase alphanumberic, `.`, or `-` characters (must match %s).",
+                                label.getKey(), LABEL_KEY_PATTERN.pattern()))
                     }
                     buildCommandLine.addAll('--label', "${label.getKey()}=${label.getValue()}")
                 }
