@@ -543,8 +543,8 @@ class PalantirDockerPluginTests extends AbstractPluginTest {
 
         then:
         buildResult.output.contains("Docker label 'test_label' contains illegal characters. Label keys " +
-                "must only contain lowercase alphanumberic, `.`, or `-` characters (must match " +
-                "^[a-z0-9.-]*\$).")
+            "must only contain lowercase alphanumberic, `.`, or `-` characters (must match " +
+            "^[a-z0-9.-]*\$).")
     }
 
     def 'check if compute name replaces the name correctly'() {
@@ -559,5 +559,32 @@ class PalantirDockerPluginTests extends AbstractPluginTest {
         "host/v1:1"      | "latest" | "host/v1:latest"
         "host:port/v1"   | "latest" | "host:port/v1:latest"
         "host:port/v1:1" | "latest" | "host:port/v1:latest"
+    }
+
+    def 'can add entire directories via copyspec'() {
+        given:
+        String id = 'id1'
+        createFile("myDir/bar")
+        file('Dockerfile') << """
+            FROM alpine:3.2
+            MAINTAINER ${id}
+            ADD myDir /myDir/
+        """.stripIndent()
+        buildFile << """
+            plugins {
+                id 'com.palantir.docker'
+            }
+
+            docker {
+                name '${id}'
+                copySpec.from("myDir").into("myDir")
+            }
+        """.stripIndent()
+        when:
+        BuildResult buildResult = with('docker').build()
+
+        then:
+        buildResult.task(':dockerPrepare').outcome == TaskOutcome.SUCCESS
+        file("build/docker/myDir/bar").exists()
     }
 }
