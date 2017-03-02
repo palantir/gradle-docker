@@ -560,4 +560,34 @@ class PalantirDockerPluginTests extends AbstractPluginTest {
         "host:port/v1"   | "latest" | "host:port/v1:latest"
         "host:port/v1:1" | "latest" | "host:port/v1:latest"
     }
+
+    def 'check if the directory gets preserved without getting unpacked'() {
+        given:
+        String id = 'id1'
+        String dirName = "scripts"
+        file('Dockerfile') << """
+            FROM alpine:3.2
+            MAINTAINER ${id}
+            ADD ${dirName} /scripts/
+        """.stripIndent()
+        buildFile << """
+            plugins {
+                id 'com.palantir.docker'
+            }
+
+            docker {
+                name '${id}'
+                files "${dirName}"
+            }
+        """.stripIndent()
+        def dirBase = new File(projectDir, dirName).mkdirs()
+        when:
+        BuildResult buildResult = with('docker').build()
+
+        then:
+        buildResult.task(':dockerPrepare').outcome == TaskOutcome.SUCCESS
+        buildResult.task(':docker').outcome == TaskOutcome.SUCCESS
+        exec("docker inspect --format '{{.Author}}' ${id}") == "'${id}'\n"
+        execCond("docker rmi -f ${id}") || true
+    }
 }
