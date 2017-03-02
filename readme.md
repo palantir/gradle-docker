@@ -34,7 +34,12 @@ automatically include outputs of task dependencies in the Docker build context.
   be stripped before applying a specific tag; defaults to the empty set
 - `dockerfile` (optional) dockerfile to use for building the image; defaults to
   `${projectDir}/Dockerfile`
-- `files` (optional) an argument list of files to be included in the Docker build context, evaluated per `Project#files`. For example, `files tasks.distTar.outputs` adds the TAR/TGZ file produced by the `distTar` tasks, and `files tasks.distTar.outputs, 'my-file.txt'` adds the archive in addition to file `my-file.txt` from the project root directory.
+- `files` (optional) an argument list of files to be included in the Docker build context, evaluated per `Project#files`. For example, `files tasks.distTar.outputs` adds the TAR/TGZ file produced by the `distTar` tasks, and `files tasks.distTar.outputs, 'my-file.txt'` adds the archive in addition to file `my-file.txt` from the project root directory. The specified files are collected in a Gradle CopySpec which is copied `into` the Docker build context directory. The underlying CopySpec can be used to copy entire directories into the build context, for example:
+````gradle
+docker {
+    copySpec.from("myDir").into("myDir")
+}
+````
 - `buildArgs` (optional) an argument map of string to string which will set --build-arg
   arguments to the docker build command; defaults to empty, which results in no --build-arg parameters
 - `labels` (optional) a map of string to string which will set --label arguments
