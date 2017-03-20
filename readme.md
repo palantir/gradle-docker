@@ -56,7 +56,7 @@ Tag and Push tasks for each tag will be generated for each provided `tags` entry
 
 Simplest configuration:
 
-````gradle
+```gradle
 docker {
     name 'hub.docker.com/username/my-app:version'
 }
@@ -64,7 +64,7 @@ docker {
 
 Canonical configuration for building a Docker image from a distribution archive:
 
-````gradle
+```gradle
 // Assumes that Gradle "distribution" plugin is applied
 docker {
     name 'hub.docker.com/username/my-app:version'
@@ -74,7 +74,7 @@ docker {
 
 Configuration specifying all parameters:
 
-````gradle
+```gradle
 docker {
     name 'hub.docker.com/username/my-app:version'
     tags 'latest'
