@@ -384,9 +384,9 @@ class PalantirDockerPluginTests extends AbstractPluginTest {
 
         when:
         BuildResult buildResult1 = with('--info', 'docker').build()
-        def imageID1 = exec("docker images -f reference=${id} -aq")
+        def imageID1 = exec("docker inspect --format=\"{{.Id}}\" ${id}")
         BuildResult buildResult2 = with('--info', 'docker').build()
-        def imageID2 = exec("docker images -f reference=${id} -aq")
+        def imageID2 = exec("docker inspect --format=\"{{.Id}}\" ${id}")
 
         then:
         buildResult1.task(':docker').outcome == TaskOutcome.SUCCESS
