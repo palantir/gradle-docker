@@ -361,6 +361,40 @@ class PalantirDockerPluginTests extends AbstractPluginTest {
         execCond("docker rmi -f ${id}") || true
     }
 
+    def 'rebuilding an image does it from scratch when "noCache" parameter is set'() {
+        given:
+        String id = 'id66'
+        String filename = "bar.txt"
+        file('Dockerfile') << """
+            FROM alpine:3.2
+            ADD ${filename} /tmp/
+        """.stripIndent()
+        buildFile << """
+            plugins {
+                id 'com.palantir.docker'
+            }
+
+            docker {
+                name '${id}'
+                files "${filename}"
+                noCache true
+            }
+        """.stripIndent()
+        createFile(filename)
+
+        when:
+        BuildResult buildResult1 = with('--info', 'docker').build()
+        def imageID1 = exec("docker images -f reference=${id} -aq")
+        BuildResult buildResult2 = with('--info', 'docker').build()
+        def imageID2 = exec("docker images -f reference=${id} -aq")
+
+        then:
+        buildResult1.task(':docker').outcome == TaskOutcome.SUCCESS
+        buildResult2.task(':docker').outcome == TaskOutcome.SUCCESS
+        imageID1 != imageID2
+        execCond("docker rmi -f ${id}") || true
+    }
+
     def 'base image is pulled when "pull" parameter is set'() {
         given:
         String id = 'id8'

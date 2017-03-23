@@ -93,8 +93,9 @@ class PalantirDockerPlugin implements Plugin<Project> {
             }
 
             List<String> buildCommandLine = ['docker', 'build']
-            if (!ext.noCache) {
-                buildCommandLine << '--no-cache'
+            if (ext.noCache) {
+                buildCommandLine.add '--no-cache'
+                log.info("No cache option ON")
             }
             if (!ext.buildArgs.isEmpty()) {
                 for (Map.Entry<String, String> buildArg : ext.buildArgs.entrySet()) {
