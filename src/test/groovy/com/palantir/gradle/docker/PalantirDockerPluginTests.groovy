@@ -56,25 +56,6 @@ class PalantirDockerPluginTests extends AbstractPluginTest {
         buildResult.output.contains("name is a required docker configuration item.")
     }
 
-    def 'fail with missing dockerfile'() {
-        given:
-        buildFile << '''
-            plugins {
-                id 'com.palantir.docker'
-            }
-            docker {
-                name 'test'
-                dockerfile 'missing'
-            }
-        '''.stripIndent()
-
-        when:
-        BuildResult buildResult = with('docker').buildAndFail()
-
-        then:
-        buildResult.output.contains("dockerfile 'missing' does not exist.")
-    }
-
     def 'check plugin creates a docker container with default configuration'() {
         given:
         String id = 'id1'
@@ -105,7 +86,7 @@ class PalantirDockerPluginTests extends AbstractPluginTest {
     def 'check plugin creates a docker container with non-standard Dockerfile name'() {
         given:
         String id = 'id2'
-        file('foo') << """
+        File foo = file('foo') << """
             FROM alpine:3.2
             MAINTAINER ${id}
         """.stripIndent()
@@ -116,7 +97,7 @@ class PalantirDockerPluginTests extends AbstractPluginTest {
 
             docker {
                 name '${id}'
-                dockerfile 'foo'
+                dockerfile new File('foo')
             }
         """.stripIndent()
 
