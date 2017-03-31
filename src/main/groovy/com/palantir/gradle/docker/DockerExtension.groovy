@@ -27,7 +27,8 @@ class DockerExtension {
     Project project
 
     private String name = null
-    private String dockerfile = 'Dockerfile'
+    private String dockerfilePath = 'Dockerfile'
+    private File dockerfile = null
     private String dockerComposeTemplate = 'docker-compose.yml.template'
     private String dockerComposeFile = 'docker-compose.yml'
     private Set<Task> dependencies = ImmutableSet.of()
@@ -56,7 +57,7 @@ class DockerExtension {
         return name
     }
 
-    public void setDockerfile(String dockerfile) {
+    public void setDockerfile(File dockerfile) {
         this.dockerfile = dockerfile
     }
 
@@ -118,8 +119,13 @@ class DockerExtension {
         Preconditions.checkArgument(!Strings.isNullOrEmpty(name),
             "name is a required docker configuration item.")
 
-        resolvedDockerfile = project.file(dockerfile)
-        Preconditions.checkArgument(resolvedDockerfile.exists(), "dockerfile '%s' does not exist.", dockerfile)
+        if (dockerfile != null) {
+            resolvedDockerfile = dockerfile
+        } else {
+            resolvedDockerfile = project.file(dockerfilePath)
+            Preconditions.checkArgument(resolvedDockerfile.exists(),
+                    "dockerfile '%s' does not exist.", dockerfile)
+        }
         resolvedDockerComposeFile = project.file(dockerComposeFile)
         resolvedDockerComposeTemplate = project.file(dockerComposeTemplate)
     }
