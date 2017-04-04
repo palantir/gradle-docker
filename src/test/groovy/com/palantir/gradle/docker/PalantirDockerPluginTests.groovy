@@ -86,7 +86,7 @@ class PalantirDockerPluginTests extends AbstractPluginTest {
     def 'check plugin creates a docker container with non-standard Dockerfile name'() {
         given:
         String id = 'id2'
-        File foo = file('foo') << """
+        file('foo') << """
             FROM alpine:3.2
             MAINTAINER ${id}
         """.stripIndent()
@@ -97,7 +97,7 @@ class PalantirDockerPluginTests extends AbstractPluginTest {
 
             docker {
                 name '${id}'
-                dockerfile new File('foo')
+                dockerfile project.file("foo")
             }
         """.stripIndent()
 

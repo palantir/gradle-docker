@@ -26,8 +26,8 @@ import org.gradle.api.file.CopySpec
 class DockerExtension {
     Project project
 
+    private static final String DEFAULT_DOCKERFILE_PATH = 'Dockerfile'
     private String name = null
-    private String dockerfilePath = 'Dockerfile'
     private File dockerfile = null
     private String dockerComposeTemplate = 'docker-compose.yml.template'
     private String dockerComposeFile = 'docker-compose.yml'
@@ -122,7 +122,7 @@ class DockerExtension {
         if (dockerfile != null) {
             resolvedDockerfile = dockerfile
         } else {
-            resolvedDockerfile = project.file(dockerfilePath)
+            resolvedDockerfile = project.file(DEFAULT_DOCKERFILE_PATH)
             Preconditions.checkArgument(resolvedDockerfile.exists(),
                     "dockerfile '%s' does not exist.", dockerfile)
         }
