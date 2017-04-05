@@ -123,8 +123,6 @@ class DockerExtension {
             resolvedDockerfile = dockerfile
         } else {
             resolvedDockerfile = project.file(DEFAULT_DOCKERFILE_PATH)
-            Preconditions.checkArgument(resolvedDockerfile.exists(),
-                    "dockerfile '%s' does not exist.", dockerfile)
         }
         resolvedDockerComposeFile = project.file(dockerComposeFile)
         resolvedDockerComposeTemplate = project.file(dockerComposeTemplate)
