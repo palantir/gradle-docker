@@ -56,25 +56,6 @@ class PalantirDockerPluginTests extends AbstractPluginTest {
         buildResult.output.contains("name is a required docker configuration item.")
     }
 
-    def 'fail with missing dockerfile'() {
-        given:
-        buildFile << '''
-            plugins {
-                id 'com.palantir.docker'
-            }
-            docker {
-                name 'test'
-                dockerfile 'missing'
-            }
-        '''.stripIndent()
-
-        when:
-        BuildResult buildResult = with('docker').buildAndFail()
-
-        then:
-        buildResult.output.contains("dockerfile 'missing' does not exist.")
-    }
-
     def 'check plugin creates a docker container with default configuration'() {
         given:
         String id = 'id1'
@@ -116,7 +97,7 @@ class PalantirDockerPluginTests extends AbstractPluginTest {
 
             docker {
                 name '${id}'
-                dockerfile 'foo'
+                dockerfile project.file("foo")
             }
         """.stripIndent()
 
@@ -358,6 +339,40 @@ class PalantirDockerPluginTests extends AbstractPluginTest {
         buildResult.task(':docker').outcome == TaskOutcome.SUCCESS
         exec("docker inspect --format '{{.Config.Env}}' ${id}").contains('ENV_BUILD_ARG_NO_DEFAULT=gradleBuildArg')
         exec("docker inspect --format '{{.Config.Env}}' ${id}").contains('BUILD_ARG_WITH_DEFAULT=gradleOverrideBuildArg')
+        execCond("docker rmi -f ${id}") || true
+    }
+
+    def 'rebuilding an image does it from scratch when "noCache" parameter is set'() {
+        given:
+        String id = 'id66'
+        String filename = "bar.txt"
+        file('Dockerfile') << """
+            FROM alpine:3.2
+            ADD ${filename} /tmp/
+        """.stripIndent()
+        buildFile << """
+            plugins {
+                id 'com.palantir.docker'
+            }
+
+            docker {
+                name '${id}'
+                files "${filename}"
+                noCache true
+            }
+        """.stripIndent()
+        createFile(filename)
+
+        when:
+        BuildResult buildResult1 = with('--info', 'docker').build()
+        def imageID1 = exec("docker inspect --format=\"{{.Id}}\" ${id}")
+        BuildResult buildResult2 = with('--info', 'docker').build()
+        def imageID2 = exec("docker inspect --format=\"{{.Id}}\" ${id}")
+
+        then:
+        buildResult1.task(':docker').outcome == TaskOutcome.SUCCESS
+        buildResult2.task(':docker').outcome == TaskOutcome.SUCCESS
+        imageID1 != imageID2
         execCond("docker rmi -f ${id}") || true
     }
 

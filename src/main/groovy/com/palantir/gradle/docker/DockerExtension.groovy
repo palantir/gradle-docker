@@ -26,8 +26,9 @@ import org.gradle.api.file.CopySpec
 class DockerExtension {
     Project project
 
+    private static final String DEFAULT_DOCKERFILE_PATH = 'Dockerfile'
     private String name = null
-    private String dockerfile = 'Dockerfile'
+    private File dockerfile = null
     private String dockerComposeTemplate = 'docker-compose.yml.template'
     private String dockerComposeFile = 'docker-compose.yml'
     private Set<Task> dependencies = ImmutableSet.of()
@@ -35,6 +36,7 @@ class DockerExtension {
     private Map<String, String> labels = ImmutableMap.of()
     private Map<String, String> buildArgs = ImmutableMap.of()
     private boolean pull = false
+    private boolean noCache = false
 
     private File resolvedDockerfile = null
     private File resolvedDockerComposeTemplate = null
@@ -56,7 +58,7 @@ class DockerExtension {
         return name
     }
 
-    public void setDockerfile(String dockerfile) {
+    public void setDockerfile(File dockerfile) {
         this.dockerfile = dockerfile
     }
 
@@ -118,8 +120,11 @@ class DockerExtension {
         Preconditions.checkArgument(!Strings.isNullOrEmpty(name),
             "name is a required docker configuration item.")
 
-        resolvedDockerfile = project.file(dockerfile)
-        Preconditions.checkArgument(resolvedDockerfile.exists(), "dockerfile '%s' does not exist.", dockerfile)
+        if (dockerfile != null) {
+            resolvedDockerfile = dockerfile
+        } else {
+            resolvedDockerfile = project.file(DEFAULT_DOCKERFILE_PATH)
+        }
         resolvedDockerComposeFile = project.file(dockerComposeFile)
         resolvedDockerComposeTemplate = project.file(dockerComposeTemplate)
     }
@@ -138,5 +143,13 @@ class DockerExtension {
 
     public void pull(boolean pull) {
         this.pull = pull
+    }
+
+    public boolean getNoCache() {
+        return noCache
+    }
+
+    public void noCache(boolean noCache) {
+        this.noCache = noCache
     }
 }
