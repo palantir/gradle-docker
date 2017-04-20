@@ -80,7 +80,7 @@ Configuration specifying all parameters:
 docker {
     name 'hub.docker.com/username/my-app:version'
     tags 'latest'
-    dockerfile 'Dockerfile'
+    dockerfile file('Dockerfile')
     files tasks.distTar.outputs, 'file1.txt', 'file2.txt'
     buildArgs([BUILD_VERSION: 'version'])
     labels(['key': 'value'])
