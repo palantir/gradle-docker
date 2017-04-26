@@ -20,9 +20,6 @@ import java.util.Map.Entry
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.tasks.Exec
-import org.gradle.internal.logging.text.StyledTextOutput
-import org.gradle.internal.logging.text.StyledTextOutputFactory
-import org.gradle.internal.logging.text.StyledTextOutput.Style
 
 import com.google.common.collect.Lists
 
@@ -86,8 +83,7 @@ class DockerRunPlugin implements Plugin<Project> {
                     File localFile = new File(project.projectDir, volume.key)
 
                     if (!localFile.exists()) {
-                       StyledTextOutput o = project.services.get(StyledTextOutputFactory.class).create(DockerRunPlugin)
-                       o.withStyle(Style.Error).println("ERROR: Local folder ${localFile} doesn't exist. Mounted volume will not be visible to container")
+                       println "ERROR: Local folder ${localFile} doesn't exist. Mounted volume will not be visible to container"
                        throw new IllegalStateException("Local folder ${localFile} doesn't exist.")
                     }
 
