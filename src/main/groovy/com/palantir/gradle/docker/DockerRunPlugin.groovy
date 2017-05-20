@@ -53,6 +53,11 @@ class DockerRunPlugin implements Plugin<Project> {
             ignoreExitValue = true
         })
 
+        Exec dockerNetworkModeStatus = project.tasks.create('dockerNetworkModeStatus', Exec, {
+            group = 'Docker Run'
+            description = 'Checks the network configuration of the container'
+        })
+
         project.afterEvaluate {
             dockerRunStatus.with {
                 standardOutput = new ByteArrayOutputStream()
@@ -67,6 +72,26 @@ class DockerRunPlugin implements Plugin<Project> {
                 }
             }
 
+            dockerNetworkModeStatus.with {
+                standardOutput = new ByteArrayOutputStream()
+                commandLine 'docker', 'inspect', '--format={{.HostConfig.NetworkMode}}', ext.name
+                doLast {
+                    def networkMode = standardOutput.toString().trim()
+                    if (networkMode == 'default') {
+                        println "Docker container '${ext.name}' has default network configuration (bridge)."
+                    }
+                    else {
+                        if (networkMode == ext.network) {
+                            println "Docker container '${ext.name}' is configured to run with '${ext.network}' network mode."
+                        }
+                        else {
+                            println "Docker container '${ext.name}' runs with '${networkMode}' network mode instead of the configured '${ext.network}'."
+                            return 1
+                        }
+                    }
+                }
+            }
+
             dockerRun.with {
                 List<String> args = Lists.newArrayList()
                 args.addAll(['docker', 'run'])
@@ -77,6 +102,9 @@ class DockerRunPlugin implements Plugin<Project> {
                   args.add('--rm')
                 } else {
                   finalizedBy dockerRunStatus
+                }
+                if (ext.network) {
+                    args.addAll(['--network', ext.network])
                 }
                 for (String port : ext.ports) {
                     args.add('-p')

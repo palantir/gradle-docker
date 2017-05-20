@@ -102,6 +102,30 @@ class DockerRunPluginTests extends AbstractPluginTest {
         offline.output =~ /(?m):dockerRunStatus\nDocker container 'bar' is STOPPED./
     }
 
+    def 'can run container with configured network' () {
+        given:
+        buildFile << '''
+            plugins {
+                id 'com.palantir.docker-run'
+            }
+            dockerRun {
+                name 'bar-hostnetwork'
+                image 'alpine:3.2'
+                network 'host'
+            }
+        '''.stripIndent()
+
+		when:
+		BuildResult buildResult = with('dockerRemoveContainer', 'dockerRun', 'dockerNetworkModeStatus').build()
+
+		then:
+		buildResult.task(':dockerRemoveContainer').outcome == TaskOutcome.SUCCESS
+
+		buildResult.task(':dockerRun').outcome == TaskOutcome.SUCCESS
+
+		buildResult.output =~ /(?m):dockerNetworkModeStatus\nDocker container 'bar-hostnetwork' is configured to run with 'host' network mode./
+	}
+
     def 'can optionally not daemonize'() {
         given:
         buildFile << '''

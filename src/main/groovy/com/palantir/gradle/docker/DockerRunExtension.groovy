@@ -26,6 +26,7 @@ class DockerRunExtension {
 
     private String name
     private String image
+    private String network
     private List<String> command = ImmutableList.of()
     private Set<String> ports = ImmutableSet.of()
     private Map<String,String> env = ImmutableMap.of()
@@ -79,6 +80,14 @@ class DockerRunExtension {
 
     public void command(String... command) {
         this.command = ImmutableList.copyOf(command)
+    }
+
+    public void setNetwork(String network) {
+        this.network = network
+    }
+
+    public String getNetwork() {
+        return network
     }
 
     private void setEnvSingle(String key, String value) {
