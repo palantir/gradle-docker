@@ -71,30 +71,35 @@ class DockerRunPlugin implements Plugin<Project> {
                 List<String> args = Lists.newArrayList()
                 args.addAll(['docker', 'run'])
                 if (ext.daemonize) {
-                  args.add('-d')
+                    args.add('-d')
                 }
                 if (ext.clean) {
-                  args.add('--rm')
+                    args.add('--rm')
                 } else {
-                  finalizedBy dockerRunStatus
+                    finalizedBy dockerRunStatus
                 }
                 for (String port : ext.ports) {
                     args.add('-p')
                     args.add(port)
                 }
-                for (Entry<String,String> volume : ext.volumes.entrySet()) {
+                for (Entry<String, String> volume : ext.volumes.entrySet()) {
                     File localFile = new File(project.projectDir, volume.key)
 
                     if (!localFile.exists()) {
-                       StyledTextOutput o = project.services.get(StyledTextOutputFactory.class).create(DockerRunPlugin)
-                       o.withStyle(Style.Error).println("ERROR: Local folder ${localFile} doesn't exist. Mounted volume will not be visible to container")
-                       throw new IllegalStateException("Local folder ${localFile} doesn't exist.")
+                        StyledTextOutput o = project.services.get(StyledTextOutputFactory.class).create(DockerRunPlugin)
+                        o.withStyle(Style.Error).println("ERROR: Local folder ${localFile} doesn't exist. Mounted volume will not be visible to container")
+                        throw new IllegalStateException("Local folder ${localFile} doesn't exist.")
                     }
 
                     args.add('-v')
                     args.add("${localFile.absolutePath}:${volume.value}")
                 }
-                args.addAll(ext.env.collect{ k, v -> ['-e', "${k}=${v}"] }.flatten())
+                args.addAll(ext.env.collect { k, v -> ['-e', "${k}=${v}"] }.flatten())
+
+                if (ext.link) {
+                    args.add('--link')
+                    args.add(ext.link)
+                }
                 args.addAll(['--name', ext.name, ext.image])
                 if (!ext.command.isEmpty()) {
                     args.addAll(ext.command)

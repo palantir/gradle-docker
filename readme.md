@@ -224,6 +224,7 @@ dockerRun {
     daemonize true
     env 'MYVAR1': 'MYVALUE1', 'MYVAR2': 'MYVALUE2'
     command 'sleep', '100'
+    
 }
 ```
 
@@ -240,7 +241,9 @@ dockerRun {
 - `clean` (optional) a boolean argument which adds `--rm` to the `docker run`
   command to ensure that containers are cleaned up after running; defaults to `false`
 - `command` the command to run.
-
+- `link` (optional) the name of linked container. This option adds `--link` to 
+  the `docker run` command to enable use of other container. Only one container 
+  can be linked in current version of plugin
 Tasks
 -----
 

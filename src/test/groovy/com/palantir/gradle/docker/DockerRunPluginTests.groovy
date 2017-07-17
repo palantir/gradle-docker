@@ -220,6 +220,45 @@ class DockerRunPluginTests extends AbstractPluginTest {
         buildResult.output =~ /(?m):dockerRunStatus\nDocker container 'foo-envvars' is STOPPED./
     }
 
+    def 'can link containers'() {
+        given:
+        buildFile << '''
+            plugins {
+                id 'com.palantir.docker-run'
+            }
+
+            task stopLinkedContainer {
+                doLast {
+                    "docker rm -f bar-linked-container".execute().waitForProcessOutput()
+                }
+            }
+
+            task runLinkedContainer {
+                doLast {
+                    "docker run -d --name bar-linked-container alpine:3.2 tail -f /dev/null".execute().waitForProcessOutput()
+                }
+            }
+                      
+            dockerRun {
+                name 'bar-linking-test'
+                image 'alpine:3.2'
+                ports '8080'
+                command 'echo', '"hello world"'
+                link 'bar-linked-container'
+            }
+        '''.stripIndent()
+
+        when:
+        BuildResult buildResult = with('dockerRemoveContainer', 'stopLinkedContainer', 'runLinkedContainer', 'dockerRun', 'dockerRunStatus').build()
+
+        then:
+        buildResult.task(':dockerRemoveContainer').outcome == TaskOutcome.SUCCESS
+
+        buildResult.task(':dockerRun').outcome == TaskOutcome.SUCCESS
+
+        buildResult.task(':dockerRunStatus').outcome == TaskOutcome.SUCCESS
+        buildResult.output =~ /(?m):dockerRunStatus\nDocker container 'bar-linking-test' is STOPPED./
+    }
 
     def isLinux() {
         return System.getProperty("os.name") =~ /(?i).*linux.*/
