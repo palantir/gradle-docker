@@ -94,7 +94,10 @@ class DockerRunPlugin implements Plugin<Project> {
                     args.add('-v')
                     args.add("${localFile.absolutePath}:${volume.value}")
                 }
+
                 args.addAll(ext.env.collect { k, v -> ['-e', "${k}=${v}"] }.flatten())
+
+                args.addAll(ext.hosts.collect { k, v -> ['--add-host', "${k}:${v}"] }.flatten())
 
                 if (ext.link) {
                     args.add('--link')
