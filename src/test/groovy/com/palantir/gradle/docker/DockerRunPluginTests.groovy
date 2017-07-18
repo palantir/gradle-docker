@@ -284,6 +284,49 @@ class DockerRunPluginTests extends AbstractPluginTest {
         buildResult.output =~ /(?m):dockerRunStatus\nDocker container 'bar-linking-test' is STOPPED./
     }
 
+    def 'can add hosts to /etc/hosts'() {
+        given:
+        buildFile << '''
+        plugins {
+            id 'com.palantir.docker-run'
+        }
+
+            task showDockerLogs {
+                doLast {
+                    StringBuffer output = new StringBuffer(); 
+                    StringBuffer error = new StringBuffer(); 
+                
+                    "docker logs bar-add-host".execute().waitForProcessOutput(output, error)
+                    logger.lifecycle(output.toString())                
+                }
+            }
+            
+        dockerRun {
+            name 'bar-add-host'
+            image 'alpine:3.2'
+            ports '8080'
+            command 'cat', '/etc/hosts'
+            hosts "host1": "192.168.1.127", "host2": "192.168.1.128"
+            daemonize true
+        }
+        '''.stripIndent()
+
+        when:
+        BuildResult buildResult = with('dockerRemoveContainer', 'dockerRun', 'showDockerLogs', 'dockerRunStatus').build()
+
+        then:
+        buildResult.task(':dockerRemoveContainer').outcome == TaskOutcome.SUCCESS
+
+        buildResult.task(':dockerRun').outcome == TaskOutcome.SUCCESS
+
+        buildResult.task(':dockerRunStatus').outcome == TaskOutcome.SUCCESS
+        buildResult.output =~ /(?m):dockerRunStatus\nDocker container 'bar-add-host' is STOPPED./
+
+        buildResult.task(':showDockerLogs').outcome == TaskOutcome.SUCCESS
+        buildResult.output =~ /(?m)192.168.1.127\s+host1/
+        buildResult.output =~ /(?m)192.168.1.128\s+host2/
+    }
+
     def isLinux() {
         return System.getProperty("os.name") =~ /(?i).*linux.*/
     }

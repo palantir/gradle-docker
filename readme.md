@@ -244,6 +244,9 @@ dockerRun {
 - `link` (optional) the name of linked container. This option adds `--link` to 
   the `docker run` command to enable use of other container. Only one container 
   can be linked in current version of plugin
+- `hosts` optional map of host names resolved to IP addresses. The key is host name, 
+   the value is host IP address. This options adds `--add-host` option to 
+   the `docker run` command for each entry in this map.   
 Tasks
 -----
 
