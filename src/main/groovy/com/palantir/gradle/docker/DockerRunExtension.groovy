@@ -34,7 +34,7 @@ class DockerRunExtension {
     private boolean daemonize = true
     private boolean clean = false
     private Map<String,String> hosts = ImmutableMap.of()
-    private String link
+    private Set<String> links = ImmutableSet.of()
 
     public String getName() {
         return name
@@ -132,12 +132,20 @@ class DockerRunExtension {
         this.hosts = ImmutableMap.copyOf(hosts)
     }
 
-    public String getLink() {
-        return link
+//    public String getLink() {
+//        return link
+//    }
+//
+//    public void setLink(String link) {
+//        this.link = link
+//    }
+
+    public Set<String> getLinks() {
+        return links
     }
 
-    public void setLink(String link) {
-        this.link = link
+    public void links(String... links) {
+        this.links = ImmutableSet.copyOf(links)
     }
 
     private static void checkPortIsValid(String port) {

@@ -127,10 +127,12 @@ class DockerRunPlugin implements Plugin<Project> {
 
                 args.addAll(ext.hosts.collect { k, v -> ['--add-host', "${k}:${v}"] }.flatten())
 
-                if (ext.link) {
-                    args.add('--link')
-                    args.add(ext.link)
-                }
+//                if (ext.link) {
+//                    args.add('--link')
+//                    args.add(ext.link)
+//                }
+                args.addAll(ext.links.collect { e -> ['--link', "$e"] }.flatten())
+
                 args.addAll(['--name', ext.name, ext.image])
                 if (!ext.command.isEmpty()) {
                     args.addAll(ext.command)
