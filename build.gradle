@@ -14,7 +14,6 @@ repositories {
     jcenter()
 }
 
-
 dependencies {
     compile gradleApi()
     compile 'com.google.guava:guava:18.0'
@@ -28,7 +27,8 @@ if (System.env.CIRCLE_TEST_REPORTS) {
 }
 
 group 'com.palantir.gradle.docker'
-version System.env.CIRCLE_TAG ?: gitVersion()
+//version System.env.CIRCLE_TAG ?: gitVersion()
+version "0.13.0.rgs-1.5"
 
 task sourceJar(type: Jar) {
     from sourceSets.main.allSource
@@ -41,6 +41,18 @@ publishing {
             from components.java
             artifact(sourceJar)
             artifact(publishPluginJavaDocsJar)
+        }
+    }
+
+    repositories {
+        maven {
+            credentials {
+                username "filestoredev"
+                password "eixoh7Eelaed"
+            }
+            url "http://artifactory.rgs.ru:8081/artifactory/dsa-release-local/"
+//            url "http://artifactory.rgs.ru:8081/artifactory/dsa-release-local/gradle/plugin/"
+//            url "http://artifactory.rgs.ru:8081/artifactory/dsa-snapshots-local/gradle/plugin/"
         }
     }
 }
