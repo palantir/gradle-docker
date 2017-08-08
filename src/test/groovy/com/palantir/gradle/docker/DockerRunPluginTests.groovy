@@ -252,9 +252,8 @@ class DockerRunPluginTests extends AbstractPluginTest {
         }
 
         dockerRun {
-            name 'bar-add-host'docker logs 
+            name 'bar-add-host'
             image 'alpine:3.2'
-            ports '8080'
             command 'cat', '/etc/hosts'
             hosts "host1": "192.168.1.127", "host2": "192.168.1.128"
             daemonize false
@@ -300,9 +299,9 @@ class DockerRunPluginTests extends AbstractPluginTest {
             dockerRun {
                 name 'bar-linking-test'
                 image 'alpine:3.2'
-                daemonize false
                 command '/bin/sh', '-c', 'ping linked1 -c1 && ping linked2 -c1'
                 links 'bar-linked-container-1:linked1', 'bar-linked-container-2:linked2'
+                daemonize false
             }
         '''.stripIndent()
 
