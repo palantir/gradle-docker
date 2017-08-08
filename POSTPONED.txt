@@ -1,6 +1,0 @@
-The job was postponed sa an urgent task appeared.
-
-TODO:
-1. Complete cheching in Test1.groovy
-2. Merge Test1.groovy to DockerRunTests
-3. Update readme.md (link -> links)
