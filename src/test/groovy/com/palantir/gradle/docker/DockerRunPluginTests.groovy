@@ -219,7 +219,7 @@ class DockerRunPluginTests extends AbstractPluginTest {
         buildResult.task(':dockerRunStatus').outcome == TaskOutcome.SUCCESS
         buildResult.output =~ /(?m):dockerRunStatus\nDocker container 'foo-envvars' is STOPPED./
     }
-//-------------------------------
+
     def 'can add hosts to /etc/hosts'() {
         given:
         buildFile << '''
@@ -227,28 +227,18 @@ class DockerRunPluginTests extends AbstractPluginTest {
             id 'com.palantir.docker-run'
         }
 
-            task showDockerLogs {
-                doLast {
-                    StringBuffer output = new StringBuffer(); 
-                    StringBuffer error = new StringBuffer(); 
-                
-                    "docker logs bar-add-host".execute().waitForProcessOutput(output, error)
-                    logger.lifecycle(output.toString())                
-                }
-            }
-            
         dockerRun {
-            name 'bar-add-host'
+            name 'bar-add-host'docker logs 
             image 'alpine:3.2'
             ports '8080'
             command 'cat', '/etc/hosts'
             hosts "host1": "192.168.1.127", "host2": "192.168.1.128"
-            daemonize true
+            daemonize false
         }
         '''.stripIndent()
 
         when:
-        BuildResult buildResult = with('dockerRemoveContainer', 'dockerRun', 'showDockerLogs', 'dockerRunStatus').build()
+        BuildResult buildResult = with('dockerRemoveContainer', 'dockerRun', 'dockerRunStatus').build()
 
         then:
         buildResult.task(':dockerRemoveContainer').outcome == TaskOutcome.SUCCESS
@@ -258,9 +248,50 @@ class DockerRunPluginTests extends AbstractPluginTest {
         buildResult.task(':dockerRunStatus').outcome == TaskOutcome.SUCCESS
         buildResult.output =~ /(?m):dockerRunStatus\nDocker container 'bar-add-host' is STOPPED./
 
-        buildResult.task(':showDockerLogs').outcome == TaskOutcome.SUCCESS
         buildResult.output =~ /(?m)192.168.1.127\s+host1/
         buildResult.output =~ /(?m)192.168.1.128\s+host2/
+    }
+
+    def 'can link containers'() {
+        given:
+        buildFile << '''
+            plugins {
+                id 'com.palantir.docker-run'
+            }
+
+            task stopLinkedContainers {
+                doLast {
+                    "docker rm -f bar-linked-container-1".execute().waitForProcessOutput()
+                    "docker rm -f bar-linked-container-2".execute().waitForProcessOutput()
+                }
+            }
+
+            task runLinkedContainers {
+                doLast {
+                    "docker run -d --name bar-linked-container-1 alpine:3.2 tail -f /dev/null".execute().waitForProcessOutput()
+                    "docker run -d --name bar-linked-container-2 alpine:3.2 tail -f /dev/null".execute().waitForProcessOutput()
+                }
+            }
+                      
+            dockerRun {
+                name 'bar-linking-test'
+                image 'alpine:3.2'
+                daemonize false
+                command '/bin/sh', '-c', 'ping linked1 -c1 && ping linked2 -c1'
+                links 'bar-linked-container-1:linked1', 'bar-linked-container-2:linked2'
+            }
+        '''.stripIndent()
+
+        when:
+        BuildResult buildResult = with('dockerRemoveContainer', 'stopLinkedContainers', 'runLinkedContainers', 'dockerRun', 'dockerRunStatus').build()
+
+        then:
+        buildResult.task(':dockerRemoveContainer').outcome == TaskOutcome.SUCCESS
+
+        buildResult.task(':dockerRun').outcome == TaskOutcome.SUCCESS
+
+        buildResult.task(':dockerRunStatus').outcome == TaskOutcome.SUCCESS
+        buildResult.output =~ /(?ms)PING linked1(.*)0% packet loss(.*)PING linked2(.*)0% packet loss/
     }
 
     def isLinux() {
