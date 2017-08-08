@@ -224,6 +224,7 @@ dockerRun {
     daemonize true
     env 'MYVAR1': 'MYVALUE1', 'MYVAR2': 'MYVALUE2'
     command 'sleep', '100'
+    
 }
 ```
 
@@ -240,7 +241,11 @@ dockerRun {
 - `clean` (optional) a boolean argument which adds `--rm` to the `docker run`
   command to ensure that containers are cleaned up after running; defaults to `false`
 - `command` the command to run.
-
+- `links` (optional) optional map of containers to be linked to this container. 
+   The key is other container name, the value is host name related to it in this container.
+- `hosts` optional map of host names resolved to IP addresses. The key is host name, 
+   the value is host IP address. This options adds `--add-host` option to 
+   the `docker run` command for each entry in this map.   
 Tasks
 -----
 
