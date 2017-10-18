@@ -30,7 +30,7 @@ class DockerRunExtension {
     private List<String> command = ImmutableList.of()
     private Set<String> ports = ImmutableSet.of()
     private Map<String,String> env = ImmutableMap.of()
-    private Map<String,String> volumes = ImmutableMap.of()
+    private Map<Object,String> volumes = ImmutableMap.of()
     private boolean daemonize = true
     private boolean clean = false
 
@@ -74,7 +74,7 @@ class DockerRunExtension {
         return command
     }
 
-    public Map<String,String> getVolumes() {
+    public Map<Object,String> getVolumes() {
         return volumes
     }
 
@@ -118,7 +118,7 @@ class DockerRunExtension {
         this.ports = builder.build()
     }
 
-    public void volumes(Map<String,String> volumes) {
+    public void volumes(Map<Object,String> volumes) {
       this.volumes = ImmutableMap.copyOf(volumes)
     }
 

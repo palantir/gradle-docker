@@ -230,9 +230,9 @@ dockerRun {
 **Docker Run Configuration Parameters**
 - `name` the name to use for this container, may include a tag.
 - `image` the name of the image to use.
-- `volumes` optional map of volumes to mount in the container. The key is path
-  to the host volume, relative to the project folder, the value is the exposed
-  container volume path.
+- `volumes` optional map of volumes to mount in the container. The key is the path
+  to the host volume, resolved using [`project.file()`](https://docs.gradle.org/current/userguide/working_with_files.html#sec:locating_files).
+  The value is the exposed container volume path.
 - `env` optional map of environment variables to supply to the running container.
   These must be exposed in the Dockerfile with `ENV` instructions.
 - `daemonize` defaults to true to daemonize the container after starting. However

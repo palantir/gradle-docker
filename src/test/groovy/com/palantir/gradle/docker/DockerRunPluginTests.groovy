@@ -201,6 +201,53 @@ class DockerRunPluginTests extends AbstractPluginTest {
         buildResult.output =~ /(?m):dockerRunStatus\nDocker container 'foo' is STOPPED./
     }
 
+    def 'can mount volumes specified by a File object with an absolute path'() {
+        if (isCi()) {
+            // circleci has problems removing volumes:
+            // see: https://discuss.circleci.com/t/docker-error-removing-intermediate-container/70/10
+            return
+        }
+
+        given:
+        File testFolder = directory("test")
+        file('Dockerfile') << '''
+            FROM alpine:3.2
+
+            RUN mkdir /test
+            VOLUME /test
+            CMD cat /test/testfile
+        '''.stripIndent()
+        buildFile << """
+            plugins {
+                id 'com.palantir.docker'
+                id 'com.palantir.docker-run'
+            }
+
+            docker {
+                name 'foo-image:latest'
+            }
+
+            dockerRun {
+                name 'foo'
+                image 'foo-image:latest'
+                volumes new File("${testFolder.absolutePath}"): "/test"
+                daemonize false
+            }
+        """.stripIndent()
+
+        when:
+        new File(testFolder, "testfile").text = "HELLO WORLD\n"
+        BuildResult buildResult = with('docker', 'dockerRemoveContainer', 'dockerRun', 'dockerRunStatus').build()
+
+        then:
+        buildResult.task(':dockerRemoveContainer').outcome == TaskOutcome.SUCCESS
+
+        buildResult.task(':dockerRun').outcome == TaskOutcome.SUCCESS
+        buildResult.output =~ /(?m)HELLO WORLD/
+        buildResult.task(':dockerRunStatus').outcome == TaskOutcome.SUCCESS
+        buildResult.output =~ /(?m):dockerRunStatus\nDocker container 'foo' is STOPPED./
+    }
+
     def 'can run with environment variables'() {
         given:
         file('Dockerfile') << '''
