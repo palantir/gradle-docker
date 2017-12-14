@@ -22,20 +22,32 @@ import org.gradle.api.Task
 import org.gradle.api.artifacts.Configuration
 import org.gradle.api.artifacts.PublishArtifact
 import org.gradle.api.internal.artifacts.publish.ArchivePublishArtifact
+import org.gradle.api.internal.attributes.ImmutableAttributesFactory
 import org.gradle.api.logging.LogLevel
 import org.gradle.api.logging.Logger
 import org.gradle.api.logging.Logging
+import org.gradle.api.model.ObjectFactory
 import org.gradle.api.tasks.Copy
 import org.gradle.api.tasks.Delete
 import org.gradle.api.tasks.Exec
 import org.gradle.api.tasks.bundling.Zip
 
+import javax.inject.Inject
 import java.util.regex.Pattern
 
 class PalantirDockerPlugin implements Plugin<Project> {
 
     private static final Logger log = Logging.getLogger(PalantirDockerPlugin.class)
     private static final Pattern LABEL_KEY_PATTERN = Pattern.compile('^[a-z0-9.-]*$')
+
+    private final ObjectFactory objectFactory
+    private final ImmutableAttributesFactory attributesFactory
+
+    @Inject
+    PalantirDockerPlugin(ObjectFactory objectFactory, ImmutableAttributesFactory attributesFactory) {
+        this.objectFactory = objectFactory
+        this.attributesFactory = attributesFactory
+    }
 
     @Override
     void apply(Project project) {
@@ -75,7 +87,8 @@ class PalantirDockerPlugin implements Plugin<Project> {
         PublishArtifact dockerArtifact = new ArchivePublishArtifact(dockerfileZip)
         Configuration dockerConfiguration = project.getConfigurations().getByName('docker')
         dockerConfiguration.getArtifacts().add(dockerArtifact)
-        project.getComponents().add(new DockerComponent(dockerArtifact, dockerConfiguration.getAllDependencies()))
+        project.getComponents().add(new DockerComponent(dockerArtifact, dockerConfiguration.getAllDependencies(),
+                objectFactory, attributesFactory))
 
         project.afterEvaluate {
             ext.resolvePathsAndValidate()
