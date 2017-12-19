@@ -18,22 +18,30 @@ package com.palantir.gradle.docker;
 import org.gradle.api.artifacts.DependencySet;
 import org.gradle.api.artifacts.ModuleDependency;
 import org.gradle.api.artifacts.PublishArtifact;
+import org.gradle.api.attributes.AttributeContainer;
 import org.gradle.api.attributes.Usage;
+import org.gradle.api.internal.attributes.ImmutableAttributes;
+import org.gradle.api.internal.attributes.ImmutableAttributesFactory;
 import org.gradle.api.internal.component.SoftwareComponentInternal;
 import org.gradle.api.internal.component.UsageContext;
+import org.gradle.api.model.ObjectFactory;
 
 import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
 public class DockerComponent implements SoftwareComponentInternal {
-    private final UsageContext runtimeUsage = new RuntimeUsageContext();
+    private final UsageContext runtimeUsage;
     private final LinkedHashSet<PublishArtifact> artifacts = new LinkedHashSet<>();
     private final DependencySet runtimeDependencies;
 
-    public DockerComponent(PublishArtifact dockerArtifact, DependencySet runtimeDependencies) {
+    public DockerComponent(PublishArtifact dockerArtifact, DependencySet runtimeDependencies,
+                           ObjectFactory objectFactory, ImmutableAttributesFactory attributesFactory) {
         artifacts.add(dockerArtifact);
         this.runtimeDependencies = runtimeDependencies;
+        Usage usage = objectFactory.named(Usage.class, Usage.JAVA_RUNTIME);
+        ImmutableAttributes attributes = attributesFactory.of(Usage.USAGE_ATTRIBUTE, usage);
+        runtimeUsage = new RuntimeUsageContext(usage, attributes);
     }
 
     @Override
@@ -46,10 +54,20 @@ public class DockerComponent implements SoftwareComponentInternal {
         return Collections.singleton(runtimeUsage);
     }
 
+
     private class RuntimeUsageContext implements UsageContext {
+
+        private final Usage usage;
+        private final ImmutableAttributes attributes;
+
+        private RuntimeUsageContext(Usage usage, ImmutableAttributes attributes) {
+            this.usage = usage;
+            this.attributes = attributes;
+        }
+
         @Override
         public Usage getUsage() {
-            return Usage.FOR_RUNTIME;
+            return usage;
         }
 
         @Override
@@ -60,6 +78,16 @@ public class DockerComponent implements SoftwareComponentInternal {
         @Override
         public Set<ModuleDependency> getDependencies() {
             return runtimeDependencies.withType(ModuleDependency.class);
+        }
+
+        @Override
+        public String getName() {
+            return "runtime";
+        }
+
+        @Override
+        public AttributeContainer getAttributes() {
+            return attributes;
         }
     }
 }
