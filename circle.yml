@@ -18,3 +18,13 @@ stages:
       - type: deploy
         shell: /bin/bash
         command: ./gradlew -i -Dgradle.publish.key=$GRADLE_KEY -Dgradle.publish.secret=$GRADLE_SECRET publishPlugins
+
+workflows:
+  version: 2
+  build-and-deploy:
+    jobs:
+      - build:
+          filters:
+            # run on all branches and tags
+            tags:
+              only: /.*/
