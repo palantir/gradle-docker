@@ -30,6 +30,10 @@ class GenerateDockerCompose extends DefaultTask {
             [("{{${it.group}:${it.name}}}"): it.version]
         }
 
+        if (ext.currentImageName != null) {
+            templateTokens.put("{{currentImageName}}", ext.currentImageName)
+        }
+
         dockerComposeFile.withPrintWriter { writer ->
             template.eachLine { line ->
                 writer.println this.replaceAll(line, templateTokens)

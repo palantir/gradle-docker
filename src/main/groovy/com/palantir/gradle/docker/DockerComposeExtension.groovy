@@ -22,6 +22,7 @@ class DockerComposeExtension {
 
     private File template
     private File dockerComposeFile
+    private String currentImageName
 
     public DockerComposeExtension(Project project) {
         this.project = project
@@ -35,6 +36,14 @@ class DockerComposeExtension {
 
     public void setDockerComposeFile(Object dockerComposeFile) {
         this.dockerComposeFile = project.file(dockerComposeFile)
+    }
+
+    public void setCurrentImageName(String currentImageName) {
+        this.currentImageName = currentImageName
+    }
+
+    String getCurrentImageName() {
+        return currentImageName
     }
 
     File getTemplate() {
