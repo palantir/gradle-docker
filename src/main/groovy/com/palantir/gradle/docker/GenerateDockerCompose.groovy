@@ -30,6 +30,10 @@ class GenerateDockerCompose extends DefaultTask {
             [("{{${it.group}:${it.name}}}"): it.version]
         }
 
+        templateTokens.putAll(ext.templateTokens.collectEntries {
+            [("{{${it.key}}"): it.value]
+        })
+
         dockerComposeFile.withPrintWriter { writer ->
             template.eachLine { line ->
                 writer.println this.replaceAll(line, templateTokens)

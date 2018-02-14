@@ -15,6 +15,7 @@
  */
 package com.palantir.gradle.docker
 
+import com.google.common.collect.Maps
 import org.gradle.api.Project
 
 class DockerComposeExtension {
@@ -22,6 +23,7 @@ class DockerComposeExtension {
 
     private File template
     private File dockerComposeFile
+    private Map<String, String> templateTokens = Maps.newHashMap()
 
     public DockerComposeExtension(Project project) {
         this.project = project
@@ -35,6 +37,18 @@ class DockerComposeExtension {
 
     public void setDockerComposeFile(Object dockerComposeFile) {
         this.dockerComposeFile = project.file(dockerComposeFile)
+    }
+
+    public void setTemplateTokens(Map<String, String> templateTokens) {
+        this.templateTokens = templateTokens
+    }
+
+    public void templateToken(String key, String value) {
+        this.templateTokens.put(key, value)
+    }
+
+    Map<String, String> getTemplateTokens() {
+        return templateTokens
     }
 
     File getTemplate() {
