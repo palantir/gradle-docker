@@ -41,7 +41,7 @@ class DockerComposePluginTests extends AbstractPluginTest {
             }
 
             dockerCompose {
-                currentImageName 'snapshot.docker.registry/current-service:1.0.0-1-gabcabcd'
+                templateTokens(['currentImageName': 'snapshot.docker.registry/current-service:1.0.0-1-gabcabcd'])
             }
 
             dependencies {
