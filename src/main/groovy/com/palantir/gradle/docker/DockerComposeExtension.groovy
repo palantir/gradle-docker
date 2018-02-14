@@ -43,6 +43,10 @@ class DockerComposeExtension {
         this.templateTokens = templateTokens
     }
 
+    public void templateToken(String key, String value) {
+        this.templateTokens.put(key, value)
+    }
+
     Map<String, String> getTemplateTokens() {
         return templateTokens
     }
