@@ -59,7 +59,7 @@ class DockerComposePluginTests extends AbstractPluginTest {
         def dockerComposeText = file("docker-compose.yml").text
         dockerComposeText.contains("repository/service1:18.0")
         dockerComposeText.contains("repository/service2:1.7.10")
-        dockerComposeText.contains("snapshot.docker.registry/current-service:1.0.0-1-gabcabcd")
+        dockerComposeText.contains("image: 'snapshot.docker.registry/current-service:1.0.0-1-gabcabcd'")
     }
 
     def 'Fails if docker-compose.yml.template has unmatched version tokens'() {
