@@ -142,7 +142,7 @@ class PalantirDockerPlugin implements Plugin<Project> {
 
             push.with {
                 workingDir dockerDir
-                commandLine 'docker', 'push', ext.name
+                commandLine 'docker', 'push', "${ -> ext.name}"
             }
 
             dockerfileZip.with {

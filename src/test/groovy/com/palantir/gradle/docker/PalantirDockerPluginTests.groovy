@@ -279,6 +279,42 @@ class PalantirDockerPluginTests extends AbstractPluginTest {
         buildResult.output.contains('dockerPushAnother')
     }
 
+
+    def 'does not throw if name is configured after evaluation phase'() {
+        given:
+        String id = 'id6'
+        file('Dockerfile') << """
+            FROM alpine:3.2
+            MAINTAINER ${id}
+        """.stripIndent()
+        buildFile << """
+            plugins {
+                id 'com.palantir.docker'
+            }
+
+            docker {
+                tags 'latest', 'another'
+            }
+
+            afterEvaluate {
+                docker.name = '${id}'
+            }
+        """.stripIndent()
+
+        when:
+        BuildResult buildResult = with('dockerTag').build()
+
+        then:
+        buildResult.task(':dockerPrepare').outcome == TaskOutcome.SUCCESS
+        buildResult.task(':docker').outcome == TaskOutcome.SUCCESS
+        buildResult.task(':dockerTag').outcome == TaskOutcome.SUCCESS
+        exec("docker inspect --format '{{.Author}}' ${id}") == "'${id}'\n"
+        exec("docker inspect --format '{{.Author}}' ${id}:latest") == "'${id}'\n"
+        exec("docker inspect --format '{{.Author}}' ${id}:another") == "'${id}'\n"
+        execCond("docker rmi -f ${id}")
+        execCond("docker rmi -f ${id}:another")
+    }
+
     def 'running tag task creates images with specified tags'() {
         given:
         String id = 'id6'
