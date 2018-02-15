@@ -292,8 +292,12 @@ class PalantirDockerPluginTests extends AbstractPluginTest {
             }
 
             docker {
-                name '${id}'
+                name 'fake-service-name'
                 tags 'latest', 'another'
+            }
+
+            afterEvaluate {
+                docker.name = '${id}'
             }
         """.stripIndent()
 
