@@ -31,7 +31,7 @@ class GenerateDockerCompose extends DefaultTask {
         }
 
         templateTokens.putAll(ext.templateTokens.collectEntries {
-            [("{{${it.key}}"): it.value]
+            [("{{${it.key}}}"): it.value]
         })
 
         dockerComposeFile.withPrintWriter { writer ->
