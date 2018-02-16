@@ -313,6 +313,7 @@ class PalantirDockerPluginTests extends AbstractPluginTest {
         exec("docker inspect --format '{{.Author}}' ${id}:another") == "'${id}'\n"
         execCond("docker rmi -f ${id}")
         execCond("docker rmi -f ${id}:another")
+        execCond("docker rmi -f ${id}:latest")
     }
 
     def 'running tag task creates images with specified tags'() {
@@ -335,12 +336,21 @@ class PalantirDockerPluginTests extends AbstractPluginTest {
             afterEvaluate {
                 docker.name = '${id}'
             }
+
+            task printInfo {
+                doLast {
+                    println "LATEST: \${tasks.dockerTagLatest.commandLine}"
+                    println "ANOTHER: \${tasks.dockerTagAnother.commandLine}"
+                }
+            }
         """.stripIndent()
 
         when:
-        BuildResult buildResult = with('dockerTag').build()
+        BuildResult buildResult = with('dockerTag', 'printInfo').build()
 
         then:
+        buildResult.output.contains("LATEST: [docker, tag, id6, id6:latest]")
+        buildResult.output.contains("ANOTHER: [docker, tag, id6, id6:another]")
         buildResult.task(':dockerPrepare').outcome == TaskOutcome.SUCCESS
         buildResult.task(':docker').outcome == TaskOutcome.SUCCESS
         buildResult.task(':dockerTag').outcome == TaskOutcome.SUCCESS
@@ -348,6 +358,7 @@ class PalantirDockerPluginTests extends AbstractPluginTest {
         exec("docker inspect --format '{{.Author}}' ${id}:latest") == "'${id}'\n"
         exec("docker inspect --format '{{.Author}}' ${id}:another") == "'${id}'\n"
         execCond("docker rmi -f ${id}")
+        execCond("docker rmi -f ${id}:latest")
         execCond("docker rmi -f ${id}:another")
     }
 

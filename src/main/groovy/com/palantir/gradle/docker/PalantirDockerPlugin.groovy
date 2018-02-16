@@ -119,7 +119,7 @@ class PalantirDockerPlugin implements Plugin<Project> {
                     description = 'Applies all tags to the Docker image.'
                 })
 
-                for (String tagName : ext.tags) {
+                ext.tags.each { tagName ->
                     String taskTagName = ucfirst(tagName)
                     Exec subTask = project.tasks.create('dockerTag' + taskTagName, Exec, {
                         group = 'Docker'
