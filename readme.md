@@ -221,6 +221,7 @@ dockerRun {
     name 'my-container'
     image 'busybox'
     volumes 'hostvolume': '/containervolume'
+    ports '8080'
     daemonize true
     env 'MYVAR1': 'MYVALUE1', 'MYVAR2': 'MYVALUE2'
     command 'sleep', '100'
@@ -233,6 +234,8 @@ dockerRun {
 - `volumes` optional map of volumes to mount in the container. The key is path
   to the host volume, relative to the project folder, the value is the exposed
   container volume path.
+- `ports` the port mappings. Either a single port if mapped to the same port, or
+   a port mapping in the form `8080:8081`.
 - `env` optional map of environment variables to supply to the running container.
   These must be exposed in the Dockerfile with `ENV` instructions.
 - `daemonize` defaults to true to daemonize the container after starting. However
