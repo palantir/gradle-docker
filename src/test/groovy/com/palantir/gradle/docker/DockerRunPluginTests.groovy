@@ -201,7 +201,7 @@ class DockerRunPluginTests extends AbstractPluginTest {
         buildResult.output =~ /(?m):dockerRunStatus\nDocker container 'foo' is STOPPED./
     }
 
-    def 'can mount volumes specified by a File object with an absolute path'() {
+    def 'can mount volumes specified with an absolute path'() {
         if (isCi()) {
             // circleci has problems removing volumes:
             // see: https://discuss.circleci.com/t/docker-error-removing-intermediate-container/70/10
@@ -230,7 +230,7 @@ class DockerRunPluginTests extends AbstractPluginTest {
             dockerRun {
                 name 'foo'
                 image 'foo-image:latest'
-                volumes new File("${testFolder.absolutePath}"): "/test"
+                volumes "${testFolder.absolutePath}": "/test"
                 daemonize false
             }
         """.stripIndent()
