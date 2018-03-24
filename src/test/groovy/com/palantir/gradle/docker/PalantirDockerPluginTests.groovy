@@ -279,7 +279,8 @@ class PalantirDockerPluginTests extends AbstractPluginTest {
         buildResult.output.contains('dockerPushAnother')
     }
 
-    def 'running tag task creates images with specified tags'() {
+
+    def 'does not throw if name is configured after evaluation phase'() {
         given:
         String id = 'id6'
         file('Dockerfile') << """
@@ -292,8 +293,11 @@ class PalantirDockerPluginTests extends AbstractPluginTest {
             }
 
             docker {
-                name '${id}'
                 tags 'latest', 'another'
+            }
+
+            afterEvaluate {
+                docker.name = '${id}'
             }
         """.stripIndent()
 
@@ -308,6 +312,53 @@ class PalantirDockerPluginTests extends AbstractPluginTest {
         exec("docker inspect --format '{{.Author}}' ${id}:latest") == "'${id}'\n"
         exec("docker inspect --format '{{.Author}}' ${id}:another") == "'${id}'\n"
         execCond("docker rmi -f ${id}")
+        execCond("docker rmi -f ${id}:another")
+        execCond("docker rmi -f ${id}:latest")
+    }
+
+    def 'running tag task creates images with specified tags'() {
+        given:
+        String id = 'id6'
+        file('Dockerfile') << """
+            FROM alpine:3.2
+            MAINTAINER ${id}
+        """.stripIndent()
+        buildFile << """
+            plugins {
+                id 'com.palantir.docker'
+            }
+
+            docker {
+                name 'fake-service-name'
+                tags 'latest', 'another'
+            }
+
+            afterEvaluate {
+                docker.name = '${id}'
+            }
+
+            task printInfo {
+                doLast {
+                    println "LATEST: \${tasks.dockerTagLatest.commandLine}"
+                    println "ANOTHER: \${tasks.dockerTagAnother.commandLine}"
+                }
+            }
+        """.stripIndent()
+
+        when:
+        BuildResult buildResult = with('dockerTag', 'printInfo').build()
+
+        then:
+        buildResult.output.contains("LATEST: [docker, tag, id6, id6:latest]")
+        buildResult.output.contains("ANOTHER: [docker, tag, id6, id6:another]")
+        buildResult.task(':dockerPrepare').outcome == TaskOutcome.SUCCESS
+        buildResult.task(':docker').outcome == TaskOutcome.SUCCESS
+        buildResult.task(':dockerTag').outcome == TaskOutcome.SUCCESS
+        exec("docker inspect --format '{{.Author}}' ${id}") == "'${id}'\n"
+        exec("docker inspect --format '{{.Author}}' ${id}:latest") == "'${id}'\n"
+        exec("docker inspect --format '{{.Author}}' ${id}:another") == "'${id}'\n"
+        execCond("docker rmi -f ${id}")
+        execCond("docker rmi -f ${id}:latest")
         execCond("docker rmi -f ${id}:another")
     }
 

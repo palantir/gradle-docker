@@ -55,6 +55,7 @@ class DockerExtension {
     }
 
     public String getName() {
+        Preconditions.checkArgument(!Strings.isNullOrEmpty(name), "name is a required docker configuration item.")
         return name
     }
 
@@ -117,9 +118,6 @@ class DockerExtension {
     }
 
     public void resolvePathsAndValidate() {
-        Preconditions.checkArgument(!Strings.isNullOrEmpty(name),
-            "name is a required docker configuration item.")
-
         if (dockerfile != null) {
             resolvedDockerfile = dockerfile
         } else {

@@ -105,32 +105,9 @@ class PalantirDockerPlugin implements Plugin<Project> {
                 into dockerDir
             }
 
-            List<String> buildCommandLine = ['docker', 'build']
-            if (ext.noCache) {
-                buildCommandLine.add '--no-cache'
-            }
-            if (!ext.buildArgs.isEmpty()) {
-                for (Map.Entry<String, String> buildArg : ext.buildArgs.entrySet()) {
-                    buildCommandLine.addAll('--build-arg', "${buildArg.getKey()}=${buildArg.getValue()}")
-                }
-            }
-            if (!ext.labels.isEmpty()) {
-                for (Map.Entry<String, String> label : ext.labels.entrySet()) {
-                    if (!label.getKey().matches(LABEL_KEY_PATTERN)) {
-                        throw new GradleException(String.format("Docker label '%s' contains illegal characters. " +
-                                "Label keys must only contain lowercase alphanumberic, `.`, or `-` characters (must match %s).",
-                                label.getKey(), LABEL_KEY_PATTERN.pattern()))
-                    }
-                    buildCommandLine.addAll('--label', "${label.getKey()}=${label.getValue()}")
-                }
-            }
-            if (ext.pull) {
-                buildCommandLine.add '--pull'
-            }
-            buildCommandLine.addAll(['-t', ext.name, '.'])
             exec.with {
                 workingDir dockerDir
-                commandLine buildCommandLine
+                commandLine buildCommandLine(ext)
                 dependsOn ext.getDependencies()
                 logging.captureStandardOutput LogLevel.INFO
                 logging.captureStandardError LogLevel.ERROR
@@ -142,13 +119,13 @@ class PalantirDockerPlugin implements Plugin<Project> {
                     description = 'Applies all tags to the Docker image.'
                 })
 
-                for (String tagName : ext.tags) {
+                ext.tags.each { tagName ->
                     String taskTagName = ucfirst(tagName)
                     Exec subTask = project.tasks.create('dockerTag' + taskTagName, Exec, {
                         group = 'Docker'
                         description = "Tags Docker image with tag '${tagName}'"
                         workingDir dockerDir
-                        commandLine 'docker', 'tag', ext.name, computeName(ext.name, tagName)
+                        commandLine 'docker', 'tag', "${ -> ext.name}", "${ -> computeName(ext.name, tagName)}"
                         dependsOn exec
                     })
                     tag.dependsOn subTask
@@ -157,7 +134,7 @@ class PalantirDockerPlugin implements Plugin<Project> {
                         group = 'Docker'
                         description = "Pushes the Docker image with tag '${tagName}' to configured Docker Hub"
                         workingDir dockerDir
-                        commandLine 'docker', 'push', computeName(ext.name, tagName)
+                        commandLine 'docker', 'push', "${ -> computeName(ext.name, tagName)}"
                         dependsOn tag
                     })
                 }
@@ -165,13 +142,40 @@ class PalantirDockerPlugin implements Plugin<Project> {
 
             push.with {
                 workingDir dockerDir
-                commandLine 'docker', 'push', ext.name
+                commandLine 'docker', 'push', "${ -> ext.name}"
             }
 
             dockerfileZip.with {
                 from(ext.resolvedDockerfile)
             }
         }
+    }
+
+    private List<String> buildCommandLine(DockerExtension ext) {
+        List<String> buildCommandLine = ['docker', 'build']
+        if (ext.noCache) {
+            buildCommandLine.add '--no-cache'
+        }
+        if (!ext.buildArgs.isEmpty()) {
+            for (Map.Entry<String, String> buildArg : ext.buildArgs.entrySet()) {
+                buildCommandLine.addAll('--build-arg', "${buildArg.getKey()}=${buildArg.getValue()}")
+            }
+        }
+        if (!ext.labels.isEmpty()) {
+            for (Map.Entry<String, String> label : ext.labels.entrySet()) {
+                if (!label.getKey().matches(LABEL_KEY_PATTERN)) {
+                    throw new GradleException(String.format("Docker label '%s' contains illegal characters. " +
+                            "Label keys must only contain lowercase alphanumberic, `.`, or `-` characters (must match %s).",
+                            label.getKey(), LABEL_KEY_PATTERN.pattern()))
+                }
+                buildCommandLine.addAll('--label', "${label.getKey()}=${label.getValue()}")
+            }
+        }
+        if (ext.pull) {
+            buildCommandLine.add '--pull'
+        }
+        buildCommandLine.addAll(['-t', "${ -> ext.name}", '.'])
+        return buildCommandLine
     }
 
     private static String computeName(String name, String tag) {

@@ -28,6 +28,8 @@ class DockerComposePluginTests extends AbstractPluginTest {
               image: 'repository/service1:{{com.google.guava:guava}}'
             service2:
               image: 'repository/service2:{{org.slf4j:slf4j-api}}'
+            current-service:
+              image: '{{currentImageName}}'
         '''.stripIndent()
         buildFile << '''
             plugins {
@@ -36,6 +38,10 @@ class DockerComposePluginTests extends AbstractPluginTest {
 
             repositories {
                 jcenter()
+            }
+
+            dockerCompose {
+                templateTokens(['currentImageName': 'snapshot.docker.registry/current-service:1.0.0-1-gabcabcd'])
             }
 
             dependencies {
@@ -53,6 +59,7 @@ class DockerComposePluginTests extends AbstractPluginTest {
         def dockerComposeText = file("docker-compose.yml").text
         dockerComposeText.contains("repository/service1:18.0")
         dockerComposeText.contains("repository/service2:1.7.10")
+        dockerComposeText.contains("image: 'snapshot.docker.registry/current-service:1.0.0-1-gabcabcd'")
     }
 
     def 'Fails if docker-compose.yml.template has unmatched version tokens'() {

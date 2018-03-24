@@ -221,6 +221,7 @@ dockerRun {
     name 'my-container'
     image 'busybox'
     volumes 'hostvolume': '/containervolume'
+    ports '7080:5000'
     daemonize true
     env 'MYVAR1': 'MYVALUE1', 'MYVAR2': 'MYVALUE2'
     command 'sleep', '100'
@@ -233,6 +234,7 @@ dockerRun {
 - `volumes` optional map of volumes to mount in the container. The key is the path
   to the host volume, resolved using [`project.file()`](https://docs.gradle.org/current/userguide/working_with_files.html#sec:locating_files).
   The value is the exposed container volume path.
+- `ports` optional mapping `local:container` of local port to container port.
 - `env` optional map of environment variables to supply to the running container.
   These must be exposed in the Dockerfile with `ENV` instructions.
 - `daemonize` defaults to true to daemonize the container after starting. However
