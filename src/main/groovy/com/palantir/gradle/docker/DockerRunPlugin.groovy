@@ -110,8 +110,8 @@ class DockerRunPlugin implements Plugin<Project> {
                     args.add('-p')
                     args.add(port)
                 }
-                for (Entry<String,String> volume : ext.volumes.entrySet()) {
-                    File localFile = new File(project.projectDir, volume.key)
+                for (Entry<Object,String> volume : ext.volumes.entrySet()) {
+                    File localFile = project.file(volume.key)
 
                     if (!localFile.exists()) {
                        StyledTextOutput o = project.services.get(StyledTextOutputFactory.class).create(DockerRunPlugin)
