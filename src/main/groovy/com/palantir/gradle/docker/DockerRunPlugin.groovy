@@ -136,6 +136,7 @@ class DockerRunPlugin implements Plugin<Project> {
 
             dockerRemoveContainer.with {
                 commandLine 'docker', 'rm', ext.name
+                mustRunAfter dockerStop
             }
         }
     }
