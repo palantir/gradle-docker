@@ -138,7 +138,7 @@ class PalantirDockerPluginTests extends AbstractPluginTest {
         buildResult.task(':dockerPrepare').outcome == TaskOutcome.SUCCESS
         buildResult.task(':docker').outcome == TaskOutcome.SUCCESS
         exec("docker inspect --format '{{.Author}}' ${id}") == "'${id}'\n"
-        execCond("docker rmi -f ${id}") || true
+        execCond("docker rmi -f ${id}")
     }
 
     def 'Publishes "docker" dependencies via "docker" component'() {
@@ -390,7 +390,7 @@ class PalantirDockerPluginTests extends AbstractPluginTest {
         buildResult.task(':docker').outcome == TaskOutcome.SUCCESS
         exec("docker inspect --format '{{.Config.Env}}' ${id}").contains('ENV_BUILD_ARG_NO_DEFAULT=gradleBuildArg')
         exec("docker inspect --format '{{.Config.Env}}' ${id}").contains('BUILD_ARG_WITH_DEFAULT=gradleOverrideBuildArg')
-        execCond("docker rmi -f ${id}") || true
+        execCond("docker rmi -f ${id}")
     }
 
     def 'rebuilding an image does it from scratch when "noCache" parameter is set'() {
@@ -424,7 +424,7 @@ class PalantirDockerPluginTests extends AbstractPluginTest {
         buildResult1.task(':docker').outcome == TaskOutcome.SUCCESS
         buildResult2.task(':docker').outcome == TaskOutcome.SUCCESS
         imageID1 != imageID2
-        execCond("docker rmi -f ${id}") || true
+        execCond("docker rmi -f ${id}")
     }
 
     def 'base image is pulled when "pull" parameter is set'() {
@@ -451,7 +451,7 @@ class PalantirDockerPluginTests extends AbstractPluginTest {
         then:
         buildResult.task(':docker').outcome == TaskOutcome.SUCCESS
         buildResult.output.contains 'Pulling from library/alpine'
-        execCond("docker rmi -f ${id}") || true
+        execCond("docker rmi -f ${id}")
     }
 
     def 'can add files from project directory to build context'() {
@@ -481,7 +481,7 @@ class PalantirDockerPluginTests extends AbstractPluginTest {
         buildResult.task(':dockerPrepare').outcome == TaskOutcome.SUCCESS
         buildResult.task(':docker').outcome == TaskOutcome.SUCCESS
         exec("docker inspect --format '{{.Author}}' ${id}") == "'${id}'\n"
-        execCond("docker rmi -f ${id}") || true
+        execCond("docker rmi -f ${id}")
     }
 
     def 'when adding a project-dir file and a Tar file, then they both end up (unzipped) in the docker image'() {
@@ -523,7 +523,7 @@ class PalantirDockerPluginTests extends AbstractPluginTest {
         buildResult.task(':myTgz').outcome == TaskOutcome.SUCCESS
         buildResult.task(':dockerPrepare').outcome == TaskOutcome.SUCCESS
         buildResult.task(':docker').outcome == TaskOutcome.SUCCESS
-        execCond("docker rmi -f ${id}") || true
+        execCond("docker rmi -f ${id}")
     }
 
     def 'can build Docker image from standard Gradle distribution plugin'() {
@@ -561,7 +561,7 @@ class PalantirDockerPluginTests extends AbstractPluginTest {
         buildResult.task(':distTar').outcome == TaskOutcome.SUCCESS
         buildResult.task(':dockerPrepare').outcome == TaskOutcome.SUCCESS
         buildResult.task(':docker').outcome == TaskOutcome.SUCCESS
-        execCond("docker rmi -f ${id}") || true
+        execCond("docker rmi -f ${id}")
     }
 
     def 'check labels are correctly applied to image'() {
@@ -586,7 +586,7 @@ class PalantirDockerPluginTests extends AbstractPluginTest {
         then:
         buildResult.task(':docker').outcome == TaskOutcome.SUCCESS
         exec("docker inspect --format '{{.Config.Labels}}' ${id}").contains("test-label")
-        execCond("docker rmi -f ${id}") || true
+        execCond("docker rmi -f ${id}")
     }
 
     def 'fail with bad label key character'() {
