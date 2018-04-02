@@ -52,7 +52,11 @@ docker {
 To build a docker container, run the `docker` task. To push that container to a
 docker repository, run the `dockerPush` task.
 
-Tag and Push tasks for each tag will be generated for each provided `tags` entry. 
+Tag and Push tasks for each tag will be generated for each provided `tags` entry.
+
+**Docker Environment Variables**
+- `GRADLE_DOCKER_BINARY` the path to the Docker binary to use; defaults to `docker` (and relies on any operating system
+  specific behaviour to resolve it, which [sometimes should not be relied upon](https://github.com/palantir/gradle-docker/issues/162)). 
 
 **Examples**
 
@@ -242,6 +246,10 @@ dockerRun {
 - `clean` (optional) a boolean argument which adds `--rm` to the `docker run`
   command to ensure that containers are cleaned up after running; defaults to `false`
 - `command` the command to run.
+
+**Docker Run Environment Variables**
+- `GRADLE_DOCKER_BINARY` the path to the Docker binary to use; defaults to `docker` (and relies on any operating system
+  specific behaviour to resolve it, which [sometimes should not be relied upon](https://github.com/palantir/gradle-docker/issues/162)).
 
 Tasks
 -----

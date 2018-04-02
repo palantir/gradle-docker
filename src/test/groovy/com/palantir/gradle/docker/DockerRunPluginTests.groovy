@@ -18,7 +18,7 @@ package com.palantir.gradle.docker
 import org.gradle.testkit.runner.BuildResult
 import org.gradle.testkit.runner.TaskOutcome
 
-class DockerRunPluginTests extends AbstractPluginTest {
+class DockerRunPluginTests extends AbstractPluginTest implements DockerExecutor {
 
     def 'can run, status, and stop a container made by the docker plugin' () {
         given:
@@ -63,7 +63,7 @@ class DockerRunPluginTests extends AbstractPluginTest {
         offline.task(':dockerRunStatus').outcome == TaskOutcome.SUCCESS
         offline.output =~ /(?m):dockerRunStatus\nDocker container 'foo' is STOPPED./
 
-        execCond('docker rmi -f foo-image')
+        execCond("$dockerBinary rmi -f foo-image")
     }
 
     def 'can run, status, and stop a container' () {
