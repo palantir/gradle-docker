@@ -15,7 +15,6 @@ trait DockerExecutor {
      * existence or executability of the returned file.
      */
     String getDockerBinary() {
-        System.err.println(getEnvironmentVariable('GRADLE_DOCKER_BINARY'))
         return getEnvironmentVariable('GRADLE_DOCKER_BINARY') ?: DEFAULT_DOCKER_BINARY
     }
 
