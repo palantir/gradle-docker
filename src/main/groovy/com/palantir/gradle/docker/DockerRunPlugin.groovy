@@ -26,7 +26,7 @@ import org.gradle.internal.logging.text.StyledTextOutput.Style
 
 import com.google.common.collect.Lists
 
-class DockerRunPlugin implements Plugin<Project> {
+class DockerRunPlugin implements Plugin<Project>, DockerExecutor {
     @Override
     void apply(Project project) {
         DockerRunExtension ext = project.extensions.create('dockerRun', DockerRunExtension)
@@ -61,7 +61,7 @@ class DockerRunPlugin implements Plugin<Project> {
         project.afterEvaluate {
             dockerRunStatus.with {
                 standardOutput = new ByteArrayOutputStream()
-                commandLine 'docker', 'inspect', '--format={{.State.Running}}', ext.name
+                commandLine dockerBinary, 'inspect', '--format={{.State.Running}}', ext.name
                 doLast {
                     if (standardOutput.toString().trim() != 'true') {
                         println "Docker container '${ext.name}' is STOPPED."
@@ -74,7 +74,7 @@ class DockerRunPlugin implements Plugin<Project> {
 
             dockerNetworkModeStatus.with {
                 standardOutput = new ByteArrayOutputStream()
-                commandLine 'docker', 'inspect', '--format={{.HostConfig.NetworkMode}}', ext.name
+                commandLine dockerBinary, 'inspect', '--format={{.HostConfig.NetworkMode}}', ext.name
                 doLast {
                     def networkMode = standardOutput.toString().trim()
                     if (networkMode == 'default') {
@@ -94,7 +94,7 @@ class DockerRunPlugin implements Plugin<Project> {
 
             dockerRun.with {
                 List<String> args = Lists.newArrayList()
-                args.addAll(['docker', 'run'])
+                args.addAll([dockerBinary, 'run'])
                 if (ext.daemonize) {
                   args.add('-d')
                 }
@@ -131,11 +131,11 @@ class DockerRunPlugin implements Plugin<Project> {
             }
 
             dockerStop.with {
-                commandLine 'docker', 'stop', ext.name
+                commandLine dockerBinary, 'stop', ext.name
             }
 
             dockerRemoveContainer.with {
-                commandLine 'docker', 'rm', ext.name
+                commandLine dockerBinary, 'rm', ext.name
             }
         }
     }

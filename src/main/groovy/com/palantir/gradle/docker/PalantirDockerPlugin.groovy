@@ -35,7 +35,7 @@ import org.gradle.api.tasks.bundling.Zip
 import javax.inject.Inject
 import java.util.regex.Pattern
 
-class PalantirDockerPlugin implements Plugin<Project> {
+class PalantirDockerPlugin implements Plugin<Project>, DockerExecutor {
 
     private static final Logger log = Logging.getLogger(PalantirDockerPlugin.class)
     private static final Pattern LABEL_KEY_PATTERN = Pattern.compile('^[a-z0-9.-]*$')
@@ -125,7 +125,7 @@ class PalantirDockerPlugin implements Plugin<Project> {
                         group = 'Docker'
                         description = "Tags Docker image with tag '${tagName}'"
                         workingDir dockerDir
-                        commandLine 'docker', 'tag', "${ -> ext.name}", "${ -> computeName(ext.name, tagName)}"
+                        commandLine dockerBinary, 'tag', "${ -> ext.name}", "${ -> computeName(ext.name, tagName)}"
                         dependsOn exec
                     })
                     tag.dependsOn subTask
@@ -134,7 +134,7 @@ class PalantirDockerPlugin implements Plugin<Project> {
                         group = 'Docker'
                         description = "Pushes the Docker image with tag '${tagName}' to configured Docker Hub"
                         workingDir dockerDir
-                        commandLine 'docker', 'push', "${ -> computeName(ext.name, tagName)}"
+                        commandLine dockerBinary, 'push', "${ -> computeName(ext.name, tagName)}"
                         dependsOn tag
                     })
                 }
@@ -142,7 +142,7 @@ class PalantirDockerPlugin implements Plugin<Project> {
 
             push.with {
                 workingDir dockerDir
-                commandLine 'docker', 'push', "${ -> ext.name}"
+                commandLine dockerBinary, 'push', "${ -> ext.name}"
             }
 
             dockerfileZip.with {
@@ -152,7 +152,7 @@ class PalantirDockerPlugin implements Plugin<Project> {
     }
 
     private List<String> buildCommandLine(DockerExtension ext) {
-        List<String> buildCommandLine = ['docker', 'build']
+        List<String> buildCommandLine = [dockerBinary, 'build']
         if (ext.noCache) {
             buildCommandLine.add '--no-cache'
         }
