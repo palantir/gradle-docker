@@ -27,7 +27,7 @@ class DockerComposeExtension {
 
     public DockerComposeExtension(Project project) {
         this.project = project
-        this.template = project.file('docker-compose.yml.template')
+        this.template = project.file('docker-compose.template.yml')
         this.dockerComposeFile = project.file('docker-compose.yml')
     }
 

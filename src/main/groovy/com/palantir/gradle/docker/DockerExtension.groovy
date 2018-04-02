@@ -29,7 +29,7 @@ class DockerExtension {
     private static final String DEFAULT_DOCKERFILE_PATH = 'Dockerfile'
     private String name = null
     private File dockerfile = null
-    private String dockerComposeTemplate = 'docker-compose.yml.template'
+    private String dockerComposeTemplate = 'docker-compose.template.yml'
     private String dockerComposeFile = 'docker-compose.yml'
     private Set<Task> dependencies = ImmutableSet.of()
     private Set<String> tags = ImmutableSet.of()

@@ -138,7 +138,7 @@ those dependencies.
 ### Generating docker-compose.yml files from dependencies
 
 The `com.palantir.docker-compose` plugin uses the transitive dependencies of the
-`docker` configuration to populate a `docker-compose.yml.template` file with the
+`docker` configuration to populate a `docker-compose.template.yml` file with the
 image versions specified by this project and all its transitive dependencies.
 The plugin uses standard Maven/Ivy machanism for declaring and resolving
 dependencies.
@@ -149,12 +149,12 @@ declared by the transitive dependencies of the docker configuration.  The task
 performs two operations: First, it generates a mapping `group:name --> version`
 from the dependencies of the `docker` configuration (see above). Second, it
 replaces all occurrences of version variables of the form `{{group:name}}` in
-the `docker-compose.yml.template` file by the resolved versions and writes the
+the `docker-compose.template.yml` file by the resolved versions and writes the
 resulting file as `docker-compose.yml`.
 
 **Example**
 
-Assume a `docker-compose.yml.template` as follows:
+Assume a `docker-compose.template.yml` as follows:
 
 ```yaml
 myservice:

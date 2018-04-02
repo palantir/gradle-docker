@@ -23,7 +23,7 @@ class DockerComposePluginTests extends AbstractPluginTest {
     def 'Generates docker-compose.yml from template with version strings replaced'() {
         given:
         file('Dockerfile') << "Foo"
-        file("docker-compose.yml.template") << '''
+        file("docker-compose.template.yml") << '''
             service1:
               image: 'repository/service1:{{com.google.guava:guava}}'
             service2:
@@ -62,10 +62,10 @@ class DockerComposePluginTests extends AbstractPluginTest {
         dockerComposeText.contains("image: 'snapshot.docker.registry/current-service:1.0.0-1-gabcabcd'")
     }
 
-    def 'Fails if docker-compose.yml.template has unmatched version tokens'() {
+    def 'Fails if docker-compose.template.yml has unmatched version tokens'() {
         given:
         file('Dockerfile') << "Foo"
-        file("docker-compose.yml.template") << '''
+        file("docker-compose.template.yml") << '''
             service1:
               image: 'repository/service1:{{foo:bar}}'
         '''.stripIndent()
