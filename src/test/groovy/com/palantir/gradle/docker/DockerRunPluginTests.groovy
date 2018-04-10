@@ -126,6 +126,50 @@ class DockerRunPluginTests extends AbstractPluginTest {
 		buildResult.output =~ /(?m):dockerNetworkModeStatus\nDocker container 'bar-hostnetwork' is configured to run with 'host' network mode./
 	}
 
+    def 'can run container with configured host port' () {
+        given:
+        buildFile << '''
+            plugins {
+                id 'com.palantir.docker-run'
+            }
+            dockerRun {
+                name 'bar-hostport'
+                image 'alpine:3.2'
+                ports '80:8080'
+            }
+        '''.stripIndent()
+
+		when:
+		BuildResult buildResult = with('dockerRemoveContainer', 'dockerRun').build()
+
+		then:
+		buildResult.task(':dockerRemoveContainer').outcome == TaskOutcome.SUCCESS
+
+		buildResult.task(':dockerRun').outcome == TaskOutcome.SUCCESS
+	}
+
+    def 'can run container with configured host port 0' () {
+        given:
+        buildFile << '''
+            plugins {
+                id 'com.palantir.docker-run'
+            }
+            dockerRun {
+                name 'bar-hostport0'
+                image 'alpine:3.2'
+                ports '0:8080'
+            }
+        '''.stripIndent()
+
+		when:
+		BuildResult buildResult = with('dockerRemoveContainer', 'dockerRun').build()
+
+		then:
+		buildResult.task(':dockerRemoveContainer').outcome == TaskOutcome.SUCCESS
+
+		buildResult.task(':dockerRun').outcome == TaskOutcome.SUCCESS
+	}
+
     def 'can optionally not daemonize'() {
         given:
         buildFile << '''

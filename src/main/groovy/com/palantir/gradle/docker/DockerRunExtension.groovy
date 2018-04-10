@@ -107,11 +107,11 @@ class DockerRunExtension {
         for (String port : ports) {
             String[] mapping = port.split(':', 2)
             if (mapping.length == 1) {
-                checkPortIsValid(mapping[0])
+                checkContainerPortIsValid(mapping[0])
                 builder.add("${mapping[0]}:${mapping[0]}")
             } else {
-                checkPortIsValid(mapping[0])
-                checkPortIsValid(mapping[1])
+                checkHostPortIsValid(mapping[0])
+                checkContainerPortIsValid(mapping[1])
                 builder.add("${mapping[0]}:${mapping[1]}")
             }
         }
@@ -122,9 +122,13 @@ class DockerRunExtension {
       this.volumes = ImmutableMap.copyOf(volumes)
     }
 
-    private static void checkPortIsValid(String port) {
+    private static void checkHostPortIsValid(String port) {
         int val = Integer.parseInt(port)
-        Preconditions.checkArgument(0 < val && val <= 65536, "Port must be in the range [1,65536]")
+        Preconditions.checkArgument(0 <= val && val <= 65536, "Host port must be in the range [0,65536]")
     }
 
+    private static void checkContainerPortIsValid(String port) {
+        int val = Integer.parseInt(port)
+        Preconditions.checkArgument(0 < val && val <= 65536, "Container port must be in the range [1,65536]")
+    }
 }
