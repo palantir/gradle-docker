@@ -290,6 +290,7 @@ class PalantirDockerPluginTests extends AbstractPluginTest {
         execCond("docker rmi -f ${id}")
         execCond("docker rmi -f ${id}:another")
         execCond("docker rmi -f ${id}:latest")
+        
     }
 
     def 'running tag task creates images with specified tags'() {
