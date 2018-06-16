@@ -8,7 +8,7 @@ This repository provides three Gradle plugins for working with Docker containers
   docker images based on a simple configuration block that specifies the container
   name, the Dockerfile, task dependencies, and any additional file resources
   required for the Docker build.
-- `com.palantir.docker-compose`: adds a task for populating placeholders in a 
+- `com.palantir.docker-compose`: adds a task for populating placeholders in a
   docker-compose template file with image versions resolved from
   dependencies.
 - `com.palantir.docker-run`: adds tasks for starting, stopping, statusing and cleaning
@@ -52,7 +52,7 @@ docker {
 To build a docker container, run the `docker` task. To push that container to a
 docker repository, run the `dockerPush` task.
 
-Tag and Push tasks for each tag will be generated for each provided `tags` entry. 
+Tag and Push tasks for each tag will be generated for each provided `tags` entry.
 
 **Examples**
 
@@ -247,12 +247,12 @@ Tasks
 -----
 
  * **Docker**
-   * `docker`: build a docker container with the specified name and Dockerfile
-   * `dockerTag`: tag the docker container with all specified tags
-   * `dockerTag<tag>`: tag the docker container with `<tag>`
-   * `dockerPush`: push the specified container to a docker repository
-   * `dockerPush<tag>`: push the `<tag>` docker container to a docker repository
-   * `dockerPrepare`: prepare to build a docker container by copying
+   * `docker`: build a docker image with the specified name and Dockerfile
+   * `dockerTag`: tag the docker image with all specified tags
+   * `dockerTag<tag>`: tag the docker image with `<tag>`
+   * `dockerPush`: push the specified image to a docker repository
+   * `dockerPush<tag>`: push the `<tag>` docker image to a docker repository
+   * `dockerPrepare`: prepare to build a docker image by copying
      dependent task outputs, referenced files, and `dockerfile` into a temporary
      directory
    * `dockerClean`: remove temporary directory associated with the docker build
@@ -273,4 +273,3 @@ This plugin is made available under the [Apache 2.0 License](http://www.apache.o
 Contributing
 ------------
 Contributions to this project must follow the [contribution guide](CONTRIBUTING.md).
-
