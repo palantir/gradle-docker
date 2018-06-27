@@ -30,5 +30,10 @@ class DockerComposePlugin implements Plugin<Project> {
             it.ext = ext
             it.configuration = dockerConfiguration
         })
+
+        project.tasks.create('dockerComposeUp', DockerComposeUp, {
+            it.ext = ext
+            it.configuration = dockerConfiguration
+        })
     }
 }

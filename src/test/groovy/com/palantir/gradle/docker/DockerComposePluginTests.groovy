@@ -137,4 +137,18 @@ class DockerComposePluginTests extends AbstractPluginTest {
         then:
         buildResult.output.contains("Could not find specified template file")
     }
+
+    def 'docker-compose is executed and fails on invalid file'() {
+        given:
+        file('docker-compose.yml') << "FOO"
+        buildFile << '''
+            plugins {
+                id 'com.palantir.docker-compose'
+            }
+        '''.stripIndent()
+        when:
+        BuildResult buildResult = with('dockerComposeUp', "--stacktrace").buildAndFail()
+        then:
+        buildResult.output.contains("Top level")
+    }
 }
