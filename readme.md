@@ -152,6 +152,10 @@ replaces all occurrences of version variables of the form `{{group:name}}` in
 the `docker-compose.yml.template` file by the resolved versions and writes the
 resulting file as `docker-compose.yml`.
 
+The `docker-compose` plugin also provides `dockerComposeUp` task that brings up
+the docker images specified in the `dockerComposeFile` in detached mode.
+
+
 **Example**
 
 Assume a `docker-compose.yml.template` as follows:
