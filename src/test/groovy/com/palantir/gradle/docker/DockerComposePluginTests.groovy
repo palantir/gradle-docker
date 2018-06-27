@@ -159,7 +159,7 @@ class DockerComposePluginTests extends AbstractPluginTest {
             services:
               hello:
                 container_name: "helloworld"
-                image: "python:3.4-alpine"
+                image: "alpine"
                 command: touch /test/foobarbaz
                 volumes:
                   - ./:/test
@@ -173,5 +173,32 @@ class DockerComposePluginTests extends AbstractPluginTest {
         with('dockerComposeUp').build()
         then:
         file("foobarbaz").exists()
+    }
+
+    def 'docker-compose successfully creates docker image from custom file'() {
+        given:
+        file('test-file.yml') << '''
+            version: "2"
+            services:
+              hello:
+                container_name: "helloworld2"
+                image: "alpine"
+                command: touch /test/qux
+                volumes:
+                  - ./:/test
+        '''.stripIndent()
+        buildFile << '''
+            plugins {
+                id 'com.palantir.docker-compose'
+            }
+
+            dockerCompose {
+              dockerComposeFile "test-file.yml"
+            }
+        '''.stripIndent()
+        when:
+        with('dockerComposeUp').build()
+        then:
+        file("qux").exists()
     }
 }
