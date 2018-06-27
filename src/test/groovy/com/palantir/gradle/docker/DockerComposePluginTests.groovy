@@ -151,4 +151,27 @@ class DockerComposePluginTests extends AbstractPluginTest {
         then:
         buildResult.output.contains("Top level")
     }
+
+    def 'docker-compose successfully creates docker image'() {
+        given:
+        file('docker-compose.yml') << '''
+            version: "2"
+            services:
+              hello:
+                container_name: "helloworld"
+                image: "python:3.4-alpine"
+                command: touch /test/foobarbaz
+                volumes:
+                  - ./:/test
+        '''.stripIndent()
+        buildFile << '''
+            plugins {
+                id 'com.palantir.docker-compose'
+            }
+        '''.stripIndent()
+        when:
+        with('dockerComposeUp').build()
+        then:
+        file("foobarbaz").exists()
+    }
 }
