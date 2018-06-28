@@ -137,4 +137,68 @@ class DockerComposePluginTests extends AbstractPluginTest {
         then:
         buildResult.output.contains("Could not find specified template file")
     }
+
+    def 'docker-compose is executed and fails on invalid file'() {
+        given:
+        file('docker-compose.yml') << "FOO"
+        buildFile << '''
+            plugins {
+                id 'com.palantir.docker-compose'
+            }
+        '''.stripIndent()
+        when:
+        BuildResult buildResult = with('dockerComposeUp', "--stacktrace").buildAndFail()
+        then:
+        buildResult.output.contains("Top level")
+    }
+
+    def 'docker-compose successfully creates docker image'() {
+        given:
+        file('docker-compose.yml') << '''
+            version: "2"
+            services:
+              hello:
+                container_name: "helloworld"
+                image: "alpine"
+                command: touch /test/foobarbaz
+                volumes:
+                  - ./:/test
+        '''.stripIndent()
+        buildFile << '''
+            plugins {
+                id 'com.palantir.docker-compose'
+            }
+        '''.stripIndent()
+        when:
+        with('dockerComposeUp').build()
+        then:
+        file("foobarbaz").exists()
+    }
+
+    def 'docker-compose successfully creates docker image from custom file'() {
+        given:
+        file('test-file.yml') << '''
+            version: "2"
+            services:
+              hello:
+                container_name: "helloworld2"
+                image: "alpine"
+                command: touch /test/qux
+                volumes:
+                  - ./:/test
+        '''.stripIndent()
+        buildFile << '''
+            plugins {
+                id 'com.palantir.docker-compose'
+            }
+
+            dockerCompose {
+              dockerComposeFile "test-file.yml"
+            }
+        '''.stripIndent()
+        when:
+        with('dockerComposeUp').build()
+        then:
+        file("qux").exists()
+    }
 }
