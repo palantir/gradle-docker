@@ -264,6 +264,8 @@ Tasks
  * **Docker Compose**
    * `generateDockerCompose`: Populates a docker-compose file template with image
      versions declared by dependencies
+   * `dockerComposeUp`: Brings up services defined in `dockerComposeFile` in 
+     detacted state
  * **Docker Run**
    * `dockerRun`: run the specified image with the specified name
    * `dockerStop`: stop the running container
