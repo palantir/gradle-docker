@@ -73,10 +73,16 @@ class PalantirDockerPlugin implements Plugin<Project> {
             dependsOn prepare
         })
 
+        Task tag = project.tasks.create('dockerTag', {
+          group = 'Docker'
+          description = 'Applies all tags to the Docker image.'
+          dependsOn exec
+        })
+
         Exec push = project.tasks.create('dockerPush', Exec, {
             group = 'Docker'
             description = 'Pushes named Docker image to configured Docker Hub.'
-            dependsOn exec
+            dependsOn tag
         })
 
         Zip dockerfileZip = project.tasks.create('dockerfileZip', Zip, {
@@ -114,10 +120,6 @@ class PalantirDockerPlugin implements Plugin<Project> {
             }
 
             if (!ext.tags.isEmpty()) {
-                Task tag = project.tasks.create('dockerTag', {
-                    group = 'Docker'
-                    description = 'Applies all tags to the Docker image.'
-                })
 
                 ext.tags.each { tagName ->
                     String taskTagName = ucfirst(tagName)
@@ -135,7 +137,7 @@ class PalantirDockerPlugin implements Plugin<Project> {
                         description = "Pushes the Docker image with tag '${tagName}' to configured Docker Hub"
                         workingDir dockerDir
                         commandLine 'docker', 'push', "${ -> computeName(ext.name, tagName)}"
-                        dependsOn tag
+                        dependsOn subTask
                     })
                 }
             }

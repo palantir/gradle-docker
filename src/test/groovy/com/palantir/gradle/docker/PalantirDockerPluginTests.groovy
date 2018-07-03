@@ -227,30 +227,6 @@ class PalantirDockerPluginTests extends AbstractPluginTest {
         buildResult.task(':tasks').outcome == TaskOutcome.SUCCESS
     }
 
-    def 'no tag task when no tags defined'() {
-        given:
-        String id = 'id4'
-        file('Dockerfile') << """
-            FROM alpine:3.2
-            MAINTAINER ${id}
-        """.stripIndent()
-        buildFile << """
-            plugins {
-                id 'com.palantir.docker'
-            }
-
-            docker {
-                name '${id}'
-            }
-        """.stripIndent()
-
-        when:
-        BuildResult buildResult = with('tasks').build()
-
-        then:
-        !buildResult.output.contains('dockerTag')
-    }
-
     def 'tag and push tasks created for each tag'() {
         given:
         String id = 'id5'
@@ -314,6 +290,7 @@ class PalantirDockerPluginTests extends AbstractPluginTest {
         execCond("docker rmi -f ${id}")
         execCond("docker rmi -f ${id}:another")
         execCond("docker rmi -f ${id}:latest")
+        
     }
 
     def 'running tag task creates images with specified tags'() {
