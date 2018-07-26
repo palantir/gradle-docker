@@ -256,6 +256,39 @@ class PalantirDockerPluginTests extends AbstractPluginTest {
     }
 
 
+    def 'tag and push tasks created for each tag with deferred binding'() {
+        given:
+        String id = 'id5'
+        file('Dockerfile') << """
+            FROM alpine:3.2
+            MAINTAINER ${id}
+        """.stripIndent()
+        buildFile << """
+            plugins {
+                id 'com.palantir.docker'
+            }
+
+            project.version = '1.0.1'
+
+            docker {
+                name '${id}'
+                tags '\${project.version}', 'Test', 'Test-\${project.version}' 
+            }
+        """.stripIndent()
+
+        when:
+        BuildResult buildResult = with('tasks').build()
+
+        then:
+        buildResult.output.contains('dockerTag1.0.1')
+        buildResult.output.contains('dockerTagTest')
+        buildResult.output.contains('dockerTagTest-1.0.1')
+        buildResult.output.contains('dockerPush1.0.1')
+        buildResult.output.contains('dockerPushTest')
+        buildResult.output.contains('dockerPushTest-1.0.1')
+    }
+
+
     def 'does not throw if name is configured after evaluation phase'() {
         given:
         String id = 'id6'

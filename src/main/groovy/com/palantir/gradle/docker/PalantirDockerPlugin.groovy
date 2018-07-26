@@ -97,6 +97,7 @@ class PalantirDockerPlugin implements Plugin<Project> {
                 objectFactory, attributesFactory))
 
         project.afterEvaluate {
+
             ext.resolvePathsAndValidate()
             String dockerDir = "${project.buildDir}/docker"
             clean.delete dockerDir
@@ -122,6 +123,12 @@ class PalantirDockerPlugin implements Plugin<Project> {
             if (!ext.tags.isEmpty()) {
 
                 ext.tags.each { tagName ->
+
+                    def binding = [project:project]
+                    def engine = new groovy.text.SimpleTemplateEngine()
+                    def template = engine.createTemplate(tagName).make(binding)
+                    tagName = template.toString()
+
                     String taskTagName = ucfirst(tagName)
                     Exec subTask = project.tasks.create('dockerTag' + taskTagName, Exec, {
                         group = 'Docker'
