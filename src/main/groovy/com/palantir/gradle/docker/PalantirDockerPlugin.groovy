@@ -90,6 +90,11 @@ class PalantirDockerPlugin implements Plugin<Project> {
             description = 'Bundles the configured Dockerfile in a zip file'
         })
 
+        Task publish = project.tasks.create('dockerPublish', {
+          group = 'Docker'
+          description = 'Pushes all configured tags for named Docker image to configured Docker Hub.'
+        })
+
         PublishArtifact dockerArtifact = new ArchivePublishArtifact(dockerfileZip)
         Configuration dockerConfiguration = project.getConfigurations().getByName('docker')
         dockerConfiguration.getArtifacts().add(dockerArtifact)
@@ -132,13 +137,14 @@ class PalantirDockerPlugin implements Plugin<Project> {
                     })
                     tag.dependsOn subTask
 
-                    project.tasks.create('dockerPush' + taskTagName, Exec, {
+                    Exec pushTask = project.tasks.create('dockerPush' + taskTagName, Exec, {
                         group = 'Docker'
                         description = "Pushes the Docker image with tag '${tagName}' to configured Docker Hub"
                         workingDir dockerDir
                         commandLine 'docker', 'push', "${ -> computeName(ext.name, tagName)}"
                         dependsOn subTask
                     })
+                    publish.dependsOn pushTask
                 }
             }
 
