@@ -87,6 +87,7 @@ class PalantirDockerPlugin implements Plugin<Project> {
 
         Zip dockerfileZip = project.tasks.create('dockerfileZip', Zip, {
             group = 'Docker'
+            baseName 'dockerfile'
             description = 'Bundles the configured Dockerfile in a zip file'
         })
 
