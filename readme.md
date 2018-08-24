@@ -34,10 +34,11 @@ automatically include outputs of task dependencies in the Docker build context.
   be stripped before applying a specific tag; defaults to the empty set
 - `dockerfile` (optional) the dockerfile to use for building the image; defaults to
   `project.file('Dockerfile')` and must be a file object
-- `files` (optional) an argument list of files to be included in the Docker build context, evaluated per `Project#files`. For example, `files tasks.distTar.outputs` adds the TAR/TGZ file produced by the `distTar` tasks, and `files tasks.distTar.outputs, 'my-file.txt'` adds the archive in addition to file `my-file.txt` from the project root directory. The specified files are collected in a Gradle CopySpec which is copied `into` the Docker build context directory. The underlying CopySpec can be used to copy entire directories into the build context, for example:
+- `files` (optional) an argument list of files to be included in the Docker build context, evaluated per `Project#files`. For example, `files tasks.distTar.outputs` adds the TAR/TGZ file produced by the `distTar` tasks, and `files tasks.distTar.outputs, 'my-file.txt'` adds the archive in addition to file `my-file.txt` from the project root directory. The specified files are collected in a Gradle CopySpec which may be copied `into` the Docker build context directory. The underlying CopySpec may also be used to copy entire directories into the build context. The following example adds the aforementioned archive and text file to the CopySpec on the `files` line, uses the CopySpec to _also_ copy all files `from` `src/myDir`, then finally executes the copy `into` the docker build context directory `myDir`
 ````gradle
 docker {
-    copySpec.from("myDir").into("myDir")
+    files tasks.distTar.outputs, 'my-file.txt'
+    copySpec.from("src/myDir").into("myDir")
 }
 ````
 - `buildArgs` (optional) an argument map of string to string which will set --build-arg
@@ -152,7 +153,7 @@ replaces all occurrences of version variables of the form `{{group:name}}` in
 the `docker-compose.yml.template` file by the resolved versions and writes the
 resulting file as `docker-compose.yml`.
 
-The `docker-compose` plugin also provides a `dockerComposeUp` task that starts 
+The `docker-compose` plugin also provides a `dockerComposeUp` task that starts
 the docker images specified in the `dockerComposeFile` in detached mode.
 
 
@@ -264,7 +265,7 @@ Tasks
  * **Docker Compose**
    * `generateDockerCompose`: Populates a docker-compose file template with image
      versions declared by dependencies
-   * `dockerComposeUp`: Brings up services defined in `dockerComposeFile` in 
+   * `dockerComposeUp`: Brings up services defined in `dockerComposeFile` in
      detacted state
  * **Docker Run**
    * `dockerRun`: run the specified image with the specified name
