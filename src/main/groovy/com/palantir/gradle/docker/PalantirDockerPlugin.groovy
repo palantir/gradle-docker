@@ -111,10 +111,16 @@ class PalantirDockerPlugin implements Plugin<Project> {
             clean.delete dockerDir
 
             login.with {
-                workingDir dockerDir
-                commandLine 'docker', 'login', '-u', "${ -> loginExt.username}", '-p', "${ -> loginExt.password}", "${ -> loginExt.repository}"
-                logging.captureStandardOutput LogLevel.INFO
-                logging.captureStandardError LogLevel.ERROR
+                if(loginExt.repository!=null) {
+                    workingDir dockerDir
+                    commandLine 'docker', 'login', '-u', "${-> loginExt.username}", '-p', "${-> loginExt.password}", "${-> loginExt.repository}"
+                    logging.captureStandardOutput LogLevel.INFO
+                    logging.captureStandardError LogLevel.ERROR
+                }
+                else {
+                    workingDir dockerDir
+                    commandLine 'echo', 'no login configured, skipping...'
+                }
             }
 
             prepare.with {
