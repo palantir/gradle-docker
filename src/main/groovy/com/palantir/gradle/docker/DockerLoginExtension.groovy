@@ -2,9 +2,9 @@ package com.palantir.gradle.docker
 
 class DockerLoginExtension {
 
-    private String repository = "myRepo"
-    private String username = "user"
-    private String password = "pw"
+    private String repository = null
+    private String username = null
+    private String password = null
 
     DockerLoginExtension() {
     }
