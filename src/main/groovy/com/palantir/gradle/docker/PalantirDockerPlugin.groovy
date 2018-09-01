@@ -55,6 +55,15 @@ class PalantirDockerPlugin implements Plugin<Project> {
         if (!project.configurations.findByName('docker')) {
             project.configurations.create('docker')
         }
+        DockerLoginExtension loginExt = project.extensions.create('dockerLogin', DockerLoginExtension)
+        if (!project.configurations.findByName('dockerLogin')){
+            project.configurations.create('dockerLogin')
+        }
+
+        Exec login = project.tasks.create('dockerLogin', Exec, {
+            group = 'Docker'
+            description = 'Log in to configured docker repos'
+        })
 
         Delete clean = project.tasks.create('dockerClean', Delete, {
             group = 'Docker'
@@ -82,7 +91,7 @@ class PalantirDockerPlugin implements Plugin<Project> {
         Exec push = project.tasks.create('dockerPush', Exec, {
             group = 'Docker'
             description = 'Pushes named Docker image to configured Docker Hub.'
-            dependsOn tag
+            dependsOn tag, login
         })
 
         Zip dockerfileZip = project.tasks.create('dockerfileZip', Zip, {
@@ -100,6 +109,13 @@ class PalantirDockerPlugin implements Plugin<Project> {
             ext.resolvePathsAndValidate()
             String dockerDir = "${project.buildDir}/docker"
             clean.delete dockerDir
+
+            login.with {
+                workingDir dockerDir
+                commandLine 'docker', 'login', '-u', "${ -> loginExt.username}", '-p', "${ -> loginExt.password}", "${ -> loginExt.repository}"
+                logging.captureStandardOutput LogLevel.INFO
+                logging.captureStandardError LogLevel.ERROR
+            }
 
             prepare.with {
                 with ext.copySpec
