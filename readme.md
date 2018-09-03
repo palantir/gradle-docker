@@ -101,8 +101,8 @@ dockerLogin {
 ````
 **Docker Login Parameters**
 - `repository` the url of the repository
-- `username` (should be optional) the user to login
-- `password` (should be optional) the login password
+- `username` (optional) the user to login
+- `password` (optional) the login password
 
 Managing Docker image dependencies
 ----------------------------------
