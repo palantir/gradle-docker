@@ -122,7 +122,7 @@ class PalantirDockerPlugin implements Plugin<Project> {
             login.with {
                 if(loginExt.repository!=null) {
                     workingDir dockerDir
-                    commandLine 'docker', 'login', '-u', "${-> loginExt.username}", '-p', "${-> loginExt.password}", "${-> loginExt.repository}"
+                    commandLine loginCommandline(loginExt)
                     logging.captureStandardOutput LogLevel.INFO
                     logging.captureStandardError LogLevel.ERROR
                 }
@@ -201,6 +201,15 @@ class PalantirDockerPlugin implements Plugin<Project> {
                 from(ext.resolvedDockerfile)
             }
         }
+    }
+
+    private List<String> loginCommandline(DockerLoginExtension loginExt){
+        List<String> loginCommandLine = ['docker', 'login']
+        if(loginExt.username && loginExt.password){
+            loginCommandLine.addAll('-u', "${-> loginExt.username}", '-p', "${-> loginExt.password}")
+        }
+        loginCommandLine.add "${-> loginExt.repository}"
+        return loginCommandLine
     }
 
     private List<String> buildCommandLine(DockerExtension ext) {
