@@ -96,7 +96,7 @@ docker {
 Add a private docker repository with credentials, to log in before pushing images. If dockerLogin isn't specified in build file, the tasks is skipped.
 ````gradle
 dockerLogin {
-    repository my.private.repo
+    repository 'my.private.repo'
     username "${MY_USERNAME}"
     password "${MY_PASSWORD}"
 }
