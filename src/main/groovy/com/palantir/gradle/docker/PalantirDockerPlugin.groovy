@@ -62,10 +62,6 @@ class PalantirDockerPlugin implements Plugin<Project> {
             project.configurations.create('dockerLogin')
         }
 
-        Exec login = project.tasks.create('dockerLogin', Exec, {
-            group = 'Docker'
-            description = 'Log in to configured docker repos'
-        })
 
         Delete clean = project.tasks.create('dockerClean', Delete, {
             group = 'Docker'
@@ -76,6 +72,12 @@ class PalantirDockerPlugin implements Plugin<Project> {
             group = 'Docker'
             description = 'Prepares Docker build directory.'
             dependsOn clean
+        })
+
+        Exec login = project.tasks.create('dockerLogin', Exec, {
+            group = 'Docker'
+            description = 'Log in to configured docker repos'
+            dependsOn prepare
         })
 
         Exec exec = project.tasks.create('docker', Exec, {
