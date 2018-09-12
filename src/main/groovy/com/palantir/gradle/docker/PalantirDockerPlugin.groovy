@@ -178,11 +178,13 @@ class PalantirDockerPlugin implements Plugin<Project> {
     }
 
     private List<String> loginCommandline(DockerLoginExtension loginExt){
-        List<String> loginCommandLine = ['docker', 'login']
-        if(loginExt.username && loginExt.password){
-            loginCommandLine.addAll('-u', "${-> loginExt.username}", '-p', "${-> loginExt.password}")
+        List<String> loginCommandLine = ['sh', '-c']
+        String dockerCommand = 'docker login'
+        if(System.env.dockerRepoUser != null && System.env.dockerRepoPassword !=null){
+            dockerCommand += ' -u $dockerRepoUser -p $dockerRepoPassword'
         }
-        loginCommandLine.add "${-> loginExt.repository}"
+        dockerCommand= dockerCommand +  " ${-> loginExt.repository}"
+        loginCommandLine.add(dockerCommand)
         return loginCommandLine
     }
 
