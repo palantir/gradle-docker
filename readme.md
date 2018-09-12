@@ -268,6 +268,7 @@ Tasks
    * `dockerTag<tag>`: tag the docker image with `<tag>`
    * `dockerPush`: push the specified image to a docker repository
    * `dockerPush<tag>`: push the `<tag>` docker image to a docker repository
+   * `dockerLogin`: log in to a private docker registry
    * `dockerPrepare`: prepare to build a docker image by copying
      dependent task outputs, referenced files, and `dockerfile` into a temporary
      directory
