@@ -37,6 +37,7 @@ class DockerExtension {
     private Map<String, String> buildArgs = ImmutableMap.of()
     private boolean pull = false
     private boolean noCache = false
+    private String target = null
 
     private File resolvedDockerfile = null
     private File resolvedDockerComposeTemplate = null
@@ -149,5 +150,13 @@ class DockerExtension {
 
     public void noCache(boolean noCache) {
         this.noCache = noCache
+    }
+
+    public String getTarget() {
+        return target
+    }
+
+    public void target(String target) {
+        this.target = target
     }
 }

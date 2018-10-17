@@ -176,6 +176,10 @@ class PalantirDockerPlugin implements Plugin<Project> {
         if (ext.pull) {
             buildCommandLine.add '--pull'
         }
+        if (ext.target != null && ext.target != "") {
+            buildCommandLine.add '--target'
+            buildCommandLine.add ext.target
+        }
         buildCommandLine.addAll(['-t', "${ -> ext.name}", '.'])
         return buildCommandLine
     }

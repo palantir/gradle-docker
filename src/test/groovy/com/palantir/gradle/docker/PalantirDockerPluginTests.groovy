@@ -370,6 +370,39 @@ class PalantirDockerPluginTests extends AbstractPluginTest {
         execCond("docker rmi -f ${id}")
     }
 
+    def 'docker --target is correctly processed'() {
+        given:
+        String id = 'id77'
+        file('Dockerfile') << '''
+            FROM alpine:3.2 as base
+            ENV STAGE=base
+            FROM base as stage1
+            ENV STAGE=stage1
+            FROM base as stage2
+            ENV STAGE=stage2
+            FROM base as stage3
+            ENV STAGE=stage3
+        '''.stripIndent()
+        buildFile << """
+            plugins {
+                id 'com.palantir.docker'
+            }
+
+            docker {
+                name '${id}'
+                target "stage2"
+            }
+        """.stripIndent()
+
+        when:
+        BuildResult buildResult = with('docker').build()
+
+        then:
+        buildResult.task(':docker').outcome == TaskOutcome.SUCCESS
+        exec("docker inspect --format '{{.Config.Env}}' ${id}").contains('STAGE=stage2')
+        execCond("docker rmi -f ${id}")
+    }
+
     def 'rebuilding an image does it from scratch when "noCache" parameter is set'() {
         given:
         String id = 'id66'
