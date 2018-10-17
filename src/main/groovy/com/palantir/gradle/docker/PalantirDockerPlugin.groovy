@@ -74,9 +74,9 @@ class PalantirDockerPlugin implements Plugin<Project> {
         })
 
         Task tag = project.tasks.create('dockerTag', {
-          group = 'Docker'
-          description = 'Applies all tags to the Docker image.'
-          dependsOn exec
+            group = 'Docker'
+            description = 'Applies all tags to the Docker image.'
+            dependsOn exec
         })
 
         Exec push = project.tasks.create('dockerPush', Exec, {
@@ -122,12 +122,12 @@ class PalantirDockerPlugin implements Plugin<Project> {
             if (!ext.tags.isEmpty()) {
 
                 ext.tags.each { tagName ->
-                    String taskTagName = ucfirst(tagName)
+                    String taskTagName = generateTagTaskName(tagName)
                     Exec subTask = project.tasks.create('dockerTag' + taskTagName, Exec, {
                         group = 'Docker'
                         description = "Tags Docker image with tag '${tagName}'"
                         workingDir dockerDir
-                        commandLine 'docker', 'tag', "${ -> ext.name}", "${ -> computeName(ext.name, tagName)}"
+                        commandLine 'docker', 'tag', "${-> ext.name}", "${-> computeName(ext.name, tagName)}"
                         dependsOn exec
                     })
                     tag.dependsOn subTask
@@ -136,7 +136,7 @@ class PalantirDockerPlugin implements Plugin<Project> {
                         group = 'Docker'
                         description = "Pushes the Docker image with tag '${tagName}' to configured Docker Hub"
                         workingDir dockerDir
-                        commandLine 'docker', 'push', "${ -> computeName(ext.name, tagName)}"
+                        commandLine 'docker', 'push', "${-> computeName(ext.name, tagName)}"
                         dependsOn subTask
                     })
                 }
@@ -144,7 +144,7 @@ class PalantirDockerPlugin implements Plugin<Project> {
 
             push.with {
                 workingDir dockerDir
-                commandLine 'docker', 'push', "${ -> ext.name}"
+                commandLine 'docker', 'push', "${-> ext.name}"
             }
 
             dockerfileZip.with {
@@ -176,29 +176,66 @@ class PalantirDockerPlugin implements Plugin<Project> {
         if (ext.pull) {
             buildCommandLine.add '--pull'
         }
-        buildCommandLine.addAll(['-t', "${ -> ext.name}", '.'])
+        buildCommandLine.addAll(['-t', "${-> ext.name}", '.'])
         return buildCommandLine
     }
 
     private static String computeName(String name, String tag) {
-        int lastColon = name.lastIndexOf(':')
-        int lastSlash = name.lastIndexOf('/')
+        int firstAt = tag.indexOf("@")
 
-        int endIndex;
+        String tagValue
+        if (firstAt > 0) {
+            tagValue = tag.substring(firstAt + 1, tag.length())
+        } else {
+            tagValue = tag
+        }
 
-        // image_name -> this should remain
-        // host:port/image_name -> this should remain.
-        // host:port/image_name:v1 -> v1 should be replaced
-        if (lastColon > lastSlash) endIndex = lastColon
-        else endIndex = name.length()
+        if (tagValue.contains(':') || tagValue.contains('/')) {
+            // tag with ':' or '/' -> force use the tag value
+            return tagValue
+        } else {
+            // tag without ':' and '/' -> replace the tag part of original name
+            int lastColon = name.lastIndexOf(':')
+            int lastSlash = name.lastIndexOf('/')
 
-        return name.substring(0, endIndex) + ":" + tag
+            int endIndex;
+
+            // image_name -> this should remain
+            // host:port/image_name -> this should remain.
+            // host:port/image_name:v1 -> v1 should be replaced
+            if (lastColon > lastSlash) endIndex = lastColon
+            else endIndex = name.length()
+
+            return name.substring(0, endIndex) + ":" + tagValue
+        }
     }
 
-    private static String ucfirst(String str) {
-        StringBuffer sb = new StringBuffer(str);
-        sb.replace(0, 1, str.substring(0, 1).toUpperCase());
+    private static String generateTagTaskName(String name) {
+        String tagTaskName = name
+        int firstAt = name.indexOf("@")
+
+        if (firstAt > 0) {
+            // Get substring of task name
+            tagTaskName = name.substring(0, firstAt)
+        } else if (firstAt == 0) {
+            // Task name must not be empty
+            throw new GradleException("Task name of docker tag '${name}' must not be empty.\n" +
+                    "There are some sample:\n" +
+                    "firstVersion@1.0.0 (dockerTagFirstVersion)\n" +
+                    "newName@docker-name:latest (dockerTagNewName)\n" +
+                    "withRepo@myregistryhost/fedora/httpd:version1.0 (dockerTagWithRepo)")
+        } else if (name.contains(':') || name.contains('/')) {
+            // Tags which with repo or name must have a task name
+            throw new GradleException("Docker tag '${name}' must have a task name.\n" +
+                    "Tags which with repo and name must have a task name, there are some sample:\n" +
+                    "firstVersion@1.0.0 (dockerTagFirstVersion)\n" +
+                    "newName@docker-name:latest (dockerTagNewName)\n" +
+                    "withRepo@myregistryhost/fedora/httpd:version1.0 (dockerTagWithRepo)")
+        }
+
+        StringBuffer sb = new StringBuffer(tagTaskName)
+        // Uppercase the first letter of task name
+        sb.replace(0, 1, tagTaskName.substring(0, 1).toUpperCase());
         return sb.toString();
     }
-
 }

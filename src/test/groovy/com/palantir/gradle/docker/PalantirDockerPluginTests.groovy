@@ -241,7 +241,7 @@ class PalantirDockerPluginTests extends AbstractPluginTest {
 
             docker {
                 name '${id}'
-                tags 'latest', 'another'
+                tags 'latest', 'another', 'withTaskName@2.0', 'newImageName@${id}-new:latest'
             }
         """.stripIndent()
 
@@ -251,8 +251,12 @@ class PalantirDockerPluginTests extends AbstractPluginTest {
         then:
         buildResult.output.contains('dockerTagLatest')
         buildResult.output.contains('dockerTagAnother')
+        buildResult.output.contains('dockerTagWithTaskName')
+        buildResult.output.contains('dockerTagNewImageName')
         buildResult.output.contains('dockerPushLatest')
         buildResult.output.contains('dockerPushAnother')
+        buildResult.output.contains('dockerPushWithTaskName')
+        buildResult.output.contains('dockerPushNewImageName')
     }
 
 
@@ -269,7 +273,7 @@ class PalantirDockerPluginTests extends AbstractPluginTest {
             }
 
             docker {
-                tags 'latest', 'another'
+                tags 'latest', 'another', 'withTaskName@2.0', 'newImageName@${id}-new:latest'
             }
 
             afterEvaluate {
@@ -278,7 +282,7 @@ class PalantirDockerPluginTests extends AbstractPluginTest {
         """.stripIndent()
 
         when:
-        BuildResult buildResult = with('dockerTag').build()
+        BuildResult buildResult = with('dockerTag', "--stacktrace").build()
 
         then:
         buildResult.task(':dockerPrepare').outcome == TaskOutcome.SUCCESS
@@ -287,10 +291,13 @@ class PalantirDockerPluginTests extends AbstractPluginTest {
         exec("docker inspect --format '{{.Author}}' ${id}") == "'${id}'\n"
         exec("docker inspect --format '{{.Author}}' ${id}:latest") == "'${id}'\n"
         exec("docker inspect --format '{{.Author}}' ${id}:another") == "'${id}'\n"
+        exec("docker inspect --format '{{.Author}}' ${id}:2.0") == "'${id}'\n"
+        exec("docker inspect --format '{{.Author}}' ${id}-new:latest") == "'${id}'\n"
         execCond("docker rmi -f ${id}")
         execCond("docker rmi -f ${id}:another")
         execCond("docker rmi -f ${id}:latest")
-        
+        execCond("docker rmi -f ${id}:2.0")
+        execCond("docker rmi -f ${id}-new:latest")
     }
 
     def 'running tag task creates images with specified tags'() {
@@ -307,7 +314,7 @@ class PalantirDockerPluginTests extends AbstractPluginTest {
 
             docker {
                 name 'fake-service-name'
-                tags 'latest', 'another'
+                tags 'latest', 'another', 'withTaskName@2.0', 'newImageName@${id}-new:latest'
             }
 
             afterEvaluate {
@@ -318,6 +325,8 @@ class PalantirDockerPluginTests extends AbstractPluginTest {
                 doLast {
                     println "LATEST: \${tasks.dockerTagLatest.commandLine}"
                     println "ANOTHER: \${tasks.dockerTagAnother.commandLine}"
+                    println "WITH_TASK_NAME: \${tasks.dockerTagWithTaskName.commandLine}"
+                    println "NEW_IMAGE_NAME: \${tasks.dockerTagNewImageName.commandLine}"
                 }
             }
         """.stripIndent()
@@ -326,17 +335,23 @@ class PalantirDockerPluginTests extends AbstractPluginTest {
         BuildResult buildResult = with('dockerTag', 'printInfo').build()
 
         then:
-        buildResult.output.contains("LATEST: [docker, tag, id6, id6:latest]")
-        buildResult.output.contains("ANOTHER: [docker, tag, id6, id6:another]")
+        buildResult.output.contains("LATEST: [docker, tag, ${id}, ${id}:latest]")
+        buildResult.output.contains("ANOTHER: [docker, tag, ${id}, ${id}:another]")
+        buildResult.output.contains("WITH_TASK_NAME: [docker, tag, ${id}, ${id}:2.0]")
+        buildResult.output.contains("NEW_IMAGE_NAME: [docker, tag, ${id}, ${id}-new:latest]")
         buildResult.task(':dockerPrepare').outcome == TaskOutcome.SUCCESS
         buildResult.task(':docker').outcome == TaskOutcome.SUCCESS
         buildResult.task(':dockerTag').outcome == TaskOutcome.SUCCESS
         exec("docker inspect --format '{{.Author}}' ${id}") == "'${id}'\n"
         exec("docker inspect --format '{{.Author}}' ${id}:latest") == "'${id}'\n"
         exec("docker inspect --format '{{.Author}}' ${id}:another") == "'${id}'\n"
+        exec("docker inspect --format '{{.Author}}' ${id}:2.0") == "'${id}'\n"
+        exec("docker inspect --format '{{.Author}}' ${id}-new:latest") == "'${id}'\n"
         execCond("docker rmi -f ${id}")
         execCond("docker rmi -f ${id}:latest")
         execCond("docker rmi -f ${id}:another")
+        execCond("docker rmi -f ${id}:2.0")
+        execCond("docker rmi -f ${id}-new:latest")
     }
 
     def 'build args are correctly processed'() {
@@ -602,6 +617,36 @@ class PalantirDockerPluginTests extends AbstractPluginTest {
         "host/v1:1"      | "latest" | "host/v1:latest"
         "host:port/v1"   | "latest" | "host:port/v1:latest"
         "host:port/v1:1" | "latest" | "host:port/v1:latest"
+        "v1"             | "name@latest" | "v1:latest"
+        "v1:1"           | "name@latest" | "v1:latest"
+        "host/v1"        | "name@latest" | "host/v1:latest"
+        "host/v1:1"      | "name@latest" | "host/v1:latest"
+        "host:port/v1"   | "name@latest" | "host:port/v1:latest"
+        "host:port/v1:1" | "name@latest" | "host:port/v1:latest"
+        "v1"             | "name@v2:latest" | "v2:latest"
+        "v1:1"           | "name@v2:latest" | "v2:latest"
+        "host/v1"        | "name@v2:latest" | "v2:latest"
+        "host/v1:1"      | "name@v2:latest" | "v2:latest"
+        "host:port/v1"   | "name@v2:latest" | "v2:latest"
+        "host:port/v1:1" | "name@v2:latest" | "v2:latest"
+        "v1"             | "name@host/v2" | "host/v2"
+        "v1:1"           | "name@host/v2" | "host/v2"
+        "host/v1"        | "name@host/v2" | "host/v2"
+        "host/v1:1"      | "name@host/v2" | "host/v2"
+        "host:port/v1"   | "name@host/v2" | "host/v2"
+        "host:port/v1:1" | "name@host/v2" | "host/v2"
+        "v1"             | "name@host/v2:2" | "host/v2:2"
+        "v1:1"           | "name@host/v2:2" | "host/v2:2"
+        "host/v1"        | "name@host/v2:2" | "host/v2:2"
+        "host/v1:1"      | "name@host/v2:2" | "host/v2:2"
+        "host:port/v1"   | "name@host/v2:2" | "host/v2:2"
+        "host:port/v1:1" | "name@host/v2:2" | "host/v2:2"
+        "v1"             | "name@host:port/v2:2" | "host:port/v2:2"
+        "v1:1"           | "name@host:port/v2:2" | "host:port/v2:2"
+        "host/v1"        | "name@host:port/v2:2" | "host:port/v2:2"
+        "host/v1:1"      | "name@host:port/v2:2" | "host:port/v2:2"
+        "host:port/v1"   | "name@host:port/v2:2" | "host:port/v2:2"
+        "host:port/v1:1" | "name@host:port/v2:2" | "host:port/v2:2"
     }
 
     def 'can add entire directories via copyspec'() {
