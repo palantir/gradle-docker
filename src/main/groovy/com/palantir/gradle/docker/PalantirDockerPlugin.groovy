@@ -85,6 +85,17 @@ class PalantirDockerPlugin implements Plugin<Project> {
             dependsOn tag
         })
 
+        Task pushAllTags = project.tasks.create('dockerTagsPush', {
+            group = 'Docker'
+            description = 'Pushes all tagged Docker images to configured Docker Hub.'
+        })
+
+        Task pushAll = project.tasks.create('dockerAllPush', {
+            group = 'Docker'
+            description = 'Pushes all tagged Docker images and named Docker image to configured Docker Hub.'
+            dependsOn push, pushAllTags
+        })
+
         Zip dockerfileZip = project.tasks.create('dockerfileZip', Zip, {
             group = 'Docker'
             description = 'Bundles the configured Dockerfile in a zip file'
@@ -123,22 +134,23 @@ class PalantirDockerPlugin implements Plugin<Project> {
 
                 ext.tags.each { tagName ->
                     String taskTagName = generateTagTaskName(tagName)
-                    Exec subTask = project.tasks.create('dockerTag' + taskTagName, Exec, {
+                    Exec tagSubTask = project.tasks.create('dockerTag' + taskTagName, Exec, {
                         group = 'Docker'
                         description = "Tags Docker image with tag '${tagName}'"
                         workingDir dockerDir
                         commandLine 'docker', 'tag', "${-> ext.name}", "${-> computeName(ext.name, tagName)}"
                         dependsOn exec
                     })
-                    tag.dependsOn subTask
+                    tag.dependsOn tagSubTask
 
-                    project.tasks.create('dockerPush' + taskTagName, Exec, {
+                    Exec pushSubTask = project.tasks.create('dockerPush' + taskTagName, Exec, {
                         group = 'Docker'
                         description = "Pushes the Docker image with tag '${tagName}' to configured Docker Hub"
                         workingDir dockerDir
                         commandLine 'docker', 'push', "${-> computeName(ext.name, tagName)}"
-                        dependsOn subTask
+                        dependsOn tagSubTask
                     })
+                    pushAllTags.dependsOn pushSubTask
                 }
             }
 
