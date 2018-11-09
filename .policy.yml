@@ -1,0 +1,50 @@
+policy:
+  approval:
+    - or:
+      - infra team approval
+      - infra team co-approval
+      - excavator only touched gradle files or versions.props
+      - excavator only touched package.json and lock files
+
+approval_rules:
+
+  - name: infra team approval
+    requires:
+      count: 1
+      teams:
+        - "palantir/infrastructure"
+
+  # Require two *contributing* infra maintainers to approve changes
+  - name: infra team co-approval
+    options:
+      allow_contributor: true
+    requires:
+      count: 2
+      teams:
+        - "palantir/infrastructure"
+
+  - name: excavator only touched gradle files or versions.props
+    requires:
+      count: 0
+    if:
+      has_author_in:
+        users: [ "svc-excavator-bot" ]
+      only_changed_files:
+        paths:
+          - "^.*gradle$"
+          - "^gradle/wrapper/.*"
+          - "^gradlew$"
+          - "^gradlew.bat$"
+          - "^versions.props$"
+          - "^versions.lock$"
+
+  - name: excavator only touched package.json and lock files
+    requires:
+      count: 0
+    if:
+      has_author_in:
+        users: [ "svc-excavator-bot" ]
+      only_changed_files:
+        paths:
+          - "^.*yarn.lock$"
+          - "^.*package.json$"
