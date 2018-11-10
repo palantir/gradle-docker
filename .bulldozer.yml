@@ -1,0 +1,14 @@
+version: 1
+merge:
+  whitelist:
+    labels: ["merge when ready"]
+  blacklist:
+    labels: ["do not merge"]
+  method: squash
+  options:
+    squash:
+      body: pull_request_body
+  delete_after_merge: true
+update:
+  whitelist:
+    labels: ["update me"]
