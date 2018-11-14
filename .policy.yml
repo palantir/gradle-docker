@@ -3,11 +3,13 @@ policy:
     - or:
       - infra team approval
       - infra team co-approval
-      - excavator only touched gradle files or versions.props
+      - excavator only touched baseline, gradle files or versions.props
       - excavator only touched package.json and lock files
+  disapproval:
+    requires:
+      organizations: [ "palantir" ]
 
 approval_rules:
-
   - name: infra team approval
     requires:
       count: 1
@@ -23,7 +25,7 @@ approval_rules:
       teams:
         - "palantir/infrastructure"
 
-  - name: excavator only touched gradle files or versions.props
+  - name: excavator only touched baseline, gradle files or versions.props
     requires:
       count: 0
     if:
@@ -31,6 +33,7 @@ approval_rules:
         users: [ "svc-excavator-bot" ]
       only_changed_files:
         paths:
+          - "^\\.baseline/.*$"
           - "^.*gradle$"
           - "^gradle/wrapper/.*"
           - "^gradlew$"
