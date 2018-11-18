@@ -115,7 +115,7 @@ class PalantirDockerPlugin implements Plugin<Project> {
                 workingDir dockerDir
                 commandLine buildCommandLine(ext)
                 dependsOn ext.getDependencies()
-                logging.captureStandardOutput LogLevel.INFO
+                logging.captureStandardOutput LogLevel.LIFECYCLE
                 logging.captureStandardError LogLevel.ERROR
             }
 
