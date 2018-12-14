@@ -15,7 +15,10 @@
  */
 package com.palantir.gradle.docker
 
+import org.gradle.api.Action
 import org.gradle.api.GradleException
+import org.gradle.api.NamedDomainObjectContainer
+import org.gradle.api.NamedDomainObjectFactory
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.Task
@@ -57,11 +60,16 @@ class PalantirDockerPlugin implements Plugin<Project> {
         if (!project.configurations.findByName('docker')) {
             project.configurations.create('docker')
         }
-        DockerLoginExtension loginExt = project.extensions.create('dockerLogin', DockerLoginExtension)
-        if (!project.configurations.findByName('dockerLogin')){
-            project.configurations.create('dockerLogin')
-        }
 
+        NamedDomainObjectContainer<DockerRepoEnvironment> dockerRepoEnvContainer = project.container(
+                DockerRepoEnvironment.class, new NamedDomainObjectFactory<DockerRepoEnvironment>() {
+            @Override
+            DockerRepoEnvironment create(String name) {
+                return new DockerRepoEnvironment(name, project.getObjects())
+            }
+        }
+        )
+        project.extensions.add("dockerRepos", dockerRepoEnvContainer)
 
         Delete clean = project.tasks.create('dockerClean', Delete, {
             group = 'Docker'
@@ -95,7 +103,7 @@ class PalantirDockerPlugin implements Plugin<Project> {
         Exec push = project.tasks.create('dockerPush', Exec, {
             group = 'Docker'
             description = 'Pushes named Docker image to configured Docker Hub.'
-            dependsOn tag, login
+            dependsOn tag
         })
 
         Task pushAllTags = project.tasks.create('dockerTagsPush', {
@@ -118,19 +126,6 @@ class PalantirDockerPlugin implements Plugin<Project> {
             ext.resolvePathsAndValidate()
             String dockerDir = "${project.buildDir}/docker"
             clean.delete dockerDir
-
-            login.with {
-                if(loginExt.repository!=null) {
-                    workingDir dockerDir
-                    commandLine loginCommandline(loginExt)
-                    logging.captureStandardOutput LogLevel.INFO
-                    logging.captureStandardError LogLevel.ERROR
-                }
-                else {
-                    workingDir dockerDir
-                    commandLine 'echo', 'no login configured, skipping...'
-                }
-            }
 
             prepare.with {
                 with ext.copySpec
@@ -164,7 +159,7 @@ class PalantirDockerPlugin implements Plugin<Project> {
                     if (tags.containsKey(taskName)) {
                         throw new IllegalArgumentException("Task name '${taskName}' is existed.")
                     }
-                    
+
                     tags[taskName] = [
                             tagName: unresolvedTagName,
                             tagTask: { -> computeName(ext.name, unresolvedTagName) }
@@ -192,6 +187,20 @@ class PalantirDockerPlugin implements Plugin<Project> {
                 pushAllTags.dependsOn pushSubTask
             }
 
+            if(dockerRepoEnvContainer.size()>0){
+                dockerRepoEnvContainer.each {
+                    DockerRepoEnvironment dockerEnv = it
+                    Exec subTask = project.tasks.create('dockerLogin' + dockerEnv.name.toUpperCase(), Exec, {
+                        group = 'Docker'
+                        description = "Docker login to repo "+ dockerEnv.name
+                        workingDir dockerDir
+                        commandLine loginCommandline(dockerEnv.name, dockerEnv.url.get())
+                        dependsOn exec
+                    })
+                    login.dependsOn subTask
+                }
+            }
+
             push.with {
                 workingDir dockerDir
                 commandLine 'docker', 'push', "${-> ext.name}"
@@ -203,13 +212,13 @@ class PalantirDockerPlugin implements Plugin<Project> {
         }
     }
 
-    private List<String> loginCommandline(DockerLoginExtension loginExt){
+    private List<String> loginCommandline(String repoName, String repoUrl){
         List<String> loginCommandLine = ['sh', '-c']
         String dockerCommand = 'docker login'
-        if(System.env.dockerRepoUser != null && System.env.dockerRepoPassword !=null){
-            dockerCommand += ' -u $dockerRepoUser -p $dockerRepoPassword'
-        }
-        dockerCommand= dockerCommand +  " ${-> loginExt.repository}"
+
+        dockerCommand += ' -u $'+ repoName +'User -p $' + repoName +'Password'
+
+        dockerCommand= dockerCommand +  " " + repoUrl
         loginCommandLine.add(dockerCommand)
         return loginCommandLine
     }
