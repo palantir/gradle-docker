@@ -82,7 +82,7 @@ class PalantirDockerPlugin implements Plugin<Project> {
             dependsOn clean
         })
 
-        Exec login = project.tasks.create('dockerLogin', Exec, {
+        Task login = project.tasks.create('dockerLogin', {
             group = 'Docker'
             description = 'Log in to configured docker repos'
             dependsOn prepare
