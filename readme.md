@@ -93,16 +93,28 @@ docker {
 ```
 
 ### Docker Login
-Add a private docker repository with credentials, to log in before pushing images. If dockerLogin isn't specified in build file, the tasks is skipped. The credentials to login has to be set as environment variables.
+Its possible to add one or more private docker repos to login before pushing images. Therefor the repositories have to be specified with a name and the repository url.
 ````gradle
-dockerLogin {
-    repository 'my.private.repo'
+dockerRepos {
+    repoA{
+        url = 'myurl.mycompany.com'
+    }
+    repoB {
+        url = 'url.anothercompany.com'
+    } 
 }
 ````
+If no dockerRepos are specified in build file, the tasks is skipped. The credentials to login has to be set as environment variables. The variables have to had the same name than specified in build file, e.g. <name>User and <name>Password.
+````sh
+export repoAUser=UserA
+export repoAPassword=PasswordUserA
+export repoBUser=UserB
+export repoBPassword=PasswordUserB
+````
+It's also possible to set the env variables via gradle, if the build is executed in a trusted environment.  
 **Docker Login Parameters**
-- `repository` the url of the repository
-- `dockerRepoUser` (optional) the user to login, has to be set as an environment variable
-- `dockerRepoPassword` (optional) the login password, has to be set as an environment variable
+- `name` a unique name or shortcut for the repository
+- `url` the url of the repository
 
 Managing Docker image dependencies
 ----------------------------------
