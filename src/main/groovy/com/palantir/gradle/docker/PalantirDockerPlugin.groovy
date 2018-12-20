@@ -205,6 +205,7 @@ class PalantirDockerPlugin implements Plugin<Project> {
                 workingDir dockerDir
                 commandLine 'docker', 'push', "${-> ext.name}"
             }
+            push.dependsOn login
 
             dockerfileZip.with {
                 from(ext.resolvedDockerfile)
