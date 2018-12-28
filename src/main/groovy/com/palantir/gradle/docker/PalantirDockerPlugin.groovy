@@ -138,16 +138,16 @@ class PalantirDockerPlugin implements Plugin<Project> {
             }
 
             if (!ext.unresolvedTags.isEmpty()) {
-                ext.unresolvedTags.each { markedTagName ->
-                    String taskName = generateTagTaskName(markedTagName)
+                ext.unresolvedTags.each { unresolvedTagName ->
+                    String taskName = generateTagTaskName(unresolvedTagName)
 
                     if (tags.containsKey(taskName)) {
-                        throw new GradleException("Task name '${taskName}' of docker tag '${tagName}' is existed.")
+                        throw new GradleException("Task name '${taskName}' of docker tag '${unresolvedTagName}' is existed.")
                     }
 
                     tags[taskName] = [
-                            rawTagName          : markedTagName,
-                            resolveTagNameAction: { -> computeName(ext.name, markedTagName) }
+                            rawTagName          : unresolvedTagName,
+                            resolveTagNameAction: { -> computeName(ext.name, unresolvedTagName) }
                     ]
                 }
             }
