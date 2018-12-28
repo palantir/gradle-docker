@@ -242,6 +242,7 @@ class PalantirDockerPluginTests extends AbstractPluginTest {
             docker {
                 name '${id}'
                 tags 'latest', 'another', 'withTaskName@2.0', 'newImageName@${id}-new:latest'
+                tag 'withTaskNameByTag', '${id}:new-latest'
             }
         """.stripIndent()
 
@@ -253,12 +254,13 @@ class PalantirDockerPluginTests extends AbstractPluginTest {
         buildResult.output.contains('dockerTagAnother')
         buildResult.output.contains('dockerTagWithTaskName')
         buildResult.output.contains('dockerTagNewImageName')
+        buildResult.output.contains('dockerTagWithTaskNameByTag')
         buildResult.output.contains('dockerPushLatest')
         buildResult.output.contains('dockerPushAnother')
         buildResult.output.contains('dockerPushWithTaskName')
         buildResult.output.contains('dockerPushNewImageName')
+        buildResult.output.contains('dockerPushWithTaskNameByTag')
     }
-
 
     def 'does not throw if name is configured after evaluation phase'() {
         given:
@@ -274,6 +276,7 @@ class PalantirDockerPluginTests extends AbstractPluginTest {
 
             docker {
                 tags 'latest', 'another', 'withTaskName@2.0', 'newImageName@${id}-new:latest'
+                tag 'withTaskNameByTag', '${id}:new-latest'
             }
 
             afterEvaluate {
@@ -293,11 +296,13 @@ class PalantirDockerPluginTests extends AbstractPluginTest {
         exec("docker inspect --format '{{.Author}}' ${id}:another") == "'${id}'\n"
         exec("docker inspect --format '{{.Author}}' ${id}:2.0") == "'${id}'\n"
         exec("docker inspect --format '{{.Author}}' ${id}-new:latest") == "'${id}'\n"
+        exec("docker inspect --format '{{.Author}}' ${id}:new-latest") == "'${id}'\n"
         execCond("docker rmi -f ${id}")
         execCond("docker rmi -f ${id}:another")
         execCond("docker rmi -f ${id}:latest")
         execCond("docker rmi -f ${id}:2.0")
         execCond("docker rmi -f ${id}-new:latest")
+        execCond("docker rmi -f ${id}:new-latest")
     }
 
     def 'running tag task creates images with specified tags'() {
@@ -315,6 +320,7 @@ class PalantirDockerPluginTests extends AbstractPluginTest {
             docker {
                 name 'fake-service-name'
                 tags 'latest', 'another', 'withTaskName@2.0', 'newImageName@${id}-new:latest'
+                tag 'withTaskNameByTag', '${id}:new-latest'
             }
 
             afterEvaluate {
@@ -327,6 +333,7 @@ class PalantirDockerPluginTests extends AbstractPluginTest {
                     println "ANOTHER: \${tasks.dockerTagAnother.commandLine}"
                     println "WITH_TASK_NAME: \${tasks.dockerTagWithTaskName.commandLine}"
                     println "NEW_IMAGE_NAME: \${tasks.dockerTagNewImageName.commandLine}"
+                    println "WITH_TASK_NAME_BY_TAG: \${tasks.dockerTagWithTaskNameByTag.commandLine}"
                 }
             }
         """.stripIndent()
@@ -339,6 +346,7 @@ class PalantirDockerPluginTests extends AbstractPluginTest {
         buildResult.output.contains("ANOTHER: [docker, tag, ${id}, ${id}:another]")
         buildResult.output.contains("WITH_TASK_NAME: [docker, tag, ${id}, ${id}:2.0]")
         buildResult.output.contains("NEW_IMAGE_NAME: [docker, tag, ${id}, ${id}-new:latest]")
+        buildResult.output.contains("WITH_TASK_NAME_BY_TAG: [docker, tag, ${id}, ${id}:new-latest]")
         buildResult.task(':dockerPrepare').outcome == TaskOutcome.SUCCESS
         buildResult.task(':docker').outcome == TaskOutcome.SUCCESS
         buildResult.task(':dockerTag').outcome == TaskOutcome.SUCCESS
@@ -347,11 +355,13 @@ class PalantirDockerPluginTests extends AbstractPluginTest {
         exec("docker inspect --format '{{.Author}}' ${id}:another") == "'${id}'\n"
         exec("docker inspect --format '{{.Author}}' ${id}:2.0") == "'${id}'\n"
         exec("docker inspect --format '{{.Author}}' ${id}-new:latest") == "'${id}'\n"
+        exec("docker inspect --format '{{.Author}}' ${id}:new-latest") == "'${id}'\n"
         execCond("docker rmi -f ${id}")
         execCond("docker rmi -f ${id}:latest")
         execCond("docker rmi -f ${id}:another")
         execCond("docker rmi -f ${id}:2.0")
         execCond("docker rmi -f ${id}-new:latest")
+        execCond("docker rmi -f ${id}:new-latest")
     }
 
     def 'build args are correctly processed'() {

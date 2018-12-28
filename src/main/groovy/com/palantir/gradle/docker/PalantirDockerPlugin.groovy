@@ -130,24 +130,44 @@ class PalantirDockerPlugin implements Plugin<Project> {
                 logging.captureStandardError LogLevel.ERROR
             }
 
-            if (!ext.tags.isEmpty()) {
+            Map<String, Object> tags = ext.tags.collectEntries { taskName, tagName ->
+                [generateTagTaskName(taskName), [
+                        rawTagName          : tagName,
+                        resolveTagNameAction: { -> tagName }
+                ]]
+            }
 
-                ext.tags.each { tagName ->
-                    String taskTagName = generateTagTaskName(tagName)
-                    Exec tagSubTask = project.tasks.create('dockerTag' + taskTagName, Exec, {
+            if (!ext.unresolvedTags.isEmpty()) {
+                ext.unresolvedTags.each { markedTagName ->
+                    String taskName = generateTagTaskName(markedTagName)
+
+                    if (tags.containsKey(taskName)) {
+                        throw new GradleException("Task name '${taskName}' of docker tag '${tagName}' is existed.")
+                    }
+
+                    tags[taskName] = [
+                            rawTagName          : markedTagName,
+                            resolveTagNameAction: { -> computeName(ext.name, markedTagName) }
+                    ]
+                }
+            }
+
+            if (!tags.isEmpty()) {
+                tags.each { taskName, tagConfig ->
+                    Exec tagSubTask = project.tasks.create('dockerTag' + taskName, Exec, {
                         group = 'Docker'
-                        description = "Tags Docker image with tag '${tagName}'"
+                        description = "Tags Docker image with tag '${tagConfig.rawTagName}'"
                         workingDir dockerDir
-                        commandLine 'docker', 'tag', "${-> ext.name}", "${-> computeName(ext.name, tagName)}"
+                        commandLine 'docker', 'tag', "${-> ext.name}", "${-> tagConfig.resolveTagNameAction()}"
                         dependsOn exec
                     })
                     tag.dependsOn tagSubTask
 
-                    Exec pushSubTask = project.tasks.create('dockerPush' + taskTagName, Exec, {
+                    Exec pushSubTask = project.tasks.create('dockerPush' + taskName, Exec, {
                         group = 'Docker'
-                        description = "Pushes the Docker image with tag '${tagName}' to configured Docker Hub"
+                        description = "Pushes the Docker image with tag '${tagConfig.rawTagName}' to configured Docker Hub"
                         workingDir dockerDir
-                        commandLine 'docker', 'push', "${-> computeName(ext.name, tagName)}"
+                        commandLine 'docker', 'push', "${-> tagConfig.resolveTagNameAction()}"
                         dependsOn tagSubTask
                     })
                     pushAllTags.dependsOn pushSubTask
@@ -192,6 +212,7 @@ class PalantirDockerPlugin implements Plugin<Project> {
         return buildCommandLine
     }
 
+    @Deprecated
     private static String computeName(String name, String tag) {
         int firstAt = tag.indexOf("@")
 
@@ -222,6 +243,7 @@ class PalantirDockerPlugin implements Plugin<Project> {
         }
     }
 
+    @Deprecated
     private static String generateTagTaskName(String name) {
         String tagTaskName = name
         int firstAt = name.indexOf("@")
@@ -248,6 +270,6 @@ class PalantirDockerPlugin implements Plugin<Project> {
         StringBuffer sb = new StringBuffer(tagTaskName)
         // Uppercase the first letter of task name
         sb.replace(0, 1, tagTaskName.substring(0, 1).toUpperCase());
-        return sb.toString();
+        return sb.toString()
     }
 }

@@ -19,6 +19,7 @@ import com.google.common.base.Preconditions
 import com.google.common.base.Strings
 import com.google.common.collect.ImmutableMap
 import com.google.common.collect.ImmutableSet
+import org.gradle.api.GradleException
 import org.gradle.api.Project
 import org.gradle.api.Task
 import org.gradle.api.file.CopySpec
@@ -32,7 +33,8 @@ class DockerExtension {
     private String dockerComposeTemplate = 'docker-compose.yml.template'
     private String dockerComposeFile = 'docker-compose.yml'
     private Set<Task> dependencies = ImmutableSet.of()
-    private Set<String> tags = ImmutableSet.of()
+    private Set<String> unresolvedTags = new HashSet<>()
+    private Map<String, String> tags = new HashMap<>()
     private Map<String, String> labels = ImmutableMap.of()
     private Map<String, String> buildArgs = ImmutableMap.of()
     private boolean pull = false
@@ -85,12 +87,25 @@ class DockerExtension {
         copySpec.from(files)
     }
 
-    public Set<String> getTags() {
-        return tags
+    public Set<String> getUnresolvedTags() {
+        return unresolvedTags
     }
 
+    @Deprecated
     public void tags(String... args) {
-        this.tags = ImmutableSet.copyOf(args)
+        this.unresolvedTags.addAll(args)
+    }
+
+    public Map<String, String> getTags() {
+        return ImmutableMap.copyOf(tags)
+    }
+
+    public void tag(String taskName, String tag) {
+        if (tags.containsKey(taskName)) {
+            throw new GradleException("Task name '${taskName}' of docker tag '${tag}' is existed.")
+        }
+
+        tags.put(taskName, tag)
     }
 
     public Map<String, String> getLabels() {
