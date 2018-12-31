@@ -103,9 +103,9 @@ class DockerExtension {
     }
 
     public void tag(String taskName, String tag) {
-        if (namedTags.putIfAbsent(taskName, tag) == null) {
+        if (namedTags.putIfAbsent(taskName, tag) != null) {
             StyledTextOutput o = project.services.get(StyledTextOutputFactory.class).create(DockerExtension)
-            o.withStyle(StyledTextOutput.Style.Error).println("WARNING: Task name '${taskName}' of docker tag '${tag}' is existed.")
+            o.withStyle(StyledTextOutput.Style.Error).println("WARNING: Task name '${taskName}' is existed.")
         }
     }
 

@@ -31,6 +31,8 @@ import org.gradle.api.tasks.Copy
 import org.gradle.api.tasks.Delete
 import org.gradle.api.tasks.Exec
 import org.gradle.api.tasks.bundling.Zip
+import org.gradle.internal.logging.text.StyledTextOutput
+import org.gradle.internal.logging.text.StyledTextOutputFactory
 
 import javax.inject.Inject
 import java.util.regex.Pattern
@@ -135,20 +137,21 @@ class PalantirDockerPlugin implements Plugin<Project> {
                         tagName: tagName,
                         tagTask: { -> tagName }
                 ]]
-            }.asImmutable()
+            }
 
             if (!ext.tags.isEmpty()) {
                 ext.tags.each { unresolvedTagName ->
                     String taskName = generateTagTaskName(unresolvedTagName)
 
                     if (tags.containsKey(taskName)) {
-                        throw new GradleException("Task name '${taskName}' of docker tag '${unresolvedTagName}' is existed.")
+                        StyledTextOutput o = project.services.get(StyledTextOutputFactory.class).create(DockerExtension)
+                        o.withStyle(StyledTextOutput.Style.Error).println("WARNING: Task name '${taskName}' is existed.")
+                    }else{
+                        tags[taskName] = [
+                                tagName: unresolvedTagName,
+                                tagTask: { -> computeName(ext.name, unresolvedTagName) }
+                        ]
                     }
-
-                    tags[taskName] = [
-                            tagName: unresolvedTagName,
-                            tagTask: { -> computeName(ext.name, unresolvedTagName) }
-                    ]
                 }
             }
 
