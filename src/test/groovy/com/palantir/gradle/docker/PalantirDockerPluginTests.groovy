@@ -285,7 +285,7 @@ class PalantirDockerPluginTests extends AbstractPluginTest {
         """.stripIndent()
 
         when:
-        BuildResult buildResult = with('dockerTag', "--stacktrace").build()
+        BuildResult buildResult = with('dockerTag').build()
 
         then:
         buildResult.task(':dockerPrepare').outcome == TaskOutcome.SUCCESS

@@ -130,15 +130,15 @@ class PalantirDockerPlugin implements Plugin<Project> {
                 logging.captureStandardError LogLevel.ERROR
             }
 
-            Map<String, Object> tags = ext.tags.collectEntries { taskName, tagName ->
+            Map<String, Object> tags = ext.namedTags.collectEntries { taskName, tagName ->
                 [generateTagTaskName(taskName), [
-                        rawTagName          : tagName,
-                        resolveTagNameAction: { -> tagName }
+                        tagName: tagName,
+                        tagTask: { -> tagName }
                 ]]
-            }
+            }.asImmutable()
 
-            if (!ext.unresolvedTags.isEmpty()) {
-                ext.unresolvedTags.each { unresolvedTagName ->
+            if (!ext.tags.isEmpty()) {
+                ext.tags.each { unresolvedTagName ->
                     String taskName = generateTagTaskName(unresolvedTagName)
 
                     if (tags.containsKey(taskName)) {
@@ -146,8 +146,8 @@ class PalantirDockerPlugin implements Plugin<Project> {
                     }
 
                     tags[taskName] = [
-                            rawTagName          : unresolvedTagName,
-                            resolveTagNameAction: { -> computeName(ext.name, unresolvedTagName) }
+                            tagName: unresolvedTagName,
+                            tagTask: { -> computeName(ext.name, unresolvedTagName) }
                     ]
                 }
             }
@@ -156,18 +156,18 @@ class PalantirDockerPlugin implements Plugin<Project> {
                 tags.each { taskName, tagConfig ->
                     Exec tagSubTask = project.tasks.create('dockerTag' + taskName, Exec, {
                         group = 'Docker'
-                        description = "Tags Docker image with tag '${tagConfig.rawTagName}'"
+                        description = "Tags Docker image with tag '${tagConfig.tagName}'"
                         workingDir dockerDir
-                        commandLine 'docker', 'tag', "${-> ext.name}", "${-> tagConfig.resolveTagNameAction()}"
+                        commandLine 'docker', 'tag', "${-> ext.name}", "${-> tagConfig.tagTask()}"
                         dependsOn exec
                     })
                     tag.dependsOn tagSubTask
 
                     Exec pushSubTask = project.tasks.create('dockerPush' + taskName, Exec, {
                         group = 'Docker'
-                        description = "Pushes the Docker image with tag '${tagConfig.rawTagName}' to configured Docker Hub"
+                        description = "Pushes the Docker image with tag '${tagConfig.tagName}' to configured Docker Hub"
                         workingDir dockerDir
-                        commandLine 'docker', 'push', "${-> tagConfig.resolveTagNameAction()}"
+                        commandLine 'docker', 'push', "${-> tagConfig.tagTask()}"
                         dependsOn tagSubTask
                     })
                     pushAllTags.dependsOn pushSubTask
@@ -253,18 +253,10 @@ class PalantirDockerPlugin implements Plugin<Project> {
             tagTaskName = name.substring(0, firstAt)
         } else if (firstAt == 0) {
             // Task name must not be empty
-            throw new GradleException("Task name of docker tag '${name}' must not be empty.\n" +
-                    "There are some sample:\n" +
-                    "firstVersion@1.0.0 (dockerTagFirstVersion)\n" +
-                    "newName@docker-name:latest (dockerTagNewName)\n" +
-                    "withRepo@myregistryhost/fedora/httpd:version1.0 (dockerTagWithRepo)")
+            throw new GradleException("Task name of docker tag '${name}' must not be empty.")
         } else if (name.contains(':') || name.contains('/')) {
             // Tags which with repo or name must have a task name
-            throw new GradleException("Docker tag '${name}' must have a task name.\n" +
-                    "Tags which with repo and name must have a task name, there are some sample:\n" +
-                    "firstVersion@1.0.0 (dockerTagFirstVersion)\n" +
-                    "newName@docker-name:latest (dockerTagNewName)\n" +
-                    "withRepo@myregistryhost/fedora/httpd:version1.0 (dockerTagWithRepo)")
+            throw new GradleException("Docker tag '${name}' must have a task name.")
         }
 
         StringBuffer sb = new StringBuffer(tagTaskName)
