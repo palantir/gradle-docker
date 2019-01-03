@@ -260,7 +260,6 @@ Tasks
    * `dockerPush`: push the specified image to a docker repository
    * `dockerPush<tag>`: push the `<tag>` docker image to a docker repository
    * `dockerTagsPush`: push all tagged Docker images to configured Docker Hub
-   * `dockerAllPush`: push all tagged Docker images and named Docker image to configured Docker Hub
    * `dockerPrepare`: prepare to build a docker image by copying
      dependent task outputs, referenced files, and `dockerfile` into a temporary
      directory

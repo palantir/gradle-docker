@@ -92,12 +92,6 @@ class PalantirDockerPlugin implements Plugin<Project> {
             description = 'Pushes all tagged Docker images to configured Docker Hub.'
         })
 
-        Task pushAll = project.tasks.create('dockerAllPush', {
-            group = 'Docker'
-            description = 'Pushes all tagged Docker images and named Docker image to configured Docker Hub.'
-            dependsOn push, pushAllTags
-        })
-
         Zip dockerfileZip = project.tasks.create('dockerfileZip', Zip, {
             group = 'Docker'
             description = 'Bundles the configured Dockerfile in a zip file'
