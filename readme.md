@@ -32,7 +32,7 @@ automatically include outputs of task dependencies in the Docker build context.
 - `name` the name to use for this container, may include a tag
 - `tags` (deprecated) (optional) an argument list of tags to create; any tag in `name` will
   be stripped before applying a specific tag; defaults to the empty set
-- `tag` (optional) defined a tag with task name
+- `tag` (optional) a tag to create with a specified task name
 - `dockerfile` (optional) the dockerfile to use for building the image; defaults to
   `project.file('Dockerfile')` and must be a file object
 - `files` (optional) an argument list of files to be included in the Docker build context, evaluated per `Project#files`. For example, `files tasks.distTar.outputs` adds the TAR/TGZ file produced by the `distTar` tasks, and `files tasks.distTar.outputs, 'my-file.txt'` adds the archive in addition to file `my-file.txt` from the project root directory. The specified files are collected in a Gradle CopySpec which may be copied `into` the Docker build context directory. The underlying CopySpec may also be used to copy entire directories into the build context. The following example adds the aforementioned archive and text file to the CopySpec, uses the CopySpec to add all files `from` `src/myDir` into the CopySpec, then finally executes the copy `into` the docker build context directory `myDir`
@@ -82,7 +82,7 @@ Configuration specifying all parameters:
 docker {
     name 'hub.docker.com/username/my-app:version'
     tags 'latest' // deprecated, use 'tag'
-    tag 'privateRepo', 'my.repo.com/username/my-app:version'
+    tag 'myRegistry', 'my.registry.com/username/my-app:version'
     dockerfile file('Dockerfile')
     files tasks.distTar.outputs, 'file1.txt', 'file2.txt'
     buildArgs([BUILD_VERSION: 'version'])
@@ -259,7 +259,7 @@ Tasks
    * `dockerTag<tag>`: tag the docker image with `<tag>`
    * `dockerPush`: push the specified image to a docker repository
    * `dockerPush<tag>`: push the `<tag>` docker image to a docker repository
-   * `dockerTagsPush`: push all tagged Docker images to configured Docker Hub
+   * `dockerTagsPush`: push all tagged docker images to a docker repository
    * `dockerPrepare`: prepare to build a docker image by copying
      dependent task outputs, referenced files, and `dockerfile` into a temporary
      directory

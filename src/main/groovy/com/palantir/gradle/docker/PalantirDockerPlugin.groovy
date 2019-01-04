@@ -138,8 +138,7 @@ class PalantirDockerPlugin implements Plugin<Project> {
                     String taskName = generateTagTaskName(unresolvedTagName)
 
                     if (tags.containsKey(taskName)) {
-                        StyledTextOutput o = project.services.get(StyledTextOutputFactory.class).create(DockerExtension)
-                        o.withStyle(StyledTextOutput.Style.Error).println("WARNING: Task name '${taskName}' is existed.")
+                        throw new IllegalArgumentException("Task name '${taskName}' is existed.")
                     }else{
                         tags[taskName] = [
                                 tagName: unresolvedTagName,
@@ -149,26 +148,24 @@ class PalantirDockerPlugin implements Plugin<Project> {
                 }
             }
 
-            if (!tags.isEmpty()) {
-                tags.each { taskName, tagConfig ->
-                    Exec tagSubTask = project.tasks.create('dockerTag' + taskName, Exec, {
-                        group = 'Docker'
-                        description = "Tags Docker image with tag '${tagConfig.tagName}'"
-                        workingDir dockerDir
-                        commandLine 'docker', 'tag', "${-> ext.name}", "${-> tagConfig.tagTask()}"
-                        dependsOn exec
-                    })
-                    tag.dependsOn tagSubTask
+            tags.each { taskName, tagConfig ->
+                Exec tagSubTask = project.tasks.create('dockerTag' + taskName, Exec, {
+                    group = 'Docker'
+                    description = "Tags Docker image with tag '${tagConfig.tagName}'"
+                    workingDir dockerDir
+                    commandLine 'docker', 'tag', "${-> ext.name}", "${-> tagConfig.tagTask()}"
+                    dependsOn exec
+                })
+                tag.dependsOn tagSubTask
 
-                    Exec pushSubTask = project.tasks.create('dockerPush' + taskName, Exec, {
-                        group = 'Docker'
-                        description = "Pushes the Docker image with tag '${tagConfig.tagName}' to configured Docker Hub"
-                        workingDir dockerDir
-                        commandLine 'docker', 'push', "${-> tagConfig.tagTask()}"
-                        dependsOn tagSubTask
-                    })
-                    pushAllTags.dependsOn pushSubTask
-                }
+                Exec pushSubTask = project.tasks.create('dockerPush' + taskName, Exec, {
+                    group = 'Docker'
+                    description = "Pushes the Docker image with tag '${tagConfig.tagName}' to configured Docker Hub"
+                    workingDir dockerDir
+                    commandLine 'docker', 'push', "${-> tagConfig.tagTask()}"
+                    dependsOn tagSubTask
+                })
+                pushAllTags.dependsOn pushSubTask
             }
 
             push.with {
