@@ -139,12 +139,12 @@ class PalantirDockerPlugin implements Plugin<Project> {
 
                     if (tags.containsKey(taskName)) {
                         throw new IllegalArgumentException("Task name '${taskName}' is existed.")
-                    }else{
-                        tags[taskName] = [
-                                tagName: unresolvedTagName,
-                                tagTask: { -> computeName(ext.name, unresolvedTagName) }
-                        ]
                     }
+                    
+                    tags[taskName] = [
+                            tagName: unresolvedTagName,
+                            tagTask: { -> computeName(ext.name, unresolvedTagName) }
+                    ]
                 }
             }
 
