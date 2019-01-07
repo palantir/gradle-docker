@@ -1,6 +1,7 @@
 policy:
   approval:
     - or:
+      - gradle docker team approval
       - infra team approval
       - infra team co-approval
       - excavator only touched baseline, gradle files or versions.props
@@ -10,6 +11,12 @@ policy:
       organizations: [ "palantir" ]
 
 approval_rules:
+  - name: gradle docker team approval
+    requires:
+      count: 1
+      teams:
+        - "palantir/gradle-docker"
+
   - name: infra team approval
     requires:
       count: 1
