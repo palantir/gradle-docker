@@ -32,17 +32,22 @@ version System.env.CIRCLE_TAG ?: gitVersion()
 
 sourceCompatibility = 1.7
 
-task sourceJar(type: Jar) {
-    from sourceSets.main.allSource
-    classifier 'sources'
+task sourcesJar(type: Jar) {
+    from sourceSets.main.allJava
+    classifier = 'sources'
+}
+
+task javadocJar(type: Jar) {
+    from javadoc
+    classifier = 'javadoc'
 }
 
 publishing {
     publications {
         bintray(MavenPublication) {
             from components.java
-            artifact(sourceJar)
-            artifact(publishPluginJavaDocsJar)
+            artifact sourcesJar
+            artifact javadocJar
         }
     }
 }

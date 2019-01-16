@@ -15,11 +15,15 @@
  */
 package com.palantir.gradle.docker;
 
+import com.google.common.collect.ImmutableSet;
+import org.gradle.api.artifacts.DependencyConstraint;
 import org.gradle.api.artifacts.DependencySet;
+import org.gradle.api.artifacts.ExcludeRule;
 import org.gradle.api.artifacts.ModuleDependency;
 import org.gradle.api.artifacts.PublishArtifact;
 import org.gradle.api.attributes.AttributeContainer;
 import org.gradle.api.attributes.Usage;
+import org.gradle.api.capabilities.Capability;
 import org.gradle.api.internal.attributes.ImmutableAttributes;
 import org.gradle.api.internal.attributes.ImmutableAttributesFactory;
 import org.gradle.api.internal.component.SoftwareComponentInternal;
@@ -59,6 +63,9 @@ public class DockerComponent implements SoftwareComponentInternal {
 
         private final Usage usage;
         private final ImmutableAttributes attributes;
+        private final Set<DependencyConstraint> dependencyConstraints = ImmutableSet.of();
+        private final Set<Capability> capabilities = ImmutableSet.of();
+        private final Set<ExcludeRule> excludeRules = ImmutableSet.of();
 
         private RuntimeUsageContext(Usage usage, ImmutableAttributes attributes) {
             this.usage = usage;
@@ -78,6 +85,21 @@ public class DockerComponent implements SoftwareComponentInternal {
         @Override
         public Set<ModuleDependency> getDependencies() {
             return runtimeDependencies.withType(ModuleDependency.class);
+        }
+
+        @Override
+        public Set<? extends DependencyConstraint> getDependencyConstraints() {
+            return dependencyConstraints;
+        }
+
+        @Override
+        public Set<? extends Capability> getCapabilities() {
+            return capabilities;
+        }
+
+        @Override
+        public Set<ExcludeRule> getGlobalExcludes() {
+            return excludeRules;
         }
 
         @Override
