@@ -20,7 +20,8 @@ dependencies {
     compile 'com.google.guava:guava:18.0'
 
     testCompile gradleTestKit()
-    testCompile "com.netflix.nebula:nebula-test:4.0.0" // for better temp directory junit rule only
+    testCompile "com.netflix.nebula:nebula-test:7.1.7" // for better temp directory junit rule only
+    testCompile "org.spockframework:spock-core:1.2-groovy-2.5" // force this version for now
 }
 
 if (System.env.CIRCLE_TEST_REPORTS) {
