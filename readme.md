@@ -80,6 +80,7 @@ Configuration specifying all parameters:
 
 ```gradle
 docker {
+    dependsOn build
     name 'hub.docker.com/username/my-app:version'
     tags 'latest' // deprecated, use 'tag'
     tag 'myRegistry', 'my.registry.com/username/my-app:version'
