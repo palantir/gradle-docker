@@ -15,13 +15,7 @@
  */
 package com.palantir.gradle.docker
 
-import org.gradle.api.Action
-import org.gradle.api.GradleException
-import org.gradle.api.NamedDomainObjectContainer
-import org.gradle.api.NamedDomainObjectFactory
-import org.gradle.api.Plugin
-import org.gradle.api.Project
-import org.gradle.api.Task
+import org.gradle.api.*
 import org.gradle.api.artifacts.Configuration
 import org.gradle.api.artifacts.PublishArtifact
 import org.gradle.api.internal.artifacts.publish.ArchivePublishArtifact
@@ -34,8 +28,6 @@ import org.gradle.api.tasks.Copy
 import org.gradle.api.tasks.Delete
 import org.gradle.api.tasks.Exec
 import org.gradle.api.tasks.bundling.Zip
-import org.gradle.internal.logging.text.StyledTextOutput
-import org.gradle.internal.logging.text.StyledTextOutputFactory
 
 import javax.inject.Inject
 import java.util.regex.Pattern
@@ -195,7 +187,6 @@ class PalantirDockerPlugin implements Plugin<Project> {
                         description = "Docker login to repo "+ dockerEnv.name
                         workingDir dockerDir
                         commandLine loginCommandline(dockerEnv.name, dockerEnv.url.get())
-                        dependsOn exec
                     })
                     login.dependsOn subTask
                 }
