@@ -83,7 +83,7 @@ class PalantirDockerPlugin implements Plugin<Project> {
         Exec exec = project.tasks.create('docker', Exec, {
             group = 'Docker'
             description = 'Builds Docker image.'
-            dependsOn prepare
+            dependsOn prepare, login
         })
 
         Task tag = project.tasks.create('dockerTag', {
@@ -191,6 +191,7 @@ class PalantirDockerPlugin implements Plugin<Project> {
                     login.dependsOn subTask
                 }
             }
+
 
             push.with {
                 workingDir dockerDir
