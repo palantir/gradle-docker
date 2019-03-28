@@ -98,23 +98,24 @@ Its possible to add one or more private docker repos to login before pushing ima
 dockerRepos {
     repoA{
         url = 'myurl.mycompany.com'
+        user = 'username'
+        password = 's3cur3'
     }
     repoB {
         url = 'url.anothercompany.com'
+        user = 'otheruser'
+        password = 's3cr3t'
     } 
 }
 ````
-If no dockerRepos are specified in build file, the tasks is skipped. The credentials to login has to be set as environment variables. The variables have to had the same name than specified in build file, e.g. <name>User and <name>Password.
-````sh
-export repoAUser=UserA
-export repoAPassword=PasswordUserA
-export repoBUser=UserB
-export repoBPassword=PasswordUserB
-````
-It's also possible to set the env variables via gradle, if the build is executed in a trusted environment.  
+If no dockerRepos are specified in build file, the tasks is skipped. **Attention**: The username and password are logged
+ if gradle is called with _-i_ parameter.
+
 **Docker Login Parameters**
 - `name` a unique name or shortcut for the repository
 - `url` the url of the repository
+- `user` the username for the repository
+- `password` the password in clear text for the repository
 
 Managing Docker image dependencies
 ----------------------------------

@@ -186,7 +186,7 @@ class PalantirDockerPlugin implements Plugin<Project> {
                         group = 'Docker'
                         description = "Docker login to repo "+ dockerEnv.name
                         workingDir dockerDir
-                        commandLine loginCommandline(dockerEnv.name, dockerEnv.url.get())
+                        commandLine loginCommandline(dockerEnv)
                     })
                     login.dependsOn subTask
                 }
@@ -205,13 +205,18 @@ class PalantirDockerPlugin implements Plugin<Project> {
         }
     }
 
-    private List<String> loginCommandline(String repoName, String repoUrl){
+    private List<String> loginCommandline(DockerRepoEnvironment repoEnvironment){
         List<String> loginCommandLine = ['sh', '-c']
         String dockerCommand = 'docker login'
 
-        dockerCommand += ' -u $'+ repoName +'User -p $' + repoName +'Password'
+        if(repoEnvironment.user.get()!=null){
+            dockerCommand += ' -u ' + repoEnvironment.user.get()
+        }
+        if(repoEnvironment.password.get()!=null){
+            dockerCommand += ' -p ' + repoEnvironment.password.get()
+        }
 
-        dockerCommand= dockerCommand +  " " + repoUrl
+        dockerCommand= dockerCommand +  " " + repoEnvironment.url.get()
         loginCommandLine.add(dockerCommand)
         return loginCommandLine
     }
