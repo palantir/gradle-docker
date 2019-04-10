@@ -39,7 +39,12 @@ automatically include outputs of task dependencies in the Docker build context.
 ````gradle
 docker {
     files tasks.distTar.outputs, 'my-file.txt'
-    copySpec.from("src/myDir").into("myDir")
+    copySpec.with {
+        from('.') {
+            include 'src/myDir/**'
+            into 'myDir'
+        }
+    }
 }
 ````
 - `buildArgs` (optional) an argument map of string to string which will set --build-arg
