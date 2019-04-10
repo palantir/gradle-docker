@@ -41,6 +41,9 @@ class DockerComposePlugin implements Plugin<Project> {
                 )))
             })
         })
+        project.getPlugins().withId("com.palantir.product-dependency-introspection", {
+            dockerConfiguration.extendsFrom(project.configurations.getByName('productDependencies'))
+        })
 
         project.tasks.create('generateDockerCompose', GenerateDockerCompose, {
             it.ext = ext
