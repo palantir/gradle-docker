@@ -15,6 +15,7 @@
  */
 package com.palantir.gradle.docker
 
+import com.google.common.collect.ImmutableMap
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.artifacts.Configuration
@@ -25,6 +26,24 @@ class DockerComposePlugin implements Plugin<Project> {
         DockerComposeExtension ext =
             project.extensions.create('dockerCompose', DockerComposeExtension, project)
         Configuration dockerConfiguration = project.configurations.maybeCreate('docker')
+
+        // sls-packaging adds a 'productDependencies' configuration, which contains the inferred lower bounds of products
+        // you depend on.  We wire it up automatically, so all users don't need to add:
+        //
+        //    dependencies {
+        //        docker project(path: ':foo', configuration: 'productDependencies')
+        //    }
+        project.subprojects({ Project subproject ->
+            subproject.getPlugins().withId("com.palantir.product-dependency-introspection", {
+                dockerConfiguration.dependencies.add(subproject.dependencies.project(ImmutableMap.of(
+                        "path", subproject.path,
+                        "configuration", "productDependencies"
+                )))
+            })
+        })
+        project.getPlugins().withId("com.palantir.product-dependency-introspection", {
+            dockerConfiguration.extendsFrom(project.configurations.getByName('productDependencies'))
+        })
 
         project.tasks.create('generateDockerCompose', GenerateDockerCompose, {
             it.ext = ext
