@@ -35,13 +35,22 @@ automatically include outputs of task dependencies in the Docker build context.
 - `tag` (optional) a tag to create with a specified task name
 - `dockerfile` (optional) the dockerfile to use for building the image; defaults to
   `project.file('Dockerfile')` and must be a file object
-- `files` (optional) an argument list of files to be included in the Docker build context, evaluated per `Project#files`. For example, `files tasks.distTar.outputs` adds the TAR/TGZ file produced by the `distTar` tasks, and `files tasks.distTar.outputs, 'my-file.txt'` adds the archive in addition to file `my-file.txt` from the project root directory. The specified files are collected in a Gradle CopySpec which may be copied `into` the Docker build context directory. The underlying CopySpec may also be used to copy entire directories into the build context. The following example adds the aforementioned archive and text file to the CopySpec, uses the CopySpec to add all files `from` `src/myDir` into the CopySpec, then finally executes the copy `into` the docker build context directory `myDir`
+- `files` (optional) an argument list of files to be included in the Docker build context, evaluated per `Project#files`. For example, `files tasks.distTar.outputs` adds the TAR/TGZ file produced by the `distTar` tasks, and `files tasks.distTar.outputs, 'my-file.txt'` adds the archive in addition to file `my-file.txt` from the project root directory. The specified files are collected in a Gradle CopySpec which may be copied `into` the Docker build context directory. The underlying CopySpec may also be used to copy entire directories into the build context. The following example adds the aforementioned archive and text file to the CopySpec, uses the CopySpec to add all files `from` `src/myDir` into the CopySpec, then finally executes the copy into the directory `myDir` in docker build context.
 ````gradle
 docker {
     files tasks.distTar.outputs, 'my-file.txt'
     copySpec.from("src/myDir").into("myDir")
 }
 ````
+The final structure will be:
+```
+build/
+  docker/
+    myDir/
+      my-file.txt
+      // contents of task.distTar.outputs
+      // files from src/myDir
+```
 - `buildArgs` (optional) an argument map of string to string which will set --build-arg
   arguments to the docker build command; defaults to empty, which results in no --build-arg parameters
 - `labels` (optional) a map of string to string which will set --label arguments
