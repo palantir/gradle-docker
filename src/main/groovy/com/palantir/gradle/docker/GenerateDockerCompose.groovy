@@ -14,7 +14,6 @@ import org.gradle.api.tasks.TaskAction
 @Slf4j
 class GenerateDockerCompose extends DefaultTask {
 
-    DockerComposeExtension ext
     Configuration configuration
 
     GenerateDockerCompose() {
@@ -30,7 +29,7 @@ class GenerateDockerCompose extends DefaultTask {
             [("{{${it.group}:${it.name}}}"): it.version]
         }
 
-        templateTokens.putAll(ext.templateTokens.collectEntries {
+        templateTokens.putAll(dockerComposeExtension.templateTokens.collectEntries {
             [("{{${it.key}}}"): it.value]
         })
 
@@ -43,7 +42,7 @@ class GenerateDockerCompose extends DefaultTask {
 
     @Override
     String getDescription() {
-        def defaultDescription = "Populates ${ext.template.name} file with versions" +
+        def defaultDescription = "Populates ${dockerComposeExtension.template.name} file with versions" +
                 " of dependencies from the '${configuration.name}' configuration"
         return super.description ?: defaultDescription
     }
@@ -61,12 +60,16 @@ class GenerateDockerCompose extends DefaultTask {
 
     @InputFiles
     File getTemplate() {
-        return ext.template
+        return dockerComposeExtension.template
     }
 
     @OutputFile
     File getDockerComposeFile() {
-        return ext.dockerComposeFile
+        return dockerComposeExtension.dockerComposeFile
+    }
+
+    DockerComposeExtension getDockerComposeExtension() {
+        return project.extensions.findByType(DockerComposeExtension)
     }
 
     /** Replaces all occurrences of templatesTokens's keys by their corresponding values in the given line. */
