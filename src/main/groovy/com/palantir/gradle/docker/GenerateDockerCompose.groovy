@@ -29,7 +29,7 @@ class GenerateDockerCompose extends DefaultTask {
             [("{{${it.group}:${it.name}}}"): it.version]
         }
 
-        templateTokens.putAll(dockerComposeExtension.templateTokens.collectEntries {
+        templateTokens.putAll(extraTemplateTokens.collectEntries {
             [("{{${it.key}}}"): it.value]
         })
 
@@ -56,6 +56,11 @@ class GenerateDockerCompose extends DefaultTask {
             *.moduleVersion
             *.id
             .toSet()
+    }
+    
+    @Input
+    Map<String, String> getExtraTemplateTokens() {
+        return dockerComposeExtension.templateTokens
     }
 
     @InputFiles
