@@ -201,4 +201,23 @@ class DockerComposePluginTests extends AbstractPluginTest {
         then:
         file("qux").exists()
     }
+
+    def 'can set custom properties on generateDockerCompose.ext'() {
+        given:
+        file('docker-compose.yml.template') << '''
+            version: "2"
+            services: {}
+        '''.stripIndent()
+        buildFile << '''
+            plugins {
+                id 'com.palantir.docker-compose'
+            }
+
+            generateDockerCompose.ext.foo = "bar"
+        '''.stripIndent()
+        when:
+        BuildResult buildResult = with('generateDockerCompose').build()
+        then:
+        buildResult.task(':generateDockerCompose').outcome == TaskOutcome.SUCCESS
+    }
 }

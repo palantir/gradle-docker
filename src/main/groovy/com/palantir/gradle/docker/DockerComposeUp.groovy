@@ -8,7 +8,6 @@ import org.gradle.api.tasks.TaskAction
 
 @Slf4j
 class DockerComposeUp extends DefaultTask {
-    DockerComposeExtension ext
     Configuration configuration
 
     DockerComposeUp() {
@@ -25,12 +24,16 @@ class DockerComposeUp extends DefaultTask {
 
     @Override
     String getDescription() {
-        def defaultDescription = "Executes `docker-compose` using ${ext.dockerComposeFile.name}"
+        def defaultDescription = "Executes `docker-compose` using ${dockerComposeFile.name}"
         return super.description ?: defaultDescription
     }
 
     @InputFiles
     File getDockerComposeFile() {
-        return ext.dockerComposeFile
+        return dockerComposeExtension.dockerComposeFile
+    }
+
+    DockerComposeExtension getDockerComposeExtension() {
+        return project.extensions.findByType(DockerComposeExtension)
     }
 }
