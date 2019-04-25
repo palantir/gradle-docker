@@ -123,7 +123,10 @@ class DockerRunPlugin implements Plugin<Project> {
                     args.add("${localFile.absolutePath}:${volume.value}")
                 }
                 args.addAll(ext.env.collect{ k, v -> ['-e', "${k}=${v}"] }.flatten())
-                args.addAll(['--name', ext.name, ext.image])
+				for (String argument : ext.arguments) {
+					args.add(argument)
+				}
+				args.addAll(['--name', ext.name, ext.image])
                 if (!ext.command.isEmpty()) {
                     args.addAll(ext.command)
                 }

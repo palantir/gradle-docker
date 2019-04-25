@@ -30,6 +30,7 @@ class DockerRunExtension {
     private List<String> command = ImmutableList.of()
     private Set<String> ports = ImmutableSet.of()
     private Map<String,String> env = ImmutableMap.of()
+    private List<String> arguments = ImmutableList.of()
     private Map<Object,String> volumes = ImmutableMap.of()
     private boolean daemonize = true
     private boolean clean = false
@@ -93,14 +94,22 @@ class DockerRunExtension {
     private void setEnvSingle(String key, String value) {
         this.env.put(checkNotNull(key, "key"), checkNotNull(value, "value"))
     }
-
-    public void env(Map<String,String> env) {
-        this.env = ImmutableMap.copyOf(env)
-    }
+	
+	public void env(Map<String,String> env) {
+		this.env = ImmutableMap.copyOf(env)
+	}
 
     public Map<String, String> getEnv() {
         return env
     }
+	
+	public void arguments(String... arguments) {
+		this.arguments = ImmutableList.copyOf(arguments)
+	}
+	
+	public List<String> getArguments() {
+		return arguments
+	}
 
     public void ports(String... ports) {
         ImmutableSet.Builder builder = ImmutableSet.builder()

@@ -153,6 +153,42 @@ class DockerRunPluginTests extends AbstractPluginTest {
         buildResult.task(':dockerRunStatus').outcome == TaskOutcome.SUCCESS
         buildResult.output =~ /(?m):dockerRunStatus\nDocker container 'bar-nodaemonize' is STOPPED./
     }
+	
+	def 'can set additional arguments'() {
+	   given:
+	   file('Dockerfile') << '''
+            FROM alpine:3.2
+             RUN mkdir /test
+        '''.stripIndent()
+	   buildFile << '''
+            plugins {
+                id 'com.palantir.docker'
+                id 'com.palantir.docker-run'
+            }
+             docker {
+                name 'foo-image:latest'
+            }
+             dockerRun {
+                name 'foo'
+                image 'foo-image:latest'
+                arguments '-w=/test'
+                daemonize false
+				command 'pwd'
+            }
+        '''.stripIndent()
+
+		when:
+	   BuildResult buildResult = with('docker', 'dockerRemoveContainer', 'dockerRun', 'dockerRunStatus').build()
+
+		then:
+	   buildResult.task(':dockerRemoveContainer').outcome == TaskOutcome.SUCCESS
+
+		buildResult.task(':dockerRun').outcome == TaskOutcome.SUCCESS
+	   buildResult.output =~ /(?m)\/test/
+
+		buildResult.task(':dockerRunStatus').outcome == TaskOutcome.SUCCESS
+	   buildResult.output =~ /(?m):dockerRunStatus\nDocker container 'foo' is STOPPED./
+   }
 
     def 'can mount volumes'() {
         if (isCi()) {

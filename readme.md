@@ -241,6 +241,7 @@ dockerRun {
     daemonize true
     env 'MYVAR1': 'MYVALUE1', 'MYVAR2': 'MYVALUE2'
     command 'sleep', '100'
+    arguments '--hostname=custom', '-P'
 }
 ```
 
@@ -258,7 +259,9 @@ dockerRun {
 - `clean` (optional) a boolean argument which adds `--rm` to the `docker run`
   command to ensure that containers are cleaned up after running; defaults to `false`
 - `command` the command to run.
-
+- `arguments` additional arguments to be passed into the docker run command.
+   Please see https://docs.docker.com/engine/reference/run/ for possible values.
+   
 Tasks
 -----
 
