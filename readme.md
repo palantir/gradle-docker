@@ -241,6 +241,7 @@ dockerRun {
     daemonize true
     env 'MYVAR1': 'MYVALUE1', 'MYVAR2': 'MYVALUE2'
     command 'sleep', '100'
+    init true
 }
 ```
 
@@ -258,6 +259,8 @@ dockerRun {
 - `clean` (optional) a boolean argument which adds `--rm` to the `docker run`
   command to ensure that containers are cleaned up after running; defaults to `false`
 - `command` the command to run.
+- `init` Run an init inside the container that forwards signals and reaps processes;
+  defaults to `false`
 
 Tasks
 -----

@@ -33,6 +33,7 @@ class DockerRunExtension {
     private Map<Object,String> volumes = ImmutableMap.of()
     private boolean daemonize = true
     private boolean clean = false
+	private boolean init = false
 
     public String getName() {
         return name
@@ -49,13 +50,21 @@ class DockerRunExtension {
     public void setDaemonize(boolean daemonize) {
         this.daemonize = daemonize
     }
+	
+	public boolean getClean() {
+		return clean
+	}
 
-    public boolean getClean() {
-        return clean
+	public void setClean(boolean clean) {
+		this.clean = clean
+	}
+	
+    public boolean getInit() {
+        return init
     }
 
-    public void setClean(boolean clean) {
-        this.clean = clean
+    public void setInit(boolean init) {
+        this.init = init
     }
 
     public String getImage() {

@@ -98,6 +98,9 @@ class DockerRunPlugin implements Plugin<Project> {
                 if (ext.daemonize) {
                   args.add('-d')
                 }
+				if (ext.init) {
+					args.add('--init')
+				}
                 if (ext.clean) {
                   args.add('--rm')
                 } else {

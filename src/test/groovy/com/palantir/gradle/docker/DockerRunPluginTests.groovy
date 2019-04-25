@@ -125,7 +125,46 @@ class DockerRunPluginTests extends AbstractPluginTest {
 
 		buildResult.output =~ /(?m):dockerNetworkModeStatus\nDocker container 'bar-hostnetwork' is configured to run with 'host' network mode./
 	}
+	
+	def 'can run with init'() {
+		
+		given:
+		file('Dockerfile') << '''
+            FROM alpine:3.2
 
+            CMD ps -ef | head -n 2 | tail -1
+        '''.stripIndent()
+		buildFile << '''
+            plugins {
+                id 'com.palantir.docker'
+                id 'com.palantir.docker-run'
+            }
+
+            docker {
+                name 'foo-image:latest'
+            }
+
+            dockerRun {
+                name 'foo-init'
+                image 'foo-image:latest'
+                daemonize false
+				init true
+            }
+        '''.stripIndent()
+
+		when:
+		BuildResult buildResult = with('docker', 'dockerRemoveContainer', 'dockerRun', 'dockerRunStatus').build()
+
+		then:
+		buildResult.task(':dockerRemoveContainer').outcome == TaskOutcome.SUCCESS
+
+		buildResult.task(':dockerRun').outcome == TaskOutcome.SUCCESS
+		buildResult.output =~ /(?m)\/dev\/init --/
+		
+		buildResult.task(':dockerRunStatus').outcome == TaskOutcome.SUCCESS
+		buildResult.output =~ /(?m):dockerRunStatus\nDocker container 'foo-init' is STOPPED./
+	}
+	
     def 'can optionally not daemonize'() {
         given:
         buildFile << '''
