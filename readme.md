@@ -241,6 +241,7 @@ dockerRun {
     daemonize true
     env 'MYVAR1': 'MYVALUE1', 'MYVAR2': 'MYVALUE2'
     command 'sleep', '100'
+    workdir '/containervolume'
 }
 ```
 
@@ -258,6 +259,7 @@ dockerRun {
 - `clean` (optional) a boolean argument which adds `--rm` to the `docker run`
   command to ensure that containers are cleaned up after running; defaults to `false`
 - `command` the command to run.
+- `workdir` the working directory inside the container; defaults to '/'.
 
 Tasks
 -----

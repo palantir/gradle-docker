@@ -27,6 +27,7 @@ class DockerRunExtension {
     private String name
     private String image
     private String network
+    private String workdir
     private List<String> command = ImmutableList.of()
     private Set<String> ports = ImmutableSet.of()
     private Map<String,String> env = ImmutableMap.of()
@@ -41,6 +42,14 @@ class DockerRunExtension {
     public void setName(String name) {
         this.name = name
     }
+	
+	public String getWorkdir() {
+		return workdir
+	}
+
+	public void setWorkdir(String workdir) {
+		this.workdir = workdir
+	}
 
     public boolean getDaemonize() {
         return daemonize
