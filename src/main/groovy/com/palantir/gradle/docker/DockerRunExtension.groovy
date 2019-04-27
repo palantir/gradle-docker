@@ -95,9 +95,9 @@ class DockerRunExtension {
         this.env.put(checkNotNull(key, "key"), checkNotNull(value, "value"))
     }
 	
-	public void env(Map<String,String> env) {
-		this.env = ImmutableMap.copyOf(env)
-	}
+    public void env(Map<String,String> env) {
+        this.env = ImmutableMap.copyOf(env)
+    }
 
     public Map<String, String> getEnv() {
         return env
