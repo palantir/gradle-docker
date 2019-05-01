@@ -102,14 +102,14 @@ class DockerRunExtension {
     public Map<String, String> getEnv() {
         return env
     }
-	
-	public void arguments(String... arguments) {
-		this.arguments = ImmutableList.copyOf(arguments)
-	}
-	
-	public List<String> getArguments() {
-		return arguments
-	}
+
+    public void arguments(String... arguments) {
+        this.arguments = ImmutableList.copyOf(arguments)
+    }
+
+    public List<String> getArguments() {
+        return arguments
+    }
 
     public void ports(String... ports) {
         ImmutableSet.Builder builder = ImmutableSet.builder()
