@@ -52,16 +52,16 @@ class DockerRunPluginTests extends AbstractPluginTest {
 
         buildResult.task(':dockerRun').outcome == TaskOutcome.SUCCESS
         // CircleCI build nodes print a WARNING
-        buildResult.output =~ /(?m):dockerRun(WARNING:.*\n)?\n[A-Za-z0-9]+/
+        buildResult.output =~ /(?m):dockerRun(WARNING:.*\R)?\R[A-Za-z0-9]+/
 
         buildResult.task(':dockerRunStatus').outcome == TaskOutcome.SUCCESS
-        buildResult.output =~ /(?m):dockerRunStatus\nDocker container 'foo' is RUNNING./
+        buildResult.output =~ /(?m):dockerRunStatus\RDocker container 'foo' is RUNNING./
 
         buildResult.task(':dockerStop').outcome == TaskOutcome.SUCCESS
-        buildResult.output =~ /(?m):dockerStop\nfoo/
+        buildResult.output =~ /(?m):dockerStop\Rfoo/
 
         offline.task(':dockerRunStatus').outcome == TaskOutcome.SUCCESS
-        offline.output =~ /(?m):dockerRunStatus\nDocker container 'foo' is STOPPED./
+        offline.output =~ /(?m):dockerRunStatus\RDocker container 'foo' is STOPPED./
 
         execCond('docker rmi -f foo-image')
     }
@@ -90,16 +90,16 @@ class DockerRunPluginTests extends AbstractPluginTest {
 
         buildResult.task(':dockerRun').outcome == TaskOutcome.SUCCESS
         // CircleCI build nodes print a WARNING
-        buildResult.output =~ /(?m):dockerRun(WARNING:.*\n)?\n[A-Za-z0-9]+/
+        buildResult.output =~ /(?m):dockerRun(WARNING:.*\R)?\R[A-Za-z0-9]+/
 
         buildResult.task(':dockerRunStatus').outcome == TaskOutcome.SUCCESS
-        buildResult.output =~ /(?m):dockerRunStatus\nDocker container 'bar' is RUNNING./
+        buildResult.output =~ /(?m):dockerRunStatus\RDocker container 'bar' is RUNNING./
 
         buildResult.task(':dockerStop').outcome == TaskOutcome.SUCCESS
-        buildResult.output =~ /(?m):dockerStop\nbar/
+        buildResult.output =~ /(?m):dockerStop\Rbar/
 
         offline.task(':dockerRunStatus').outcome == TaskOutcome.SUCCESS
-        offline.output =~ /(?m):dockerRunStatus\nDocker container 'bar' is STOPPED./
+        offline.output =~ /(?m):dockerRunStatus\RDocker container 'bar' is STOPPED./
     }
 
     def 'can run container with configured network' () {
@@ -123,7 +123,7 @@ class DockerRunPluginTests extends AbstractPluginTest {
 
 		buildResult.task(':dockerRun').outcome == TaskOutcome.SUCCESS
 
-		buildResult.output =~ /(?m):dockerNetworkModeStatus\nDocker container 'bar-hostnetwork' is configured to run with 'host' network mode./
+		buildResult.output =~ /(?m):dockerNetworkModeStatus\RDocker container 'bar-hostnetwork' is configured to run with 'host' network mode./
 	}
 
     def 'can optionally not daemonize'() {
@@ -151,7 +151,7 @@ class DockerRunPluginTests extends AbstractPluginTest {
         buildResult.task(':dockerRun').outcome == TaskOutcome.SUCCESS
 
         buildResult.task(':dockerRunStatus').outcome == TaskOutcome.SUCCESS
-        buildResult.output =~ /(?m):dockerRunStatus\nDocker container 'bar-nodaemonize' is STOPPED./
+        buildResult.output =~ /(?m):dockerRunStatus\RDocker container 'bar-nodaemonize' is STOPPED./
     }
 
     def 'can mount volumes'() {
@@ -198,7 +198,7 @@ class DockerRunPluginTests extends AbstractPluginTest {
         buildResult.task(':dockerRun').outcome == TaskOutcome.SUCCESS
         buildResult.output =~ /(?m)HELLO WORLD/
         buildResult.task(':dockerRunStatus').outcome == TaskOutcome.SUCCESS
-        buildResult.output =~ /(?m):dockerRunStatus\nDocker container 'foo' is STOPPED./
+        buildResult.output =~ /(?m):dockerRunStatus\RDocker container 'foo' is STOPPED./
     }
 
     def 'can mount volumes specified with an absolute path'() {
@@ -210,6 +210,11 @@ class DockerRunPluginTests extends AbstractPluginTest {
 
         given:
         File testFolder = directory("test")
+        def absolutePath = testFolder.absolutePath
+        if(isWindows()){
+            absolutePath = absolutePath.replace("\\", "/")
+        }
+
         file('Dockerfile') << '''
             FROM alpine:3.2
 
@@ -230,7 +235,7 @@ class DockerRunPluginTests extends AbstractPluginTest {
             dockerRun {
                 name 'foo'
                 image 'foo-image:latest'
-                volumes "${testFolder.absolutePath}": "/test"
+                volumes "${absolutePath}": "/test"
                 daemonize false
             }
         """.stripIndent()
@@ -245,7 +250,7 @@ class DockerRunPluginTests extends AbstractPluginTest {
         buildResult.task(':dockerRun').outcome == TaskOutcome.SUCCESS
         buildResult.output =~ /(?m)HELLO WORLD/
         buildResult.task(':dockerRunStatus').outcome == TaskOutcome.SUCCESS
-        buildResult.output =~ /(?m):dockerRunStatus\nDocker container 'foo' is STOPPED./
+        buildResult.output =~ /(?m):dockerRunStatus\RDocker container 'foo' is STOPPED./
     }
 
     def 'can run with environment variables'() {
@@ -288,9 +293,12 @@ class DockerRunPluginTests extends AbstractPluginTest {
         buildResult.task(':dockerRun').outcome == TaskOutcome.SUCCESS
         buildResult.output =~ /(?m)FOO = BAR = QUUY = ZIP/
         buildResult.task(':dockerRunStatus').outcome == TaskOutcome.SUCCESS
-        buildResult.output =~ /(?m):dockerRunStatus\nDocker container 'foo-envvars' is STOPPED./
+        buildResult.output =~ /(?m):dockerRunStatus\RDocker container 'foo-envvars' is STOPPED./
     }
 
+    def isWindows() {
+        return System.getProperty("os.name") =~ /.*Windows.*/
+    }
 
     def isLinux() {
         return System.getProperty("os.name") =~ /(?i).*linux.*/
