@@ -33,11 +33,13 @@ class AbstractPluginTest extends Specification {
     }
 
     GradleRunner with(String... tasks) {
+        def args = new ArrayList<String>(Arrays.asList(tasks))
+        args.add("--stacktrace")
         return GradleRunner.create()
-            .withProjectDir(projectDir)
-            .withArguments(tasks)
-            .withPluginClasspath()
-            .withDebug(true)
+                .withProjectDir(projectDir)
+                .withArguments(args)
+                .withPluginClasspath()
+                .withDebug(true)
     }
 
     String exec(String task) {

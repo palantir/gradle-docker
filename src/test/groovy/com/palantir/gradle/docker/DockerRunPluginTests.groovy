@@ -102,6 +102,47 @@ class DockerRunPluginTests extends AbstractPluginTest {
         offline.output =~ /(?m):dockerRunStatus\RDocker container 'bar' is STOPPED./
     }
 
+    def 'derived task can run, status, and stop containers' () {
+        given:
+        buildFile << '''
+            plugins {
+                id 'com.palantir.docker-run'
+            }
+
+            dockerRunExtension {
+                name 'bar'
+                image 'alpine:3.2'
+                command 'sleep', '1000'
+            }
+            
+            task another(type:DockerRunTask){
+                nameContainer 'foo'
+                image 'alpine:3.2'
+                command 'sleep', '1000'
+            }
+        '''.stripIndent()
+
+        when:
+        BuildResult buildResult = with('dockerRemoveContainer', 'dockerRun', 'dockerRunStatus', 'dockerStop').build()
+        BuildResult offline = with('dockerRunStatus', 'dockerRemoveContainer').build()
+
+        then:
+        buildResult.task(':dockerRemoveContainer').outcome == TaskOutcome.SUCCESS
+
+        buildResult.task(':dockerRun').outcome == TaskOutcome.SUCCESS
+        // CircleCI build nodes print a WARNING
+        buildResult.output =~ /(?m):dockerRun(WARNING:.*\R)?\R[A-Za-z0-9]+/
+
+        buildResult.task(':dockerRunStatus').outcome == TaskOutcome.SUCCESS
+        buildResult.output =~ /(?m):dockerRunStatus\RDocker container 'bar' is RUNNING./
+
+        buildResult.task(':dockerStop').outcome == TaskOutcome.SUCCESS
+        buildResult.output =~ /(?m):dockerStop\Rbar/
+
+        offline.task(':dockerRunStatus').outcome == TaskOutcome.SUCCESS
+        offline.output =~ /(?m):dockerRunStatus\RDocker container 'bar' is STOPPED./
+    }
+
     def 'can run container with configured network' () {
         given:
         buildFile << '''
