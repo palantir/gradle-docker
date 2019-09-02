@@ -109,14 +109,14 @@ class DockerRunPluginTests extends AbstractPluginTest {
                 id 'com.palantir.docker-run'
             }
 
-            dockerRunExtension {
+            dockerRun {
                 name 'bar'
                 image 'alpine:3.2'
                 command 'sleep', '1000'
             }
             
             task another(type:DockerRunTask){
-                nameContainer 'foo'
+                name 'foo'
                 image 'alpine:3.2'
                 command 'sleep', '1000'
             }

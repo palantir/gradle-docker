@@ -15,35 +15,37 @@
  */
 package com.palantir.gradle.docker
 
-import com.google.common.collect.Lists
+
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.plugins.ExtraPropertiesExtension
 import org.gradle.api.tasks.Exec
-import org.gradle.internal.logging.text.StyledTextOutput
-import org.gradle.internal.logging.text.StyledTextOutput.Style
-import org.gradle.internal.logging.text.StyledTextOutputFactory
-
-import java.util.Map.Entry
 
 class DockerRunPlugin implements Plugin<Project> {
     @Override
     void apply(Project project) {
-        DockerRunExtension ext = project.extensions.create('dockerRunExtension', DockerRunExtension)
+        DockerRunExtension ext = project.extensions.create('dockerRun', DockerRunExtension)
 
         Exec dockerRunStatus = project.tasks.create('dockerRunStatus', Exec, {
             group = 'Docker Run'
             description = 'Checks the run status of the container'
         })
 
-        ExtraPropertiesExtension extraProperties =
-                project.getExtensions().getExtraProperties();
+
+        ExtraPropertiesExtension extraProperties = project.getExtensions().getExtraProperties();
         extraProperties.set(DockerRunTask.class.getSimpleName(), DockerRunTask.class);
 
-        DockerRunTask dockerRun = project.tasks.create('dockerRun', DockerRunTask.class, {
-            group = 'Docker Run'
-            description = 'Runs the specified container with port mappings'
-        })
+        project.tasks.create('dockerRun', DockerRunTask.class) {
+            conventionMapping.containerName = { project.dockerRun.name }
+            conventionMapping.image = { project.dockerRun.image }
+            conventionMapping.command = { project.dockerRun.command }
+            conventionMapping.network = { project.dockerRun.network }
+            conventionMapping.ports = { project.dockerRun.ports }
+            conventionMapping.env = { project.dockerRun.env }
+            conventionMapping.volumes = { project.dockerRun.volumes }
+            conventionMapping.daemonize = { project.dockerRun.daemonize }
+            conventionMapping.clean = { project.dockerRun.clean }
+        }
 
         Exec dockerStop = project.tasks.create('dockerStop', Exec, {
             group = 'Docker Run'
@@ -92,44 +94,6 @@ class DockerRunPlugin implements Plugin<Project> {
                         }
                     }
                 }
-            }
-
-            dockerRun.with {
-                List<String> args = Lists.newArrayList()
-                args.addAll(['docker', 'run'])
-                if (ext.daemonize) {
-                    args.add('-d')
-                }
-                if (ext.clean) {
-                    args.add('--rm')
-                } else {
-                    finalizedBy dockerRunStatus
-                }
-                if (ext.network) {
-                    args.addAll(['--network', ext.network])
-                }
-                for (String port : ext.ports) {
-                    args.add('-p')
-                    args.add(port)
-                }
-                for (Entry<Object, String> volume : ext.volumes.entrySet()) {
-                    File localFile = project.file(volume.key)
-
-                    if (!localFile.exists()) {
-                        StyledTextOutput o = project.services.get(StyledTextOutputFactory.class).create(DockerRunPlugin)
-                        o.withStyle(Style.Error).println("ERROR: Local folder ${localFile} doesn't exist. Mounted volume will not be visible to container")
-                        throw new IllegalStateException("Local folder ${localFile} doesn't exist.")
-                    }
-
-                    args.add('-v')
-                    args.add("${localFile.absolutePath}:${volume.value}")
-                }
-                args.addAll(ext.env.collect { k, v -> ['-e', "${k}=${v}"] }.flatten())
-                args.addAll(['--name', ext.name, ext.image])
-                if (!ext.command.isEmpty()) {
-                    args.addAll(ext.command)
-                }
-                commandLine args
             }
 
             dockerStop.with {
