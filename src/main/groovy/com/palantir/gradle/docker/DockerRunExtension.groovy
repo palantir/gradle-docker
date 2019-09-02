@@ -19,87 +19,67 @@ import com.google.common.base.Preconditions
 import com.google.common.collect.ImmutableList
 import com.google.common.collect.ImmutableMap
 import com.google.common.collect.ImmutableSet
-
-import static com.google.common.base.Preconditions.checkNotNull
+import org.gradle.api.Project
+import org.gradle.api.provider.Property
 
 class DockerRunExtension {
 
-    private String name
-    private String image
-    private String network
-    private List<String> command = ImmutableList.of()
-    private Set<String> ports = ImmutableSet.of()
-    private Map<String,String> env = ImmutableMap.of()
-    private Map<Object,String> volumes = ImmutableMap.of()
-    private boolean daemonize = true
-    private boolean clean = false
+    Property<String> name
+    Property<String> image
+    Property<String> network
+    Property<List<String>> command
+    Property<Set<String>> ports
+    Property<Map<String, String>> env
+    Property<Map<Object, String>> volumes
+    Property<Boolean> daemonize
+    Property<Boolean> clean
 
-    public String getName() {
-        return name
+    DockerRunExtension(Project project) {
+        name = project.objects.property(String)
+        image = project.objects.property(String)
+        network = project.objects.property(String)
+        command = project.objects.property(List)
+        ports = project.objects.property(Set)
+        env = project.objects.property(Map)
+        volumes = project.objects.property(Map)
+        daemonize = project.objects.property(Boolean)
+        clean = project.objects.property(Boolean)
+
+        command.set(ImmutableList.of())
+        ports.set(ImmutableSet.of())
+        env.set(ImmutableMap.of())
+        volumes.set(ImmutableMap.of())
+
+        daemonize.set(true)
+        clean.set(false)
     }
 
     public void setName(String name) {
-        this.name = name
-    }
-
-    public boolean getDaemonize() {
-        return daemonize
+        this.name.set name
     }
 
     public void setDaemonize(boolean daemonize) {
-        this.daemonize = daemonize
-    }
-
-    public boolean getClean() {
-        return clean
+        this.daemonize.set daemonize
     }
 
     public void setClean(boolean clean) {
-        this.clean = clean
-    }
-
-    public String getImage() {
-        return image
+        this.clean.set clean
     }
 
     public void setImage(String image) {
-        this.image = image
-    }
-
-    public Set<String> getPorts() {
-        return ports
-    }
-
-    public List<String> getCommand() {
-        return command
-    }
-
-    public Map<Object,String> getVolumes() {
-        return volumes
+        this.image.set image
     }
 
     public void command(String... command) {
-        this.command = ImmutableList.copyOf(command)
+        this.command.set ImmutableList.copyOf(command)
     }
 
     public void setNetwork(String network) {
-        this.network = network
+        this.network.set network
     }
 
-    public String getNetwork() {
-        return network
-    }
-
-    private void setEnvSingle(String key, String value) {
-        this.env.put(checkNotNull(key, "key"), checkNotNull(value, "value"))
-    }
-
-    public void env(Map<String,String> env) {
-        this.env = ImmutableMap.copyOf(env)
-    }
-
-    public Map<String, String> getEnv() {
-        return env
+    public void env(Map<String, String> env) {
+        this.env.set ImmutableMap.copyOf(env)
     }
 
     public void ports(String... ports) {
@@ -115,11 +95,11 @@ class DockerRunExtension {
                 builder.add("${mapping[0]}:${mapping[1]}")
             }
         }
-        this.ports = builder.build()
+        this.ports.set builder.build()
     }
 
-    public void volumes(Map<Object,String> volumes) {
-      this.volumes = ImmutableMap.copyOf(volumes)
+    public void volumes(Map<Object, String> volumes) {
+        this.volumes.set ImmutableMap.copyOf(volumes)
     }
 
     private static void checkPortIsValid(String port) {

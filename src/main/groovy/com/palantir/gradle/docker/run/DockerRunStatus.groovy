@@ -1,6 +1,7 @@
 package com.palantir.gradle.docker.run
 
 class DockerRunStatus extends DockerRunBaseTask {
+
     DockerRunStatus() {
         super(DockerRunStatus.class)
         group = 'Docker Run'
@@ -8,14 +9,15 @@ class DockerRunStatus extends DockerRunBaseTask {
 
         project.afterEvaluate {
             standardOutput = new ByteArrayOutputStream()
-            commandLine 'docker', 'inspect', '--format={{.State.Running}}', containerName
-            doLast {
-                if (standardOutput.toString().trim() != 'true') {
-                    println "Docker container '${containerName}' is STOPPED."
-                    return 1
-                } else {
-                    println "Docker container '${containerName}' is RUNNING."
-                }
+            commandLine 'docker', 'inspect', '--format={{.State.Running}}', containerName.get()
+        }
+
+        doLast {
+            if (standardOutput.toString().trim() != 'true') {
+                println "Docker container '${containerName.get()}' is STOPPED."
+                return 1
+            } else {
+                println "Docker container '${containerName.get()}' is RUNNING."
             }
         }
     }

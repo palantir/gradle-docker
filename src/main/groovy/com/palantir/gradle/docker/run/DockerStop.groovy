@@ -8,7 +8,7 @@ class DockerStop extends DockerRunBaseTask {
         description = 'Stops the named container if it is running'
         ignoreExitValue = true
         project.afterEvaluate {
-            commandLine 'docker', 'stop', containerName
+            commandLine 'docker', 'stop', containerName.get()
         }
     }
 }

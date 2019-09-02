@@ -15,11 +15,7 @@
  */
 package com.palantir.gradle.docker
 
-import com.palantir.gradle.docker.run.DockerNetworkModeStatus
-import com.palantir.gradle.docker.run.DockerRemoveContainer
-import com.palantir.gradle.docker.run.DockerRunStatus
-import com.palantir.gradle.docker.run.DockerRun
-import com.palantir.gradle.docker.run.DockerStop
+import com.palantir.gradle.docker.run.*
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.plugins.ExtraPropertiesExtension
@@ -27,39 +23,20 @@ import org.gradle.api.plugins.ExtraPropertiesExtension
 class DockerRunPlugin implements Plugin<Project> {
     @Override
     void apply(Project project) {
-        DockerRunExtension ext = project.extensions.create('dockerRun', DockerRunExtension)
+        DockerRunExtension ext = project.extensions.create('dockerRun', DockerRunExtension, project)
 
-        ExtraPropertiesExtension extraProperties = project.getExtensions().getExtraProperties();
+        ExtraPropertiesExtension extraProperties = project.getExtensions().getExtraProperties()
 
-        extraProperties.set(DockerRun.class.getSimpleName(), DockerRun.class);
+        extraProperties.set(DockerRun.class.getSimpleName(), DockerRun.class)
+        extraProperties.set(DockerRunStatus.class.getSimpleName(), DockerRunStatus.class)
+        extraProperties.set(DockerStop.class.getSimpleName(), DockerStop.class)
+        extraProperties.set(DockerRemoveContainer.class.getSimpleName(), DockerRemoveContainer.class)
+        extraProperties.set(DockerNetworkModeStatus.class.getSimpleName(), DockerNetworkModeStatus.class)
 
-        project.tasks.create('dockerRunStatus', DockerRunStatus.class) {
-            conventionMapping.containerName = { project.dockerRun.name }
-        }
-
-        project.tasks.create('dockerRun', DockerRun.class) {
-            conventionMapping.containerName = { project.dockerRun.name }
-            conventionMapping.image = { project.dockerRun.image }
-            conventionMapping.command = { project.dockerRun.command }
-            conventionMapping.network = { project.dockerRun.network }
-            conventionMapping.ports = { project.dockerRun.ports }
-            conventionMapping.env = { project.dockerRun.env }
-            conventionMapping.volumes = { project.dockerRun.volumes }
-            conventionMapping.daemonize = { project.dockerRun.daemonize }
-            conventionMapping.clean = { project.dockerRun.clean }
-        }
-
-        project.tasks.create('dockerStop', DockerStop.class) {
-            conventionMapping.containerName = { project.dockerRun.name }
-        }
-
-        project.tasks.create('dockerRemoveContainer', DockerRemoveContainer.class) {
-            conventionMapping.containerName = { project.dockerRun.name }
-        }
-
-        project.tasks.create('dockerNetworkModeStatus', DockerNetworkModeStatus.class){
-            conventionMapping.containerName = { project.dockerRun.name }
-            conventionMapping.network = { project.dockerRun.network }
-        }
+        project.tasks.create('dockerRun', DockerRun.class)
+        project.tasks.create('dockerStop', DockerStop.class)
+        project.tasks.create('dockerRemoveContainer', DockerRemoveContainer.class)
+        project.tasks.create('dockerNetworkModeStatus', DockerNetworkModeStatus.class)
+        project.tasks.create('dockerRunStatus', DockerRunStatus.class)
     }
 }

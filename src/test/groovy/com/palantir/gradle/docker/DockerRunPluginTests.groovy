@@ -20,7 +20,7 @@ import org.gradle.testkit.runner.TaskOutcome
 
 class DockerRunPluginTests extends AbstractPluginTest {
 
-    def 'can run, status, and stop a container made by the docker plugin' () {
+    def 'can run, status, and stop a container made by the docker plugin'() {
         given:
         file('Dockerfile') << '''
             FROM alpine:3.2
@@ -66,7 +66,7 @@ class DockerRunPluginTests extends AbstractPluginTest {
         execCond('docker rmi -f foo-image')
     }
 
-    def 'can run, status, and stop a container' () {
+    def 'can run, status, and stop a container'() {
         given:
         buildFile << '''
             plugins {
@@ -102,48 +102,62 @@ class DockerRunPluginTests extends AbstractPluginTest {
         offline.output =~ /(?m):dockerRunStatus\RDocker container 'bar' is STOPPED./
     }
 
-    def 'derived task can run, status, and stop containers' () {
+    def 'derived task can run, status, and stop containers'() {
         given:
         buildFile << '''
             plugins {
                 id 'com.palantir.docker-run'
             }
 
+            def anotherContainer = 'anotherName'
+            
             dockerRun {
                 name 'bar'
                 image 'alpine:3.2'
                 command 'sleep', '1000'
             }
             
-            task another(type:DockerRun){
-                name 'foo'
+            task anotherStop(type:DockerStop){
+                name anotherContainer
+            }            
+            
+            task anotherRunStatus(type:DockerRunStatus){
+                name anotherContainer
+            }
+            
+            task anotherRemoveContainer(type:DockerRemoveContainer){
+                name anotherContainer
+            }
+            
+            task anotherRun(type:DockerRun){
+                name anotherContainer
                 image 'alpine:3.2'
                 command 'sleep', '1000'
             }
         '''.stripIndent()
 
         when:
-        BuildResult buildResult = with('dockerRemoveContainer', 'dockerRun', 'dockerRunStatus', 'dockerStop').build()
-        BuildResult offline = with('dockerRunStatus', 'dockerRemoveContainer').build()
+        BuildResult buildResult = with('anotherRemoveContainer', 'anotherRun', 'anotherRunStatus', 'anotherStop').build()
+        BuildResult offline = with('anotherRunStatus', 'anotherRemoveContainer').build()
 
         then:
-        buildResult.task(':dockerRemoveContainer').outcome == TaskOutcome.SUCCESS
+        buildResult.task(':anotherRemoveContainer').outcome == TaskOutcome.SUCCESS
 
-        buildResult.task(':dockerRun').outcome == TaskOutcome.SUCCESS
+        buildResult.task(':anotherRun').outcome == TaskOutcome.SUCCESS
         // CircleCI build nodes print a WARNING
-        buildResult.output =~ /(?m):dockerRun(WARNING:.*\R)?\R[A-Za-z0-9]+/
+        buildResult.output =~ /(?m):anotherRun(WARNING:.*\R)?\R[A-Za-z0-9]+/
 
-        buildResult.task(':dockerRunStatus').outcome == TaskOutcome.SUCCESS
-        buildResult.output =~ /(?m):dockerRunStatus\RDocker container 'bar' is RUNNING./
+        buildResult.task(':anotherRunStatus').outcome == TaskOutcome.SUCCESS
+        buildResult.output =~ /(?m):anotherRunStatus\RDocker container 'anotherName' is RUNNING./
 
-        buildResult.task(':dockerStop').outcome == TaskOutcome.SUCCESS
-        buildResult.output =~ /(?m):dockerStop\Rbar/
+        buildResult.task(':anotherStop').outcome == TaskOutcome.SUCCESS
+        buildResult.output =~ /(?m):anotherStop\RanotherName/
 
-        offline.task(':dockerRunStatus').outcome == TaskOutcome.SUCCESS
-        offline.output =~ /(?m):dockerRunStatus\RDocker container 'bar' is STOPPED./
+        offline.task(':anotherRunStatus').outcome == TaskOutcome.SUCCESS
+        offline.output =~ /(?m):anotherRunStatus\RDocker container 'anotherName' is STOPPED./
     }
 
-    def 'can run container with configured network' () {
+    def 'can run container with configured network'() {
         given:
         buildFile << '''
             plugins {
@@ -156,16 +170,16 @@ class DockerRunPluginTests extends AbstractPluginTest {
             }
         '''.stripIndent()
 
-		when:
-		BuildResult buildResult = with('dockerRemoveContainer', 'dockerRun', 'dockerNetworkModeStatus').build()
+        when:
+        BuildResult buildResult = with('dockerRemoveContainer', 'dockerRun', 'dockerNetworkModeStatus').build()
 
-		then:
-		buildResult.task(':dockerRemoveContainer').outcome == TaskOutcome.SUCCESS
+        then:
+        buildResult.task(':dockerRemoveContainer').outcome == TaskOutcome.SUCCESS
 
-		buildResult.task(':dockerRun').outcome == TaskOutcome.SUCCESS
+        buildResult.task(':dockerRun').outcome == TaskOutcome.SUCCESS
 
-		buildResult.output =~ /(?m):dockerNetworkModeStatus\RDocker container 'bar-hostnetwork' is configured to run with 'host' network mode./
-	}
+        buildResult.output =~ /(?m):dockerNetworkModeStatus\RDocker container 'bar-hostnetwork' is configured to run with 'host' network mode./
+    }
 
     def 'can optionally not daemonize'() {
         given:
@@ -252,7 +266,7 @@ class DockerRunPluginTests extends AbstractPluginTest {
         given:
         File testFolder = directory("test")
         def absolutePath = testFolder.absolutePath
-        if(isWindows()){
+        if (isWindows()) {
             absolutePath = absolutePath.replace("\\", "/")
         }
 
