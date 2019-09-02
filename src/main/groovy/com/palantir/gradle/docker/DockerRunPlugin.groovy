@@ -26,9 +26,22 @@ class DockerRunPlugin implements Plugin<Project> {
     void apply(Project project) {
         DockerRunExtension ext = project.extensions.create('dockerRun', DockerRunExtension)
 
-        Exec dockerRunStatus = project.tasks.create('dockerRunStatus', Exec, {
+        project.tasks.create('dockerRunStatus', Exec, {
             group = 'Docker Run'
             description = 'Checks the run status of the container'
+
+            project.afterEvaluate {
+                standardOutput = new ByteArrayOutputStream()
+                commandLine 'docker', 'inspect', '--format={{.State.Running}}', ext.name
+                doLast {
+                    if (standardOutput.toString().trim() != 'true') {
+                        println "Docker container '${ext.name}' is STOPPED."
+                        return 1
+                    } else {
+                        println "Docker container '${ext.name}' is RUNNING."
+                    }
+                }
+            }
         })
 
 
@@ -47,38 +60,28 @@ class DockerRunPlugin implements Plugin<Project> {
             conventionMapping.clean = { project.dockerRun.clean }
         }
 
-        Exec dockerStop = project.tasks.create('dockerStop', Exec, {
+        project.tasks.create('dockerStop', Exec, {
             group = 'Docker Run'
             description = 'Stops the named container if it is running'
             ignoreExitValue = true
+            project.afterEvaluate {
+                commandLine 'docker', 'stop', ext.name
+            }
         })
 
-        Exec dockerRemoveContainer = project.tasks.create('dockerRemoveContainer', Exec, {
+        project.tasks.create('dockerRemoveContainer', Exec, {
             group = 'Docker Run'
             description = 'Removes the persistent container associated with the Docker Run tasks'
             ignoreExitValue = true
+            project.afterEvaluate {
+                commandLine 'docker', 'rm', ext.name
+            }
         })
 
-        Exec dockerNetworkModeStatus = project.tasks.create('dockerNetworkModeStatus', Exec, {
+        project.tasks.create('dockerNetworkModeStatus', Exec, {
             group = 'Docker Run'
             description = 'Checks the network configuration of the container'
-        })
-
-        project.afterEvaluate {
-            dockerRunStatus.with {
-                standardOutput = new ByteArrayOutputStream()
-                commandLine 'docker', 'inspect', '--format={{.State.Running}}', ext.name
-                doLast {
-                    if (standardOutput.toString().trim() != 'true') {
-                        println "Docker container '${ext.name}' is STOPPED."
-                        return 1
-                    } else {
-                        println "Docker container '${ext.name}' is RUNNING."
-                    }
-                }
-            }
-
-            dockerNetworkModeStatus.with {
+            project.afterEvaluate {
                 standardOutput = new ByteArrayOutputStream()
                 commandLine 'docker', 'inspect', '--format={{.HostConfig.NetworkMode}}', ext.name
                 doLast {
@@ -95,14 +98,6 @@ class DockerRunPlugin implements Plugin<Project> {
                     }
                 }
             }
-
-            dockerStop.with {
-                commandLine 'docker', 'stop', ext.name
-            }
-
-            dockerRemoveContainer.with {
-                commandLine 'docker', 'rm', ext.name
-            }
-        }
+        })
     }
 }
