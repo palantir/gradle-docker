@@ -115,7 +115,7 @@ class DockerRunPluginTests extends AbstractPluginTest {
                 command 'sleep', '1000'
             }
             
-            task another(type:DockerRunTask){
+            task another(type:DockerRun){
                 name 'foo'
                 image 'alpine:3.2'
                 command 'sleep', '1000'

@@ -1,17 +1,16 @@
-package com.palantir.gradle.docker
+package com.palantir.gradle.docker.run
 
 import com.google.common.base.Preconditions
 import com.google.common.collect.ImmutableList
 import com.google.common.collect.ImmutableMap
 import com.google.common.collect.ImmutableSet
 import com.google.common.collect.Lists
-import org.gradle.api.tasks.AbstractExecTask
+import com.palantir.gradle.docker.DockerRunPlugin
 import org.gradle.internal.logging.text.StyledTextOutput
 import org.gradle.internal.logging.text.StyledTextOutputFactory
 
-class DockerRunTask extends AbstractExecTask {
+class DockerRun extends DockerRunBaseTask {
 
-    String containerName
     String image
     String network
     List<String> command = ImmutableList.of()
@@ -21,8 +20,8 @@ class DockerRunTask extends AbstractExecTask {
     boolean daemonize = true
     boolean clean = false
 
-    DockerRunTask() {
-        super(DockerRunTask.class)
+    DockerRun() {
+        super(DockerRun.class)
         group = 'Docker Run'
         description = 'Runs the specified container with port mappings'
         project.afterEvaluate {
@@ -63,14 +62,6 @@ class DockerRunTask extends AbstractExecTask {
             assert !args.contains(null)
             commandLine args
         }
-    }
-
-    def name(String name) {
-        this.containerName = name
-    }
-
-    def containerName(String containerName) {
-        this.containerName = containerName
     }
 
     def image(String image) {
