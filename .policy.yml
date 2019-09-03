@@ -1,37 +1,67 @@
 policy:
   approval:
     - or:
-      - repo owner approval
-      - repo owner co-approval
-      - excavator only touched baseline, gradle files or versions.props
+      - one admin has approved (PR contributors not allowed)
+      - two admins have approved
+      - changelog only and contributor approval
+      - fixing excavator
+      - excavator only touched baseline, circle, gradle files, docker-compose-rule config or versions.props
       - excavator only touched package.json and lock files
   disapproval:
     requires:
       organizations: [ "palantir" ]
 
 approval_rules:
-  - name: repo owner approval
+
+  - name: one admin has approved (PR contributors not allowed)
+    options:
+      allow_contributor: false
     requires:
       count: 1
       admins: true
 
-  # Require two *contributing* maintainers to approve changes
-  - name: repo owner co-approval
+  - name: two admins have approved
     options:
       allow_contributor: true
     requires:
       count: 2
       admins: true
 
-  - name: excavator only touched baseline, gradle files or versions.props
+  - name: changelog only and contributor approval
+    options:
+      allow_contributor: true
+    requires:
+      count: 1
+      admins: true
+    if:
+      only_changed_files:
+        paths:
+          - "changelog/@unreleased/.*\\.yml"
+
+  - name: fixing excavator
+    options:
+      allow_contributor: true
+    requires:
+      count: 1
+      admins: true
+    if:
+      has_author_in:
+        users: [ "svc-excavator-bot" ]
+
+  - name: excavator only touched baseline, circle, gradle files, docker-compose-rule config or versions.props
     requires:
       count: 0
     if:
       has_author_in:
         users: [ "svc-excavator-bot" ]
       only_changed_files:
+        # product-dependencies.lock should never go here, to force review of all product (SLS) dependency changes
+        # this way excavator cannot change the deployability of a service or product via auto-merge
         paths:
+          - "changelog/@unreleased/.*\\.yml"
           - "^\\.baseline/.*$"
+          - "^\\.circleci/.*$"
+          - "^\\.docker-compose-rule\\.yml$"
           - "^.*gradle$"
           - "^gradle/wrapper/.*"
           - "^gradlew$"
