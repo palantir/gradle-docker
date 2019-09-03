@@ -9,15 +9,15 @@ class DockerRunStatus extends DockerRunBaseTask {
 
         project.afterEvaluate {
             standardOutput = new ByteArrayOutputStream()
-            commandLine 'docker', 'inspect', '--format={{.State.Running}}', containerName.get()
+            commandLine 'docker', 'inspect', '--format={{.State.Running}}', containerName.getOrNull()
         }
 
         doLast {
             if (standardOutput.toString().trim() != 'true') {
-                println "Docker container '${containerName.get()}' is STOPPED."
+                println "Docker container '${containerName.getOrNull()}' is STOPPED."
                 return 1
             } else {
-                println "Docker container '${containerName.get()}' is RUNNING."
+                println "Docker container '${containerName.getOrNull()}' is RUNNING."
             }
         }
     }

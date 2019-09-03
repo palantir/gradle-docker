@@ -157,6 +157,19 @@ class DockerRunPluginTests extends AbstractPluginTest {
         offline.output =~ /(?m):anotherRunStatus\RDocker container 'anotherName' is STOPPED./
     }
 
+    def 'can initialize without specifying dockerRun'() {
+        given:
+        buildFile << '''
+            plugins {
+                id 'com.palantir.docker-run'
+            }
+        '''.stripIndent()
+        when:
+        BuildResult buildResult = with('help').build()
+        then:
+        buildResult.task(':help').outcome == TaskOutcome.SUCCESS
+    }
+
     def 'can run container with configured network'() {
         given:
         buildFile << '''

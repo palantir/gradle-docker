@@ -70,12 +70,12 @@ class DockerRun extends DockerRunBaseTask {
                 args.add("${localFile.absolutePath}:${volume.value}")
             }
             args.addAll(env.get().collect { k, v -> ['-e', "${k}=${v}"] }.flatten())
-            args.addAll(['--name', containerName.get(), image.get()])
+            args.addAll(['--name', containerName.getOrNull(), image.getOrNull()])
             if (!command.get().isEmpty()) {
                 args.addAll(command.get())
             }
-            assert !args.contains(null)
             commandLine args
+
         }
     }
 

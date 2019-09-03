@@ -8,7 +8,7 @@ class DockerRemoveContainer extends DockerRunBaseTask {
         description = 'Removes the persistent container associated with the Docker Run tasks'
         ignoreExitValue = true
         project.afterEvaluate {
-            commandLine 'docker', 'rm', containerName.get()
+            commandLine 'docker', 'rm', containerName.getOrNull()
         }
     }
 
