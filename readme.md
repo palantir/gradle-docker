@@ -241,6 +241,7 @@ dockerRun {
     name 'my-container'
     image 'busybox'
     volumes 'hostvolume': '/containervolume'
+    network 'host'
     ports '7080:5000'
     daemonize true
     env 'MYVAR1': 'MYVALUE1', 'MYVAR2': 'MYVALUE2'
@@ -251,17 +252,50 @@ dockerRun {
 **Docker Run Configuration Parameters**
 - `name` the name to use for this container, may include a tag.
 - `image` the name of the image to use.
-- `volumes` optional map of volumes to mount in the container. The key is the path
+- `volumes` (optional) map of volumes to mount in the container. The key is the path
   to the host volume, resolved using [`project.file()`](https://docs.gradle.org/current/userguide/working_with_files.html#sec:locating_files).
   The value is the exposed container volume path.
-- `ports` optional mapping `local:container` of local port to container port.
-- `env` optional map of environment variables to supply to the running container.
+- `ports` (optional) mapping `local:container` of local port to container port.
+- `env` (optional) map of environment variables to supply to the running container.
   These must be exposed in the Dockerfile with `ENV` instructions.
-- `daemonize` defaults to true to daemonize the container after starting. However
+- `network` (optional) Connect a container to a network.
+- `daemonize` (optional) defaults to `true` to daemonize the container after starting. However
   if your container runs a command and exits, you can set this to false.
 - `clean` (optional) a boolean argument which adds `--rm` to the `docker run`
   command to ensure that containers are cleaned up after running; defaults to `false`
-- `command` the command to run.
+- `command` (optional) the command to run.
+
+**Docker Run custom Tasks**
+Use the DockerRunTaskTypes to configure custom Tasks:
+
+```gradle
+task runA(type: DockerRun){
+    name 'container-A'
+    image 'busybox'
+    command 'sleep', '10'
+}
+
+task runB(type: DockerRun){
+    name 'container-B'
+    image 'busybox'
+    command 'sleep', '10'
+}
+
+task stopA(type: DockerStop){
+    name 'container-A'
+}
+
+task stopB(type: DockerStop){
+    name 'container-B'
+}
+```
+The custom DockerRunTaskTypes are:
+- `DockerRun` uses all parameters from `dockerRun` unless overridden
+- `DockerStop` uses `name` from `dockerRun` unless overridden
+- `DockerRunStatus` uses `name` from `dockerRun` unless overridden
+- `dockerRemoveContainer` uses `name` from `dockerRun` unless overridden
+- `DockerNetworkModeStatus` uses `name` and `network` from `dockerRun` unless overridden
+
 
 Tasks
 -----
@@ -288,7 +322,7 @@ Tasks
    * `dockerStop`: stop the running container
    * `dockerRunStatus`: indicate the run status of the container
    * `dockerRemoveContainer`: remove the container
-
+   * `DockerNetworkModeStatus`: checks the network configuration of the container
 License
 -------
 This plugin is made available under the [Apache 2.0 License](http://www.apache.org/licenses/LICENSE-2.0).
