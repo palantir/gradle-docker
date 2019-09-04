@@ -12,7 +12,6 @@ import org.gradle.internal.logging.text.StyledTextOutputFactory
 class DockerRun extends DockerRunBaseTask {
 
     Property<String> image = project.objects.property(String)
-    Property<String> network = project.objects.property(String)
     Property<List<String>> command = project.objects.property(List)
     Property<Set<String>> ports = project.objects.property(Set)
     Property<Map<String, String>> env = project.objects.property(Map)
@@ -26,7 +25,6 @@ class DockerRun extends DockerRunBaseTask {
         description = 'Runs the specified container with port mappings'
 
         image.set(getExtension().image)
-        network.set(getExtension().network)
         command.set(getExtension().command)
         ports.set(getExtension().ports)
         env.set(getExtension().env)
@@ -81,10 +79,6 @@ class DockerRun extends DockerRunBaseTask {
 
     def image(String image) {
         this.image.set image
-    }
-
-    def network(String network) {
-        this.network.set network
     }
 
     def env(Map<String, String> env) {
