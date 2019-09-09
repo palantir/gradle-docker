@@ -1,3 +1,19 @@
+buildscript {
+    repositories {
+        maven { url 'https://artifactory.palantir.build/artifactory/release-jar' }
+    }
+    dependencies {
+        classpath 'com.netflix.nebula:gradle-info-plugin:5.0.3'
+    }
+}
+buildscript {
+    repositories {
+        maven { url 'https://artifactory.palantir.build/artifactory/release-jar' }
+    }
+    dependencies {
+        classpath 'com.netflix.nebula:nebula-publishing-plugin:13.3.0'
+    }
+}
 plugins {
     id 'com.gradle.plugin-publish' version '0.9.10'
     id 'com.jfrog.bintray' version '1.8.4'
