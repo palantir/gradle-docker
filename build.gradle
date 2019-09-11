@@ -1,3 +1,21 @@
+buildscript {
+    repositories {
+        jcenter()
+        maven { url 'https://plugins.gradle.org/m2/' }
+        maven { url 'https://palantir.bintray.com/releases' }    }
+    dependencies {
+        classpath 'com.netflix.nebula:gradle-info-plugin:5.0.3'
+    }
+}
+buildscript {
+    repositories {
+        jcenter()
+        maven { url 'https://plugins.gradle.org/m2/' }
+        maven { url 'https://palantir.bintray.com/releases' }    }
+    dependencies {
+        classpath 'com.netflix.nebula:nebula-publishing-plugin:13.4.1'
+    }
+}
 plugins {
     id 'com.gradle.plugin-publish' version '0.9.10'
     id 'com.jfrog.bintray' version '1.8.4'
