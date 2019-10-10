@@ -1,0 +1,12 @@
+# Excavator auto-updates this file. Please contribute improvements to the central template:
+
+only: pulls
+staleLabel: stale
+pulls:
+  daysUntilStale: 14
+  daysUntilClose: 7
+  exemptLabels: [ long-lived ]
+  markComment: >
+    This PR has been automatically marked as stale because it has not been touched in the last 14 days.
+    If you'd like to keep it open, please leave a comment or add the 'long-lived' label, otherwise it'll be closed in 7 days.
+  closeComment: false
