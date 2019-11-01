@@ -13,7 +13,7 @@ buildscript {
         maven { url 'https://plugins.gradle.org/m2/' }
         maven { url 'https://palantir.bintray.com/releases' }    }
     dependencies {
-        classpath 'com.netflix.nebula:nebula-publishing-plugin:14.0.0'
+        classpath 'com.netflix.nebula:nebula-publishing-plugin:14.1.1'
     }
 }
 plugins {
