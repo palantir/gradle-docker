@@ -78,4 +78,8 @@ class AbstractPluginTest extends Specification {
             return it
         }
     }
+
+    protected String escapePath(String path) {
+        return path.replaceAll('\\\\', '\\\\\\\\')
+    }
 }
