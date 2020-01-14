@@ -170,6 +170,7 @@ resulting file as `docker-compose.yml`.
 
 The `docker-compose` plugin also provides a `dockerComposeUp` task that starts
 the docker images specified in the `dockerComposeFile` in detached mode.
+You can also use the `dockerComposeDown` task to stop the containers.
 
 
 **Example**
@@ -283,6 +284,7 @@ Tasks
      versions declared by dependencies
    * `dockerComposeUp`: Brings up services defined in `dockerComposeFile` in
      detacted state
+   * `dockerComposeDown`: Stops services defined in `dockerComposeFile`
  * **Docker Run**
    * `dockerRun`: run the specified image with the specified name
    * `dockerStop`: stop the running container

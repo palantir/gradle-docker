@@ -78,4 +78,18 @@ class AbstractPluginTest extends Specification {
             return it
         }
     }
+
+    protected int processCount() {
+        StringBuffer sout = new StringBuffer(), serr = new StringBuffer()
+        Process proc = 'docker ps -q'.execute()
+        proc.consumeProcessOutput(sout, serr)
+        proc.waitFor()
+        assert proc.exitValue() == 0
+
+        return sout.readLines().size()
+    }
+
+    protected String escapePath(String path) {
+        return path.replaceAll('\\\\', '\\\\\\\\')
+    }
 }

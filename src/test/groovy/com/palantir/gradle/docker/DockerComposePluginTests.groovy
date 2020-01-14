@@ -220,4 +220,26 @@ class DockerComposePluginTests extends AbstractPluginTest {
         then:
         buildResult.task(':generateDockerCompose').outcome == TaskOutcome.SUCCESS
     }
+
+    def 'docker-compose stop successfully stops docker container'() {
+        given:
+        file('docker-compose.yml') << '''
+            version: "2"
+            services:
+              hello:
+                container_name: "unit-test-docker-compose-stop"
+                image: "alpine"
+                command: sh -c 'while sleep 3600; do :; done\'
+        '''.stripIndent()
+        buildFile << '''
+            plugins {
+                id 'com.palantir.docker-compose'
+            }
+        '''.stripIndent()
+        with('dockerComposeUp').build()
+        when:
+        with('dockerComposeDown').build()
+        then:
+        processCount() == 0
+    }
 }

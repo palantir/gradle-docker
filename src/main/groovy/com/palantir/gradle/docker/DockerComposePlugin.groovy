@@ -51,5 +51,9 @@ class DockerComposePlugin implements Plugin<Project> {
         project.tasks.create('dockerComposeUp', DockerComposeUp, {
             it.configuration = dockerConfiguration
         })
+
+        project.tasks.create('dockerComposeDown', DockerComposeDown, {
+            it.configuration = dockerConfiguration
+        })
     }
 }

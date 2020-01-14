@@ -20,6 +20,8 @@ import org.gradle.testkit.runner.TaskOutcome
 
 class DockerRunPluginTests extends AbstractPluginTest {
 
+    private static final String SEPARATOR = System.lineSeparator()
+
     def 'can run, status, and stop a container made by the docker plugin' () {
         given:
         file('Dockerfile') << '''
@@ -52,16 +54,16 @@ class DockerRunPluginTests extends AbstractPluginTest {
 
         buildResult.task(':dockerRun').outcome == TaskOutcome.SUCCESS
         // CircleCI build nodes print a WARNING
-        buildResult.output =~ /(?m):dockerRun(WARNING:.*\n)?\n[A-Za-z0-9]+/
+        buildResult.output =~ /(?m):dockerRun(WARNING:.*${SEPARATOR})?${SEPARATOR}[A-Za-z0-9]+/
 
         buildResult.task(':dockerRunStatus').outcome == TaskOutcome.SUCCESS
-        buildResult.output =~ /(?m):dockerRunStatus\nDocker container 'foo' is RUNNING./
+        buildResult.output =~ /(?m):dockerRunStatus${SEPARATOR}Docker container 'foo' is RUNNING./
 
         buildResult.task(':dockerStop').outcome == TaskOutcome.SUCCESS
-        buildResult.output =~ /(?m):dockerStop\nfoo/
+        buildResult.output =~ /(?m):dockerStop${SEPARATOR}foo/
 
         offline.task(':dockerRunStatus').outcome == TaskOutcome.SUCCESS
-        offline.output =~ /(?m):dockerRunStatus\nDocker container 'foo' is STOPPED./
+        offline.output =~ /(?m):dockerRunStatus${SEPARATOR}Docker container 'foo' is STOPPED./
 
         execCond('docker rmi -f foo-image')
     }
@@ -90,16 +92,16 @@ class DockerRunPluginTests extends AbstractPluginTest {
 
         buildResult.task(':dockerRun').outcome == TaskOutcome.SUCCESS
         // CircleCI build nodes print a WARNING
-        buildResult.output =~ /(?m):dockerRun(WARNING:.*\n)?\n[A-Za-z0-9]+/
+        buildResult.output =~ /(?m):dockerRun(WARNING:.*${SEPARATOR})?${SEPARATOR}[A-Za-z0-9]+/
 
         buildResult.task(':dockerRunStatus').outcome == TaskOutcome.SUCCESS
-        buildResult.output =~ /(?m):dockerRunStatus\nDocker container 'bar' is RUNNING./
+        buildResult.output =~ /(?m):dockerRunStatus${SEPARATOR}Docker container 'bar' is RUNNING./
 
         buildResult.task(':dockerStop').outcome == TaskOutcome.SUCCESS
-        buildResult.output =~ /(?m):dockerStop\nbar/
+        buildResult.output =~ /(?m):dockerStop${SEPARATOR}bar/
 
         offline.task(':dockerRunStatus').outcome == TaskOutcome.SUCCESS
-        offline.output =~ /(?m):dockerRunStatus\nDocker container 'bar' is STOPPED./
+        offline.output =~ /(?m):dockerRunStatus${SEPARATOR}Docker container 'bar' is STOPPED./
     }
 
     def 'can run container with configured network' () {
@@ -123,7 +125,7 @@ class DockerRunPluginTests extends AbstractPluginTest {
 
 		buildResult.task(':dockerRun').outcome == TaskOutcome.SUCCESS
 
-		buildResult.output =~ /(?m):dockerNetworkModeStatus\nDocker container 'bar-hostnetwork' is configured to run with 'host' network mode./
+		buildResult.output =~ /(?m):dockerNetworkModeStatus${SEPARATOR}Docker container 'bar-hostnetwork' is configured to run with 'host' network mode./
 	}
 
     def 'can optionally not daemonize'() {
@@ -151,7 +153,7 @@ class DockerRunPluginTests extends AbstractPluginTest {
         buildResult.task(':dockerRun').outcome == TaskOutcome.SUCCESS
 
         buildResult.task(':dockerRunStatus').outcome == TaskOutcome.SUCCESS
-        buildResult.output =~ /(?m):dockerRunStatus\nDocker container 'bar-nodaemonize' is STOPPED./
+        buildResult.output =~ /(?m):dockerRunStatus${SEPARATOR}Docker container 'bar-nodaemonize' is STOPPED./
     }
 
     def 'can mount volumes'() {
@@ -189,7 +191,7 @@ class DockerRunPluginTests extends AbstractPluginTest {
         '''.stripIndent()
 
         when:
-        new File(testFolder, "testfile").text = "HELLO WORLD\n"
+        new File(testFolder, "testfile").text = "HELLO WORLD${SEPARATOR}"
         BuildResult buildResult = with('docker', 'dockerRemoveContainer', 'dockerRun', 'dockerRunStatus').build()
 
         then:
@@ -198,7 +200,7 @@ class DockerRunPluginTests extends AbstractPluginTest {
         buildResult.task(':dockerRun').outcome == TaskOutcome.SUCCESS
         buildResult.output =~ /(?m)HELLO WORLD/
         buildResult.task(':dockerRunStatus').outcome == TaskOutcome.SUCCESS
-        buildResult.output =~ /(?m):dockerRunStatus\nDocker container 'foo' is STOPPED./
+        buildResult.output =~ /(?m):dockerRunStatus${SEPARATOR}Docker container 'foo' is STOPPED./
     }
 
     def 'can mount volumes specified with an absolute path'() {
@@ -230,13 +232,13 @@ class DockerRunPluginTests extends AbstractPluginTest {
             dockerRun {
                 name 'foo'
                 image 'foo-image:latest'
-                volumes "${testFolder.absolutePath}": "/test"
+                volumes "${escapePath(testFolder.absolutePath)}": "/test"
                 daemonize false
             }
         """.stripIndent()
 
         when:
-        new File(testFolder, "testfile").text = "HELLO WORLD\n"
+        new File(testFolder, "testfile").text = "HELLO WORLD${SEPARATOR}"
         BuildResult buildResult = with('docker', 'dockerRemoveContainer', 'dockerRun', 'dockerRunStatus').build()
 
         then:
@@ -245,7 +247,7 @@ class DockerRunPluginTests extends AbstractPluginTest {
         buildResult.task(':dockerRun').outcome == TaskOutcome.SUCCESS
         buildResult.output =~ /(?m)HELLO WORLD/
         buildResult.task(':dockerRunStatus').outcome == TaskOutcome.SUCCESS
-        buildResult.output =~ /(?m):dockerRunStatus\nDocker container 'foo' is STOPPED./
+        buildResult.output =~ /(?m):dockerRunStatus${SEPARATOR}Docker container 'foo' is STOPPED./
     }
 
     def 'can run with environment variables'() {
@@ -288,7 +290,7 @@ class DockerRunPluginTests extends AbstractPluginTest {
         buildResult.task(':dockerRun').outcome == TaskOutcome.SUCCESS
         buildResult.output =~ /(?m)FOO = BAR = QUUY = ZIP/
         buildResult.task(':dockerRunStatus').outcome == TaskOutcome.SUCCESS
-        buildResult.output =~ /(?m):dockerRunStatus\nDocker container 'foo-envvars' is STOPPED./
+        buildResult.output =~ /(?m):dockerRunStatus${SEPARATOR}Docker container 'foo-envvars' is STOPPED./
     }
 
 

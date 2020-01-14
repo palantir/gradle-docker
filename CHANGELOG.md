@@ -1,0 +1,1 @@
+New dockerComposeDown Gradle task available in Docker Compose plugin.
