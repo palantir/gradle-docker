@@ -25,7 +25,7 @@ bintray {
     publish = true
     pkg {
         repo = 'releases'
-        name = 'gradle-consistent-versions'
+        name = 'gradle-docker'
         userOrg = 'palantir'
         licenses = ['Apache-2.0']
         publications = ['nebula']
