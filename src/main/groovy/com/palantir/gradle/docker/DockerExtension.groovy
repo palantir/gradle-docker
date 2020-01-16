@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 Palantir Technologies
+ * (c) Copyright 2020 Palantir Technologies Inc. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,7 +19,6 @@ import com.google.common.base.Preconditions
 import com.google.common.base.Strings
 import com.google.common.collect.ImmutableMap
 import com.google.common.collect.ImmutableSet
-import org.gradle.api.GradleException
 import org.gradle.api.Project
 import org.gradle.api.Task
 import org.gradle.api.file.CopySpec

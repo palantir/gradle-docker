@@ -2,87 +2,50 @@ buildscript {
     repositories {
         jcenter()
         maven { url 'https://plugins.gradle.org/m2/' }
-        maven { url 'https://palantir.bintray.com/releases' }    }
+        maven { url 'https://palantir.bintray.com/releases' }
+    }
     dependencies {
         classpath 'com.netflix.nebula:gradle-info-plugin:5.2.0'
-    }
-}
-buildscript {
-    repositories {
-        jcenter()
-        maven { url 'https://plugins.gradle.org/m2/' }
-        maven { url 'https://palantir.bintray.com/releases' }    }
-    dependencies {
+        classpath 'com.palantir.javaformat:gradle-palantir-java-format:0.3.9'
         classpath 'com.netflix.nebula:nebula-publishing-plugin:14.1.1'
+        classpath 'com.netflix.nebula:gradle-info-plugin:5.2.0'
+        classpath 'com.palantir.gradle.consistentversions:gradle-consistent-versions:1.14.0'
+        classpath 'com.palantir.baseline:gradle-baseline-java:2.47.0'
+        classpath 'com.palantir.gradle.gitversion:gradle-git-version:0.12.2'
+        classpath 'gradle.plugin.org.inferred:gradle-processors:3.2.0'
+        classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.8.4'
     }
 }
-plugins {
-    id 'com.gradle.plugin-publish' version '0.9.10'
-    id 'com.jfrog.bintray' version '1.8.4'
-    id 'com.palantir.git-version' version '0.12.2'
 
-    id 'eclipse'
-    id 'groovy'
-    id 'idea'
-    id 'java-gradle-plugin'
-    id 'maven-publish'
+plugins {
+    id 'com.gradle.plugin-publish' version '0.10.1'
 }
 
 repositories {
     jcenter()
+    maven { url 'https://dl.bintray.com/palantir/releases/' }
 }
 
-
-dependencies {
-    compile gradleApi()
-    compile 'com.google.guava:guava:18.0'
-
-    testCompile gradleTestKit()
-    testCompile "com.netflix.nebula:nebula-test:4.0.0" // for better temp directory junit rule only
-}
-
-if (System.env.CIRCLE_TEST_REPORTS) {
-    test.reports.junitXml.destination = new File(System.env.CIRCLE_TEST_REPORTS, getName())
-}
+apply plugin: 'java-gradle-plugin'
+apply plugin: 'groovy'
+apply plugin: 'com.palantir.baseline'
+apply plugin: 'com.palantir.consistent-versions'
+apply plugin: 'com.palantir.git-version'
+apply plugin: 'org.inferred.processors'
+apply from: "$rootDir/gradle/publish-jar.gradle"
 
 group 'com.palantir.gradle.docker'
 version System.env.CIRCLE_TAG ?: gitVersion()
 
-sourceCompatibility = 1.7
+dependencies {
+    compile gradleApi()
+    compile 'com.google.guava:guava'
 
-task sourceJar(type: Jar) {
-    from sourceSets.main.allSource
-    classifier 'sources'
+    testCompile gradleTestKit()
+    testCompile 'com.netflix.nebula:nebula-test'
 }
 
-publishing {
-    publications {
-        bintray(MavenPublication) {
-            from components.java
-            artifact(sourceJar)
-            artifact(publishPluginJavaDocsJar)
-        }
-    }
-}
-
-bintray {
-    user = System.env.BINTRAY_USERNAME
-    key = System.env.BINTRAY_PASSWORD
-    publish = true
-    pkg {
-        repo = 'releases'
-        name = 'gradle-docker'
-        userOrg = 'palantir'
-        licenses = ['Apache-2.0']
-        publications = ['bintray']
-    }
-}
-
-bintrayUpload.dependsOn 'generatePomFileForBintrayPublication', 'sourceJar', 'build'
-
-bintrayUpload.onlyIf {
-    project.version ==~ /[0-9]+(\.[0-9]+)+((-(beta|rc)[0-9]{1,2})(\.[0-9])?)?/
-}
+sourceCompatibility = 1.8
 
 pluginBundle {
     website = 'https://github.com/palantir/gradle-docker'
@@ -106,7 +69,5 @@ pluginBundle {
     }
 }
 
-publishPlugins.onlyIf {
-    project.version ==~ /\d+\.\d+\.\d+/
-}
+publishPlugins.onlyIf { versionDetails().isCleanTag }
 
