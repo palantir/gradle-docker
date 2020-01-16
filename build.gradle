@@ -71,3 +71,7 @@ pluginBundle {
 
 publishPlugins.onlyIf { versionDetails().isCleanTag }
 
+// Configure the publishPlugins task
+tasks.publish.dependsOn publishPlugins
+project.ext.'gradle.publish.key' = System.env["GRADLE_KEY"]
+project.ext.'gradle.publish.secret' = System.env["GRADLE_SECRET"]
