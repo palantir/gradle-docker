@@ -15,19 +15,23 @@
  */
 package com.palantir.gradle.docker
 
-import com.energizedwork.spock.extensions.TempDirectory
+
 import groovy.transform.CompileStatic
 import groovy.transform.TypeCheckingMode
 import org.gradle.testkit.runner.GradleRunner
+import org.junit.Rule
+import org.junit.rules.TemporaryFolder
 import spock.lang.Specification
 
 class AbstractPluginTest extends Specification {
 
-    @TempDirectory(clean = false)
+    @Rule
+    TemporaryFolder tempFolder
     File projectDir
     File buildFile
 
     def setup() {
+        projectDir = tempFolder.getRoot()
         buildFile = file('build.gradle')
         println("Build directory: \n" + projectDir.absolutePath)
     }

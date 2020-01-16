@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 Palantir Technologies
+ * (c) Copyright 2020 Palantir Technologies Inc. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,6 +15,8 @@
  */
 package com.palantir.gradle.docker
 
+import java.util.regex.Pattern
+import javax.inject.Inject
 import org.gradle.api.GradleException
 import org.gradle.api.Plugin
 import org.gradle.api.Project
@@ -31,9 +33,6 @@ import org.gradle.api.tasks.Copy
 import org.gradle.api.tasks.Delete
 import org.gradle.api.tasks.Exec
 import org.gradle.api.tasks.bundling.Zip
-
-import javax.inject.Inject
-import java.util.regex.Pattern
 
 class PalantirDockerPlugin implements Plugin<Project> {
 
@@ -138,7 +137,7 @@ class PalantirDockerPlugin implements Plugin<Project> {
                     if (tags.containsKey(taskName)) {
                         throw new IllegalArgumentException("Task name '${taskName}' is existed.")
                     }
-                    
+
                     tags[taskName] = [
                             tagName: unresolvedTagName,
                             tagTask: { -> computeName(ext.name, unresolvedTagName) }

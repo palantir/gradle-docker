@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 Palantir Technologies
+ * (c) Copyright 2020 Palantir Technologies Inc. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,16 +15,14 @@
  */
 package com.palantir.gradle.docker
 
+import com.google.common.collect.Lists
 import java.util.Map.Entry
-
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.tasks.Exec
 import org.gradle.internal.logging.text.StyledTextOutput
-import org.gradle.internal.logging.text.StyledTextOutputFactory
 import org.gradle.internal.logging.text.StyledTextOutput.Style
-
-import com.google.common.collect.Lists
+import org.gradle.internal.logging.text.StyledTextOutputFactory
 
 class DockerRunPlugin implements Plugin<Project> {
     @Override

@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 Palantir Technologies
+ * (c) Copyright 2020 Palantir Technologies Inc. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,26 +13,29 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package com.palantir.gradle.docker;
 
+import java.util.Collections;
+import java.util.LinkedHashSet;
+import java.util.Set;
+import org.gradle.api.artifacts.DependencyConstraint;
 import org.gradle.api.artifacts.DependencySet;
+import org.gradle.api.artifacts.ExcludeRule;
 import org.gradle.api.artifacts.ModuleDependency;
 import org.gradle.api.artifacts.PublishArtifact;
 import org.gradle.api.attributes.AttributeContainer;
 import org.gradle.api.attributes.Usage;
+import org.gradle.api.capabilities.Capability;
 import org.gradle.api.internal.attributes.ImmutableAttributes;
 import org.gradle.api.internal.attributes.ImmutableAttributesFactory;
 import org.gradle.api.internal.component.SoftwareComponentInternal;
 import org.gradle.api.internal.component.UsageContext;
 import org.gradle.api.model.ObjectFactory;
 
-import java.util.Collections;
-import java.util.LinkedHashSet;
-import java.util.Set;
-
 public class DockerComponent implements SoftwareComponentInternal {
     private final UsageContext runtimeUsage;
-    private final LinkedHashSet<PublishArtifact> artifacts = new LinkedHashSet<>();
+    private final Set<PublishArtifact> artifacts = new LinkedHashSet<>();
     private final DependencySet runtimeDependencies;
 
     public DockerComponent(PublishArtifact dockerArtifact, DependencySet runtimeDependencies,
@@ -45,12 +48,12 @@ public class DockerComponent implements SoftwareComponentInternal {
     }
 
     @Override
-    public String getName() {
+    public final String getName() {
         return "docker";
     }
 
     @Override
-    public Set<UsageContext> getUsages() {
+    public final Set<UsageContext> getUsages() {
         return Collections.singleton(runtimeUsage);
     }
 
@@ -88,6 +91,21 @@ public class DockerComponent implements SoftwareComponentInternal {
         @Override
         public AttributeContainer getAttributes() {
             return attributes;
+        }
+
+        @Override
+        public Set<? extends DependencyConstraint> getDependencyConstraints() {
+            return Collections.emptySet();
+        }
+
+        @Override
+        public Set<? extends Capability> getCapabilities() {
+            return Collections.emptySet();
+        }
+
+        @Override
+        public Set<ExcludeRule> getGlobalExcludes() {
+            return Collections.emptySet();
         }
     }
 }
