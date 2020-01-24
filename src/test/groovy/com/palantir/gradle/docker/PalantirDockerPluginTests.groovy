@@ -22,6 +22,9 @@ import org.gradle.testkit.runner.BuildResult
 import org.gradle.testkit.runner.TaskOutcome
 import spock.lang.Ignore
 
+import java.nio.file.Path
+import java.nio.file.Paths
+
 class PalantirDockerPluginTests extends AbstractPluginTest {
 
     def 'fail when missing docker configuration'() {
@@ -689,5 +692,34 @@ class PalantirDockerPluginTests extends AbstractPluginTest {
         then:
         buildResult.task(':dockerPrepare').outcome == TaskOutcome.SUCCESS
         file("build/docker/myDir/bar").exists()
+    }
+
+    def 'tag and save images each tag'() {
+        given:
+        String id = 'id12'
+        file('Dockerfile') << """
+            FROM alpine:3.2
+            MAINTAINER ${id}
+        """.stripIndent()
+        buildFile << """
+            plugins {
+                id 'com.palantir.docker'
+            }
+
+            docker {
+                name '${id}'
+                tag 'withTaskNameByTag', '${id}:new-latest_2.0'
+            }
+        """.stripIndent()
+
+        when:
+        BuildResult buildResult = with('dockerSave').build()
+
+        then:
+        buildResult.task(':dockerSave').outcome == TaskOutcome.SUCCESS
+        file("build/docker-images").exists()
+        file("build/docker-images/${id}_new-latest_2.0.tar.gz").exists()
+        execCond("docker rmi -f ${id}:new-latest_2.0")
+        execCond("docker rmi -f ${id}:latest")
     }
 }

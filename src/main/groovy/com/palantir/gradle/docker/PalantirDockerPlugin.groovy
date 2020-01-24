@@ -15,6 +15,8 @@
  */
 package com.palantir.gradle.docker
 
+import java.nio.file.Files
+import java.nio.file.Paths
 import java.util.regex.Pattern
 import javax.inject.Inject
 import org.gradle.api.GradleException
@@ -78,6 +80,12 @@ class PalantirDockerPlugin implements Plugin<Project> {
             dependsOn exec
         })
 
+        Task save = project.tasks.create('dockerSave', {
+            group = 'Docker'
+            description = 'Saves all docker images to file system'
+            dependsOn tag
+        })
+
         Exec push = project.tasks.create('dockerPush', Exec, {
             group = 'Docker'
             description = 'Pushes named Docker image to configured Docker Hub.'
@@ -104,6 +112,8 @@ class PalantirDockerPlugin implements Plugin<Project> {
             ext.resolvePathsAndValidate()
             String dockerDir = "${project.buildDir}/docker"
             clean.delete dockerDir
+            String dockerImageDir = "${project.buildDir}/docker-images"
+            clean.delete dockerImageDir
 
             prepare.with {
                 with ext.copySpec
@@ -154,6 +164,18 @@ class PalantirDockerPlugin implements Plugin<Project> {
                     dependsOn exec
                 })
                 tag.dependsOn tagSubTask
+
+                Exec saveSubTask = project.tasks.create('dockerSave' + taskName, Exec, {
+                    group = 'Docker'
+                    description = "Saves the Docker image with tag '${tagConfig.tagName}' to file system (${dockerImageDir})"
+                    doFirst {
+                        Files.createDirectories(Paths.get(dockerImageDir))
+                    }
+                    workingDir dockerDir
+                    commandLine 'docker', 'save', "${-> tagConfig.tagTask()}", "-o", "${dockerImageDir}/${-> tagConfig.tagName.replaceAll(/[\/\\:]/,"_")}.tar.gz"
+                    dependsOn tagSubTask
+                })
+                save.dependsOn saveSubTask
 
                 Exec pushSubTask = project.tasks.create('dockerPush' + taskName, Exec, {
                     group = 'Docker'
