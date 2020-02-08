@@ -147,6 +147,11 @@
             <message key="import.illegal" value="Must not import repackaged classes."/>
         </module>
         <module name="IllegalImport">
+            <property name="illegalPkgs" value="^org\.gradle\.(internal|.*\.internal)"/>
+            <property name="regexp" value="true" />
+            <message key="import.illegal" value="Do not rely on gradle internal classes as these may change in minor releases - use org.gradle.api versions instead."/>
+        </module>
+        <module name="IllegalImport">
             <property name="illegalPkgs" value="sun"/>
             <message key="import.illegal" value="Must not use Oracle's Java implementation details. See http://www.oracle.com/technetwork/java/faq-sun-packages-142232.html ."/>
         </module>
@@ -195,10 +200,6 @@
             <property name="option" value="top"/>
             <property name="separated" value="true"/>
             <property name="sortStaticImportsAlphabetically" value="true"/>
-        </module>
-        <module name="Indentation"> <!-- Java Style Guide: Block indentation: +4 spaces -->
-            <property name="arrayInitIndent" value="8"/>
-            <property name="lineWrappingIndentation" value="8"/>
         </module>
         <module name="InnerAssignment"/> <!-- Java Coding Guidelines: Inner assignments: Not used -->
         <module name="LeftCurly"/> <!-- Java Style Guide: Nonempty blocks: K & R style -->
