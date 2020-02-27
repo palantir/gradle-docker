@@ -373,15 +373,5 @@ class DockerRunPluginTests extends AbstractPluginTest {
         return System.getenv("CI") == "true"
     }
 
-    def assertThatContainerLogExist(){
-        projectDir.eachFileRecurse(FileType.FILES){
-            if(it.name.endsWith('.log')){
-                println it
-            }
-        }
-
-        true
-    }
-
 
 }
