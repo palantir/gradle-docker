@@ -56,6 +56,11 @@ class DockerRunPlugin implements Plugin<Project> {
             description = 'Checks the network configuration of the container'
         })
 
+        Exec dockerSaveContainerLog = project.tasks.create('dockerSaveContainerLog', Exec, {
+            group = 'Docker Run'
+            description = 'Save container log file in project build directory'
+        })
+
         project.afterEvaluate {
             dockerRunStatus.with {
                 standardOutput = new ByteArrayOutputStream()
@@ -139,6 +144,21 @@ class DockerRunPlugin implements Plugin<Project> {
 
             dockerRemoveContainer.with {
                 commandLine 'docker', 'rm', ext.name
+            }
+
+            dockerSaveContainerLog.with {
+                commandLine 'docker', 'logs', ext.name
+
+                doFirst {
+                    def projectDir = "${project.buildDir}"
+                    def logFilename = "docker-container-${ext.name}.log"
+
+                    def logFile =  new File(projectDir, logFilename)
+                    logFile.getParentFile().mkdirs()
+
+                    standardOutput = new FileOutputStream(logFile);
+                    println "Saved log file to $projectDir with name $logFilename"
+                }
             }
         }
     }

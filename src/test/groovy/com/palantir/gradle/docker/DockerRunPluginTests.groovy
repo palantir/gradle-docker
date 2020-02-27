@@ -15,6 +15,7 @@
  */
 package com.palantir.gradle.docker
 
+import groovy.io.FileType
 import org.gradle.testkit.runner.BuildResult
 import org.gradle.testkit.runner.TaskOutcome
 
@@ -102,6 +103,40 @@ class DockerRunPluginTests extends AbstractPluginTest {
 
         offline.task(':dockerRunStatus').outcome == TaskOutcome.SUCCESS
         offline.output =~ /(?m):dockerRunStatus${SEPARATOR}Docker container 'bar' is STOPPED./
+    }
+
+    def 'can run, log and stop a container'(){
+        given:
+        buildFile << '''
+            plugins {
+                id 'com.palantir.docker-run'
+            }
+
+            dockerRun {
+                name 'bar'
+                image 'alpine:3.2'
+                ports '8080'
+                command 'sh', '-c', 'echo "hello world" && sleep 1000'
+            }
+        '''.stripIndent()
+
+        when:
+        BuildResult buildResult = with('dockerRemoveContainer', 'dockerRun', 'dockerSaveContainerLog', 'dockerStop').build()
+
+        then:
+        buildResult.task(':dockerRemoveContainer').outcome == TaskOutcome.SUCCESS
+
+        buildResult.task(':dockerRun').outcome == TaskOutcome.SUCCESS
+        // CircleCI build nodes print a WARNING
+        buildResult.output =~ /(?m):dockerRun(WARNING:.*${SEPARATOR})?${SEPARATOR}[A-Za-z0-9]+/
+
+        buildResult.task(':dockerSaveContainerLog').outcome == TaskOutcome.SUCCESS
+        buildResult.output =~ /(?m):dockerSaveContainerLog${SEPARATOR}Saved log file/
+        new File(projectDir, '/build/docker-container-bar.log').exists()
+        new File(projectDir, '/build/docker-container-bar.log').text.contains('hello world')
+
+        buildResult.task(':dockerStop').outcome == TaskOutcome.SUCCESS
+        buildResult.output =~ /(?m):dockerStop${SEPARATOR}bar/
     }
 
     def 'can run container with configured network' () {
@@ -336,6 +371,16 @@ class DockerRunPluginTests extends AbstractPluginTest {
 
     def isCi() {
         return System.getenv("CI") == "true"
+    }
+
+    def assertThatContainerLogExist(){
+        projectDir.eachFileRecurse(FileType.FILES){
+            if(it.name.endsWith('.log')){
+                println it
+            }
+        }
+
+        true
     }
 
 
