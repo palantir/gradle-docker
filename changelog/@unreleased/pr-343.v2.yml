@@ -1,0 +1,16 @@
+type: improvement
+improvement:
+  description: |-
+    Add force-recreate option to dockerComposeUp task
+
+    ## Before this PR
+    dockerComposeUp task could fail if networks were previously pruned and a stop container that used them was tried to be restarted by dockerComposeUp
+
+    ## After this PR
+    dockerComposeUp always recreates the containers, even if the images didn't change and existing ones could be used
+
+    ## Possible downsides?
+    This could lead to unnecessary creation of containers, especially for local setups.
+    For CI tests, it could lead to problems if setups are relying on the old behavior to call dockerComposeUp multiple times in parallel and expecting the same containers to be up.
+  links:
+  - https://github.com/palantir/gradle-docker/pull/343
