@@ -34,7 +34,7 @@ class DockerComposeUp extends DefaultTask {
     void run() {
         project.exec {
             it.executable "docker-compose"
-            it.args "-f", getDockerComposeFile(), "up", "-d"
+            it.args "-f", getDockerComposeFile(), "up", "-d", "--force-recreate"
         }
     }
 
