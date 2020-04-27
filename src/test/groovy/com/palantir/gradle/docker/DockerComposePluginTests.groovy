@@ -290,7 +290,7 @@ class DockerComposePluginTests extends AbstractPluginTest {
             }
             
             dockerCompose {
-                // force build every time
+                // remove images
                 downArguments '--rmi', 'all'
             }
         '''.stripIndent()

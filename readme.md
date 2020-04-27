@@ -214,7 +214,7 @@ version.
 
 **Configuring the `docker-compose` plugin**
 
-The template location, the generated file locations, and optional arguments for
+The template location, the generated file location, and optional arguments for
 `docker-compose` are customizable using the `dockerCompose` extension:
 
 ```gradle
