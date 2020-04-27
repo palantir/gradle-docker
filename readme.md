@@ -212,15 +212,17 @@ conflicts between transitive dependencies of the same artifact are handled with
 the standard Gradle semantics: each artifact is resolved to the highest declared
 version.
 
-**Configuring file locations**
+**Configuring the `docker-compose` plugin**
 
-The template and generated file locations are customizable through the
-`dockerCompose` extension:
+The template location, the generated file locations, and optional arguments for
+`docker-compose` are customizable using the `dockerCompose` extension:
 
 ```gradle
 dockerCompose {
     template 'my-template.yml'
     dockerComposeFile 'my-docker-compose.yml'
+    upArguments '--build', '--force-recreate'
+    downArguments '--rmi', 'all'
 }
 ```
 
@@ -286,7 +288,7 @@ Tasks
    * `generateDockerCompose`: Populates a docker-compose file template with image
      versions declared by dependencies
    * `dockerComposeUp`: Brings up services defined in `dockerComposeFile` in
-     detacted state
+     detached state
    * `dockerComposeDown`: Stops services defined in `dockerComposeFile`
  * **Docker Run**
    * `dockerRun`: run the specified image with the specified name

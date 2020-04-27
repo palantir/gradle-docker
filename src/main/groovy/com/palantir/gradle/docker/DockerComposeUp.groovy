@@ -34,7 +34,7 @@ class DockerComposeUp extends DefaultTask {
     void run() {
         project.exec {
             it.executable "docker-compose"
-            it.args "-f", getDockerComposeFile(), "up", "-d"
+            it.args getArguments()
         }
     }
 
@@ -51,5 +51,9 @@ class DockerComposeUp extends DefaultTask {
 
     DockerComposeExtension getDockerComposeExtension() {
         return project.extensions.findByType(DockerComposeExtension)
+    }
+
+    List<String> getArguments() {
+        return ["-f", getDockerComposeFile(), "up", "-d"] + dockerComposeExtension.upArguments
     }
 }

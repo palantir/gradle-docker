@@ -16,6 +16,7 @@
 package com.palantir.gradle.docker
 
 import com.google.common.collect.Maps
+import com.google.common.collect.ImmutableList
 import org.gradle.api.Project
 
 class DockerComposeExtension {
@@ -24,6 +25,8 @@ class DockerComposeExtension {
     private File template
     private File dockerComposeFile
     private Map<String, String> templateTokens = Maps.newHashMap()
+    private List<String> upArguments = ImmutableList.of()
+    private List<String> downArguments = ImmutableList.of()
 
     public DockerComposeExtension(Project project) {
         this.project = project
@@ -47,6 +50,14 @@ class DockerComposeExtension {
         this.templateTokens.put(key, value)
     }
 
+    public void upArguments(String... upArguments) {
+        this.upArguments = ImmutableList.copyOf(upArguments)
+    }
+
+    public void downArguments(String... downArguments) {
+        this.downArguments = ImmutableList.copyOf(downArguments)
+    }
+
     Map<String, String> getTemplateTokens() {
         return templateTokens
     }
@@ -57,5 +68,13 @@ class DockerComposeExtension {
 
     File getDockerComposeFile() {
         return dockerComposeFile
+    }
+
+    List<String> getUpArguments() {
+        return upArguments
+    }
+
+    List<String> getDownArguments() {
+        return downArguments
     }
 }

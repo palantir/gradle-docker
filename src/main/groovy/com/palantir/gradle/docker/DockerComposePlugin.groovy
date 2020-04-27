@@ -23,7 +23,7 @@ import org.gradle.api.artifacts.Configuration
 class DockerComposePlugin implements Plugin<Project> {
     @Override
     void apply(Project project) {
-        project.extensions.create('dockerCompose', DockerComposeExtension, project)
+        DockerComposeExtension extension = project.extensions.create('dockerCompose', DockerComposeExtension, project)
         Configuration dockerConfiguration = project.configurations.maybeCreate('docker')
 
         // sls-packaging adds a 'productDependencies' configuration, which contains the inferred lower bounds of products

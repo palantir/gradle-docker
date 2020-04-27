@@ -242,4 +242,62 @@ class DockerComposePluginTests extends AbstractPluginTest {
         then:
         processCount() == 0
     }
+
+    def 'docker-compose up uses supplied arguments'() {
+        given:
+        file('Dockerfile') << '''\
+        FROM alpine
+        RUN apk add openssl
+        '''.stripIndent()
+        file('docker-compose.yml') << '''
+            version: "2"
+            services:
+              alpine-openssl:
+                build: .
+        '''.stripIndent()
+        buildFile << '''
+            plugins {
+                id 'com.palantir.docker-compose'
+            }
+            
+            dockerCompose {
+                // force build every time
+                upArguments '--build'
+            }
+        '''.stripIndent()
+        with('dockerComposeUp').build()
+        when:
+        BuildResult buildResult = with('dockerComposeUp').build()
+        then:
+        buildResult.output.contains('Building alpine-openssl')
+    }
+
+    def 'docker-compose down uses supplied arguments'() {
+        given:
+        file('Dockerfile') << '''\
+        FROM alpine
+        RUN apk add openssl
+        '''.stripIndent()
+        file('docker-compose.yml') << '''
+            version: "2"
+            services:
+              alpine-openssl:
+                build: .
+        '''.stripIndent()
+        buildFile << '''
+            plugins {
+                id 'com.palantir.docker-compose'
+            }
+            
+            dockerCompose {
+                // force build every time
+                downArguments '--rmi', 'all'
+            }
+        '''.stripIndent()
+        with('dockerComposeUp').build()
+        when:
+        BuildResult buildResult = with('dockerComposeDown').build()
+        then:
+        buildResult.output.contains('Removing image')
+    }
 }
