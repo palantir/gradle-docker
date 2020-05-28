@@ -486,7 +486,9 @@ class PalantirDockerPluginTests extends AbstractPluginTest {
 
         then:
         buildResult.task(':docker').outcome == TaskOutcome.FAILED
-        buildResult.output.contains 'network foobar not found'
+        buildResult.output.contains('network foobar not found') or(
+            buildResult.output.contains('No such network: foobar')
+        )
         execCond("docker rmi -f ${id}")
     }
 
