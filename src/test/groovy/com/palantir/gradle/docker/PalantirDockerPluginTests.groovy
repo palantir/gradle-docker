@@ -461,6 +461,35 @@ class PalantirDockerPluginTests extends AbstractPluginTest {
         execCond("docker rmi -f ${id}")
     }
 
+    def 'can build docker with network mode configured'() {
+        given:
+        String id = 'id11'
+        file('Dockerfile') << '''
+            FROM alpine:3.2
+            RUN curl localhost:404
+        '''.stripIndent()
+        buildFile << """
+            plugins {
+                id 'com.palantir.docker'
+            }
+
+            docker {
+                name '${id}'
+                // this should trigger the error because this is invalid option
+                // thus it is possible to validate the --network was set correctly
+                network 'foobar'
+            }
+        """.stripIndent()
+
+        when:
+        BuildResult buildResult = with('-i', 'docker').buildAndFail()
+
+        then:
+        buildResult.task(':docker').outcome == TaskOutcome.FAILED
+        buildResult.output.contains 'network foobar not found'
+        execCond("docker rmi -f ${id}")
+    }
+
     def 'can add files from project directory to build context'() {
         given:
         String id = 'id9'
