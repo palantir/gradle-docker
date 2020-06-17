@@ -38,8 +38,11 @@ public class DockerComponent implements SoftwareComponentInternal {
     private final Set<PublishArtifact> artifacts = new LinkedHashSet<>();
     private final DependencySet runtimeDependencies;
 
-    public DockerComponent(PublishArtifact dockerArtifact, DependencySet runtimeDependencies,
-                           ObjectFactory objectFactory, ImmutableAttributesFactory attributesFactory) {
+    public DockerComponent(
+            PublishArtifact dockerArtifact,
+            DependencySet runtimeDependencies,
+            ObjectFactory objectFactory,
+            ImmutableAttributesFactory attributesFactory) {
         artifacts.add(dockerArtifact);
         this.runtimeDependencies = runtimeDependencies;
         Usage usage = objectFactory.named(Usage.class, Usage.JAVA_RUNTIME);
@@ -56,7 +59,6 @@ public class DockerComponent implements SoftwareComponentInternal {
     public final Set<UsageContext> getUsages() {
         return Collections.singleton(runtimeUsage);
     }
-
 
     private class RuntimeUsageContext implements UsageContext {
 

@@ -6,7 +6,7 @@ buildscript {
     }
     dependencies {
         classpath 'com.netflix.nebula:gradle-info-plugin:8.2.0'
-        classpath 'com.palantir.javaformat:gradle-palantir-java-format:0.3.9'
+        classpath 'com.palantir.javaformat:gradle-palantir-java-format:1.0.0'
         classpath 'com.netflix.nebula:nebula-publishing-plugin:16.0.0'
         classpath 'com.netflix.nebula:gradle-info-plugin:8.2.0'
         classpath 'com.palantir.gradle.consistentversions:gradle-consistent-versions:1.23.0'
@@ -19,6 +19,9 @@ buildscript {
 
 plugins {
     id 'com.gradle.plugin-publish' version '0.12.0'
+}
+allprojects {
+    apply plugin: 'com.palantir.java-format'
 }
 
 repositories {
