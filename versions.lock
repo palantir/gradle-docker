@@ -8,7 +8,7 @@ org.codehaus.mojo:animal-sniffer-annotations:1.14 (1 constraints: ea09d5aa)
 
 [Test dependencies]
 cglib:cglib-nodep:3.2.2 (1 constraints: 490ded24)
-com.netflix.nebula:nebula-test:7.8.6 (1 constraints: 17052c36)
+com.netflix.nebula:nebula-test:7.9.1 (1 constraints: 13052a36)
 commons-io:commons-io:2.5 (1 constraints: eb0c8d0a)
 junit:junit:4.12 (1 constraints: 050de611)
 org.hamcrest:hamcrest-core:1.3 (1 constraints: cc05fe3f)
