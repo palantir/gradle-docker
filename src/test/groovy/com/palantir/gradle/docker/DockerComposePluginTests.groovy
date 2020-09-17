@@ -17,6 +17,7 @@ package com.palantir.gradle.docker
 
 import org.gradle.testkit.runner.BuildResult
 import org.gradle.testkit.runner.TaskOutcome
+import org.gradle.testkit.runner.UnexpectedBuildFailure
 
 class DockerComposePluginTests extends AbstractPluginTest {
 
@@ -240,6 +241,23 @@ class DockerComposePluginTests extends AbstractPluginTest {
         when:
         with('dockerComposeDown').build()
         then:
-        processCount() == 0
+        !isProcessRunning('unit-test-docker-compose-stop')
+    }
+
+    def 'docker-compose setTemplateTokens with null values throw exceptions'() {
+        given:
+        buildFile << '''
+            plugins {
+                id 'com.palantir.docker-compose'
+            }
+            dockerCompose {
+                templateTokens = ["aProperty": null]
+            }
+        '''.stripIndent()
+        when:
+        with('dockerComposeUp').build()
+        then:
+        def e = thrown(UnexpectedBuildFailure)
+        e.message.contains("Supplied templateToken property [aProperty] value is null")
     }
 }

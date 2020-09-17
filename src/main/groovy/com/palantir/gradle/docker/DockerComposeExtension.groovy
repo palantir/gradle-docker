@@ -15,6 +15,7 @@
  */
 package com.palantir.gradle.docker
 
+import static com.google.common.base.Preconditions.checkNotNull
 import com.google.common.collect.Maps
 import org.gradle.api.Project
 
@@ -40,6 +41,7 @@ class DockerComposeExtension {
     }
 
     public void setTemplateTokens(Map<String, String> templateTokens) {
+        templateTokens.forEach({templateTokenKey, templateTokenValue -> checkNotNull(templateTokenValue, String.format("Supplied templateToken property [%s] value is null", templateTokenKey))})
         this.templateTokens = templateTokens
     }
 
