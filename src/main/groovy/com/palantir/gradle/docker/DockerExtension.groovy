@@ -40,6 +40,7 @@ class DockerExtension {
     private Map<String, String> buildArgs = ImmutableMap.of()
     private boolean pull = false
     private boolean noCache = false
+    private String network = null
 
     private File resolvedDockerfile = null
     private File resolvedDockerComposeTemplate = null
@@ -144,6 +145,14 @@ class DockerExtension {
 
     public Map<String, String> getBuildArgs() {
         return buildArgs
+    }
+
+    public String getNetwork() {
+        return network
+    }
+
+    public void setNetwork(String network) {
+        this.network = network
     }
 
     public void buildArgs(Map<String, String> buildArgs) {

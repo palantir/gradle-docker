@@ -181,6 +181,9 @@ class PalantirDockerPlugin implements Plugin<Project> {
         if (ext.noCache) {
             buildCommandLine.add '--no-cache'
         }
+        if (ext.getNetwork() != null) {
+            buildCommandLine.addAll('--network', ext.network)
+        }
         if (!ext.buildArgs.isEmpty()) {
             for (Map.Entry<String, String> buildArg : ext.buildArgs.entrySet()) {
                 buildCommandLine.addAll('--build-arg', "${buildArg.getKey()}=${buildArg.getValue()}")
