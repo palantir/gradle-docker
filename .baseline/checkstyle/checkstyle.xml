@@ -18,15 +18,6 @@
     <module name="NewlineAtEndOfFile"> <!-- Java Style Guide: Line ending: LF -->
         <property name="lineSeparator" value="lf"/>
     </module>
-    <module name="RegexpHeader">
-        <property name="header" value="^/\*$\n^ \* \(c\) Copyright \d{4} Palantir Technologies Inc\. All rights reserved\.$"/>
-        <property name="fileExtensions" value=".java,.ts"/>
-    </module>
-    <module name="RegexpMultiline"> <!-- Development Practices: Writing good unit tests -->
-        <property name="fileExtensions" value="java"/>
-        <property name="format" value="@VisibleForTesting\s+(protected|public)"/>
-        <property name="message" value="@VisibleForTesting members should be package-private."/>
-    </module>
     <module name="RegexpSingleline"> <!-- No reference needed as this is evident. -->
         <property name="format" value="&lt;&lt;&lt;&lt;&lt;&lt;&lt;"/>
         <property name="message" value="Found (&lt;&lt;&lt;&lt;&lt;&lt;&lt;), so it looks like you had a merge conflict that compiles. Please fix it."/>
@@ -55,6 +46,10 @@
     <module name="SuppressWarningsFilter"/> <!-- baseline-gradle: README.md -->
     <module name="BeforeExecutionExclusionFileFilter">
         <property name="fileNamePattern" value="module\-info\.java$"/>
+    </module>
+    <module name="LineLength"> <!-- Java Style Guide: No line-wrapping -->
+        <property name="max" value="120"/>
+        <property name="ignorePattern" value="^package.*|^import.*|a href|href|http://|https://|ftp://"/>
     </module>
     <module name="TreeWalker">
         <module name="SuppressionCommentFilter"/> <!-- baseline-gradle: README.md -->
@@ -147,6 +142,11 @@
             <message key="import.illegal" value="Must not import repackaged classes."/>
         </module>
         <module name="IllegalImport">
+            <property name="illegalPkgs" value="^org\.gradle\.(internal|.*\.internal)"/>
+            <property name="regexp" value="true" />
+            <message key="import.illegal" value="Do not rely on gradle internal classes as these may change in minor releases - use org.gradle.api versions instead."/>
+        </module>
+        <module name="IllegalImport">
             <property name="illegalPkgs" value="sun"/>
             <message key="import.illegal" value="Must not use Oracle's Java implementation details. See http://www.oracle.com/technetwork/java/faq-sun-packages-142232.html ."/>
         </module>
@@ -202,10 +202,6 @@
         </module>
         <module name="InnerAssignment"/> <!-- Java Coding Guidelines: Inner assignments: Not used -->
         <module name="LeftCurly"/> <!-- Java Style Guide: Nonempty blocks: K & R style -->
-        <module name="LineLength"> <!-- Java Style Guide: No line-wrapping -->
-            <property name="max" value="120"/>
-            <property name="ignorePattern" value="^package.*|^import.*|a href|href|http://|https://|ftp://"/>
-        </module>
         <module name="MemberName"> <!-- Java Style Guide: Non-constant field names -->
             <property name="format" value="^[a-z][a-zA-Z0-9]+$"/>
             <message key="name.invalidPattern" value="Member name ''{0}'' must match pattern ''{1}''."/>
@@ -371,6 +367,7 @@
         <module name="RegexpSinglelineJava">
             <property name="format" value="\/\/TODO|\/\/ TODO(?!\([^()\s]+\): )"/>
             <property name="message" value="TODO format: // TODO(#issue): explanation"/>
+            <property name="ignoreCase" value="true"/>
         </module>
         <module name="RegexpSinglelineJava">
             <property name="format" value="(void setUp\(\))|(void setup\(\))|(void setupStatic\(\))|(void setUpStatic\(\))|(void beforeTest\(\))|(void teardown\(\))|(void tearDown\(\))|(void beforeStatic\(\))|(void afterStatic\(\))"/>
@@ -378,11 +375,11 @@
         </module>
         <module name="RightCurly"> <!-- Java Style Guide: Nonempty blocks: K & R style -->
             <property name="option" value="same"/>
-            <property name="tokens" value="LITERAL_TRY, LITERAL_CATCH, LITERAL_FINALLY, LITERAL_IF, LITERAL_ELSE, LITERAL_DO"/>
+            <property name="tokens" value="CLASS_DEF, METHOD_DEF, CTOR_DEF, LITERAL_TRY, LITERAL_CATCH, LITERAL_FINALLY, LITERAL_IF, LITERAL_ELSE, LITERAL_DO"/>
         </module>
         <module name="RightCurly"> <!-- Java Style Guide: Nonempty blocks: K & R style -->
             <property name="option" value="alone"/>
-            <property name="tokens" value="CLASS_DEF, METHOD_DEF, CTOR_DEF, LITERAL_FOR, LITERAL_WHILE, STATIC_INIT, INSTANCE_INIT"/>
+            <property name="tokens" value="LITERAL_FOR, LITERAL_WHILE, STATIC_INIT, INSTANCE_INIT"/>
         </module>
         <module name="SeparatorWrap"> <!-- Java Style Guide: Where to break -->
             <property name="tokens" value="DOT"/>
@@ -405,7 +402,6 @@
             <message key="name.invalidPattern" value="Type name ''{0}'' must match pattern ''{1}''."/>
         </module>
         <module name="TypecastParenPad"/> <!-- Java Style Guide: Horizontal whitespace -->
-        <module name="UnnecessaryParentheses"/>
         <module name="UnusedImports"> <!-- Java Style Guide: No unused imports -->
             <property name="processJavadoc" value="true"/>
         </module>
@@ -436,11 +432,8 @@
         <module name="JavadocMethod"> <!-- Java Style Guide: Where Javadoc is used -->
             <property name="scope" value="public"/>
             <property name="allowMissingParamTags" value="true"/>
-            <property name="allowMissingThrowsTags" value="true"/>
             <property name="allowMissingReturnTag" value="true"/>
-            <property name="minLineCount" value="99999999"/>
             <property name="allowedAnnotations" value="Override, Test"/>
-            <property name="allowThrowsTagsForSubclasses" value="true"/>
         </module>
         <module name="JavadocStyle"/> <!-- Java Style Guide: Javadoc -->
         <module name="JavadocTagContinuationIndentation"> <!-- Java Style Guide: At-clauses -->
