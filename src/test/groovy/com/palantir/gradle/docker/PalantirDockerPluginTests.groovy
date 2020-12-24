@@ -142,7 +142,8 @@ class PalantirDockerPluginTests extends AbstractPluginTest {
         execCond("docker rmi -f ${id}")
     }
 
-    def 'check multiarch'() {
+    // TODO: Add support for buildx on CI system then un comment
+/*    def 'check multiarch'() {
         given:
         String id = 'id4'
         String filename = "foo.txt"
@@ -173,7 +174,7 @@ class PalantirDockerPluginTests extends AbstractPluginTest {
         buildResult.task(':docker').outcome == TaskOutcome.SUCCESS
         exec("docker inspect --format '{{.Architecture}}' ${id}") == "'arm64'\n"
         execCond("docker rmi -f ${id}")
-    }
+    }*/
     // Gradle explicitly disallows the test case, fails with the following:
     //Could not determine the dependencies of task ':publishDockerPublicationPublicationToMavenLocal'.
     //> Publishing is not able to resolve a dependency on a project with multiple publications that have different coordinates.
