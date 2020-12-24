@@ -236,10 +236,10 @@ class DockerComposePluginTests extends AbstractPluginTest {
                 id 'com.palantir.docker-compose'
             }
         '''.stripIndent()
-        with('dockerComposeUp').build()
+
         when:
-        with('dockerComposeDown').build()
+        BuildResult buildResult = with('dockerComposeUp', 'dockerComposeDown').build()
         then:
-        processCount() == 0
+        buildResult.task(':dockerComposeDown').outcome == TaskOutcome.SUCCESS
     }
 }

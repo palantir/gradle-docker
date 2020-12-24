@@ -142,6 +142,38 @@ class PalantirDockerPluginTests extends AbstractPluginTest {
         execCond("docker rmi -f ${id}")
     }
 
+    def 'check multiarch'() {
+        given:
+        String id = 'id4'
+        String filename = "foo.txt"
+        file('Dockerfile') << """
+            FROM alpine
+            MAINTAINER ${id}
+            ADD ${filename} /tmp/
+        """.stripIndent()
+        buildFile << """
+            plugins {
+                id 'com.palantir.docker'
+            }
+
+            docker {
+                name '${id}'
+                files "${filename}"
+                buildx true
+                load true
+                platform 'linux/arm64'
+            }
+        """.stripIndent()
+        new File(projectDir, filename).createNewFile()
+        when:
+        BuildResult buildResult = with('docker').build()
+
+        then:
+        buildResult.task(':dockerPrepare').outcome == TaskOutcome.SUCCESS
+        buildResult.task(':docker').outcome == TaskOutcome.SUCCESS
+        exec("docker inspect --format '{{.Architecture}}' ${id}") == "'arm64'\n"
+        execCond("docker rmi -f ${id}")
+    }
     // Gradle explicitly disallows the test case, fails with the following:
     //Could not determine the dependencies of task ':publishDockerPublicationPublicationToMavenLocal'.
     //> Publishing is not able to resolve a dependency on a project with multiple publications that have different coordinates.

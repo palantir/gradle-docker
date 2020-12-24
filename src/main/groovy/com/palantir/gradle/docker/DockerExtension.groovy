@@ -41,6 +41,10 @@ class DockerExtension {
     private boolean pull = false
     private boolean noCache = false
     private String network = null
+    private boolean buildx = false
+    private Set<String> platform = ImmutableSet.of()
+    private boolean load = false
+    private String builder = null
 
     private File resolvedDockerfile = null
     private File resolvedDockerComposeTemplate = null
@@ -167,11 +171,43 @@ class DockerExtension {
         this.pull = pull
     }
 
+    public boolean getLoad() {
+        return pull
+    }
+
+    public void load(boolean pull) {
+        this.pull = pull
+    }
+
     public boolean getNoCache() {
         return noCache
     }
 
     public void noCache(boolean noCache) {
         this.noCache = noCache
+    }
+
+    boolean getBuildx() {
+        return buildx
+    }
+
+    public void buildx(boolean buildx) {
+        this.buildx = buildx
+    }
+
+    public Set<String> getPlatform() {
+        return platform
+    }
+
+    public void platform(String... args) {
+        this.platform = ImmutableSet.copyOf(args)
+    }
+
+    String getBuilder() {
+        return builder
+    }
+
+    public void builder(String builder) {
+        this.builder = builder
     }
 }
