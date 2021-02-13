@@ -16,20 +16,24 @@
 
 package com.palantir.gradle.docker
 
-import com.google.common.base.Preconditions
-import groovy.transform.Memoized
-import groovy.util.logging.Slf4j
 import org.gradle.api.DefaultTask
 import org.gradle.api.artifacts.Configuration
 import org.gradle.api.artifacts.ModuleVersionIdentifier
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.InputFiles
+import org.gradle.api.tasks.Internal
 import org.gradle.api.tasks.OutputFile
 import org.gradle.api.tasks.TaskAction
+
+import com.google.common.base.Preconditions
+
+import groovy.transform.Memoized
+import groovy.util.logging.Slf4j
 
 @Slf4j
 class GenerateDockerCompose extends DefaultTask {
 
+    @Internal
     Configuration configuration
 
     GenerateDockerCompose() {
@@ -56,6 +60,7 @@ class GenerateDockerCompose extends DefaultTask {
         }
     }
 
+    @Internal
     @Override
     String getDescription() {
         def defaultDescription = "Populates ${dockerComposeExtension.template.name} file with versions" +
@@ -64,14 +69,18 @@ class GenerateDockerCompose extends DefaultTask {
     }
 
     @Input
-    @Memoized
     Set<ModuleVersionIdentifier> getModuleDependencies() {
+        return memoizedModuleDependencies();
+    }
+
+    @Memoized
+    Set<ModuleVersionIdentifier> memoizedModuleDependencies() {
         log.info "Resolving Docker template dependencies from configuration ${configuration.name}..."
         return configuration.resolvedConfiguration
-            .resolvedArtifacts
-            *.moduleVersion
-            *.id
-            .toSet()
+                .resolvedArtifacts
+                *.moduleVersion
+                *.id
+                .toSet()
     }
 
     @Input
@@ -89,6 +98,7 @@ class GenerateDockerCompose extends DefaultTask {
         return dockerComposeExtension.dockerComposeFile
     }
 
+    @Internal
     DockerComposeExtension getDockerComposeExtension() {
         return project.extensions.findByType(DockerComposeExtension)
     }
@@ -99,8 +109,8 @@ class GenerateDockerCompose extends DefaultTask {
         templateTokens.each { mapping -> line = line.replace(mapping.key, mapping.value) }
         def unmatchedTokens = line.findAll(/\{\{.*\}\}/)
         Preconditions.checkState(unmatchedTokens.size() == 0,
-            "Failed to resolve Docker dependencies declared in %s: %s. Known dependencies: %s",
-            template, unmatchedTokens, templateTokens)
+                "Failed to resolve Docker dependencies declared in %s: %s. Known dependencies: %s",
+                template, unmatchedTokens, templateTokens)
         return line
     }
 }
