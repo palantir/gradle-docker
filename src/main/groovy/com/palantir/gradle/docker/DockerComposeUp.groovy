@@ -16,14 +16,17 @@
 
 package com.palantir.gradle.docker
 
-import groovy.util.logging.Slf4j
 import org.gradle.api.DefaultTask
 import org.gradle.api.artifacts.Configuration
 import org.gradle.api.tasks.InputFiles
+import org.gradle.api.tasks.Internal
 import org.gradle.api.tasks.TaskAction
+
+import groovy.util.logging.Slf4j
 
 @Slf4j
 class DockerComposeUp extends DefaultTask {
+    @Internal
     Configuration configuration
 
     DockerComposeUp() {
@@ -38,6 +41,7 @@ class DockerComposeUp extends DefaultTask {
         }
     }
 
+    @Internal
     @Override
     String getDescription() {
         def defaultDescription = "Executes `docker-compose` using ${dockerComposeFile.name}"
@@ -49,6 +53,7 @@ class DockerComposeUp extends DefaultTask {
         return dockerComposeExtension.dockerComposeFile
     }
 
+    @Internal
     DockerComposeExtension getDockerComposeExtension() {
         return project.extensions.findByType(DockerComposeExtension)
     }
