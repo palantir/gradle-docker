@@ -6,15 +6,12 @@ buildscript {
         jcenter()
     }
     dependencies {
-        classpath 'com.netflix.nebula:gradle-info-plugin:9.3.0'
+        classpath 'com.palantir.gradle.externalpublish:gradle-external-publish-plugin:0.4.10'
         classpath 'com.palantir.javaformat:gradle-palantir-java-format:0.3.9'
-        classpath 'com.netflix.nebula:nebula-publishing-plugin:16.0.0'
-        classpath 'com.netflix.nebula:gradle-info-plugin:9.3.0'
         classpath 'com.palantir.gradle.consistentversions:gradle-consistent-versions:1.28.0'
         classpath 'com.palantir.baseline:gradle-baseline-java:2.49.2'
         classpath 'com.palantir.gradle.gitversion:gradle-git-version:0.12.3'
         classpath 'gradle.plugin.org.inferred:gradle-processors:3.3.0'
-        classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.8.5'
     }
 }
 
@@ -28,13 +25,14 @@ repositories {
     jcenter()
 }
 
+apply plugin: 'com.palantir.external-publish'
 apply plugin: 'java-gradle-plugin'
 apply plugin: 'groovy'
 apply plugin: 'com.palantir.baseline'
 apply plugin: 'com.palantir.consistent-versions'
 apply plugin: 'com.palantir.git-version'
 apply plugin: 'org.inferred.processors'
-apply from: "$rootDir/gradle/publish-jar.gradle"
+apply plugin: 'com.palantir.external-publish-jar'
 
 group 'com.palantir.gradle.docker'
 version System.env.CIRCLE_TAG ?: gitVersion()
