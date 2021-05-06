@@ -461,6 +461,37 @@ class PalantirDockerPluginTests extends AbstractPluginTest {
         execCond("docker rmi -f ${id}")
     }
 
+
+    def 'build quietly when "quiet" parameter is set'() {
+        given:
+        String id = 'id66'
+        String filename = "bar.txt"
+        file('Dockerfile') << """
+            FROM alpine:3.2
+            ADD ${filename} /tmp/
+        """.stripIndent()
+        buildFile << """
+            plugins {
+                id 'com.palantir.docker'
+            }
+
+            docker {
+                name '${id}'
+                files "${filename}"
+                quiet true
+            }
+        """.stripIndent()
+        createFile(filename)
+
+        when:
+        BuildResult buildResult = with('-i', 'docker').build()
+
+        then:
+        buildResult.task(':dockerPrepare').outcome == TaskOutcome.SUCCESS
+        buildResult.task(':docker').outcome == TaskOutcome.SUCCESS
+        execCond("docker rmi -f ${id}")
+    }
+
     def 'can build docker with network mode configured'() {
         given:
         String id = 'id11'

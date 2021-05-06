@@ -40,6 +40,7 @@ class DockerExtension {
     private Map<String, String> buildArgs = ImmutableMap.of()
     private boolean pull = false
     private boolean noCache = false
+    private boolean quiet = false
     private String network = null
 
     private File resolvedDockerfile = null
@@ -173,5 +174,13 @@ class DockerExtension {
 
     public void noCache(boolean noCache) {
         this.noCache = noCache
+    }
+
+    public boolean getQuiet() {
+        return quiet
+    }
+
+    public void quiet(boolean quiet) {
+        this.quiet = quiet
     }
 }
