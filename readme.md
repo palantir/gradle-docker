@@ -62,7 +62,7 @@ build/
 - `pull` (optional) a boolean argument which defines whether Docker should attempt to pull
   a newer version of the base image before building; defaults to `false`
 - `noCache` (optional) a boolean argument which defines whether Docker build should add the option --no-cache,
-    so that it rebuilds the whole image from scratch; defaults to `false`
+  so that it rebuilds the whole image from scratch; defaults to `false`
 - `buildx` (optional) a boolean argument which defines whether Docker build should use buildx for cross platform builds; defaults to `false`
 - `platform` (optional) a list of strings argument which defines which platforms buildx should target; defaults to empty
 - `builder` (optional) a string argument which defines which builder buildx should use; defaults to `null`
@@ -70,6 +70,8 @@ build/
   loading the image into the local repository; defaults to `false`
 - `push` (optional) a boolean argument which defines whether Docker buildx builder should add --push flag,
   pushing the image into the remote registry; defaults to `false`
+- `quiet` (optional) a boolean argument which defines whether Docker build should add the option --quiet,
+  so that
 
 To build a docker container, run the `docker` task. To push that container to a
 docker repository, run the `dockerPush` task.
@@ -109,6 +111,7 @@ docker {
     labels(['key': 'value'])
     pull true
     noCache true
+    quiet true
 }
 ```
 
