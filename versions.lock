@@ -9,7 +9,7 @@ org.checkerframework:checker-qual:3.8.0 (1 constraints: 1d0a02b5)
 
 [Test dependencies]
 cglib:cglib-nodep:3.2.2 (1 constraints: 490ded24)
-com.netflix.nebula:nebula-test:8.1.0 (1 constraints: 0b051636)
+com.netflix.nebula:nebula-test:8.2.0 (1 constraints: 0c051936)
 commons-io:commons-io:2.5 (1 constraints: eb0c8d0a)
 junit:junit:4.12 (1 constraints: 050de611)
 org.hamcrest:hamcrest-core:1.3 (1 constraints: cc05fe3f)
