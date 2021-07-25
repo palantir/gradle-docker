@@ -39,7 +39,6 @@ class DockerRunExtension {
 
     DockerRunExtension(String extensionName, Project project) {
         String taskNamePrefix = 'docker'
-        println("SR" + extensionName)
         if (DEFAULT_EXTENSION_NAME != extensionName) {
             taskNamePrefix = extensionName
         }
