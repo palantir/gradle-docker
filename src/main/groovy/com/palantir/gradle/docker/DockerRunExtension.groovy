@@ -15,12 +15,14 @@
  */
 package com.palantir.gradle.docker
 
+import static com.google.common.base.Preconditions.checkNotNull
+
 import com.google.common.base.Preconditions
 import com.google.common.collect.ImmutableList
 import com.google.common.collect.ImmutableMap
 import com.google.common.collect.ImmutableSet
-
-import static com.google.common.base.Preconditions.checkNotNull
+import com.palantir.gradle.docker.task.dockerrun.*
+import org.gradle.api.Project
 
 class DockerRunExtension {
     private String name
@@ -28,66 +30,79 @@ class DockerRunExtension {
     private String network
     private List<String> command = ImmutableList.of()
     private Set<String> ports = ImmutableSet.of()
-    private Map<String,String> env = ImmutableMap.of()
+    private Map<String, String> env = ImmutableMap.of()
     private List<String> arguments = ImmutableList.of()
-    private Map<Object,String> volumes = ImmutableMap.of()
+    private Map<Object, String> volumes = ImmutableMap.of()
     private boolean daemonize = true
     private boolean clean = false
-    final static String DEFAULT_EXTENSION_NAME ="dockerRun"
+    static final String DEFAULT_EXTENSION_NAME = "dockerRun"
 
-    public String getName() {
+    DockerRunExtension(String extensionName, Project project) {
+        String taskNamePrefix = 'docker'
+        println("SR" + extensionName)
+        if (DEFAULT_EXTENSION_NAME != extensionName) {
+            taskNamePrefix = extensionName
+        }
+        project.tasks.register("${taskNamePrefix}Run", DockerRunTask, this)
+        project.tasks.register("${taskNamePrefix}Stop", DockerStopTask, this)
+        project.tasks.register("${taskNamePrefix}RemoveContainer", DockerRemoveTask, this)
+        project.tasks.register("${taskNamePrefix}RunStatus", DockerRunStatusTask, this)
+        project.tasks.register("${taskNamePrefix}NetworkModeStatus", DockerNetworkModeStatusTask, this)
+    }
+
+    String getName() {
         return name
     }
 
-    public void setName(String name) {
+    void setName(String name) {
         this.name = name
     }
 
-    public boolean getDaemonize() {
+    boolean getDaemonize() {
         return daemonize
     }
 
-    public void setDaemonize(boolean daemonize) {
+    void setDaemonize(boolean daemonize) {
         this.daemonize = daemonize
     }
 
-    public boolean getClean() {
+    boolean getClean() {
         return clean
     }
 
-    public void setClean(boolean clean) {
+    void setClean(boolean clean) {
         this.clean = clean
     }
 
-    public String getImage() {
+    String getImage() {
         return image
     }
 
-    public void setImage(String image) {
+    void setImage(String image) {
         this.image = image
     }
 
-    public Set<String> getPorts() {
+    Set<String> getPorts() {
         return ports
     }
 
-    public List<String> getCommand() {
+    List<String> getCommand() {
         return command
     }
 
-    public Map<Object,String> getVolumes() {
+    Map<Object, String> getVolumes() {
         return volumes
     }
 
-    public void command(String... command) {
+    void command(String... command) {
         this.command = ImmutableList.copyOf(command)
     }
 
-    public void setNetwork(String network) {
+    void setNetwork(String network) {
         this.network = network
     }
 
-    public String getNetwork() {
+    String getNetwork() {
         return network
     }
 
@@ -95,23 +110,23 @@ class DockerRunExtension {
         this.env.put(checkNotNull(key, "key"), checkNotNull(value, "value"))
     }
 
-    public void env(Map<String,String> env) {
+    void env(Map<String, String> env) {
         this.env = ImmutableMap.copyOf(env)
     }
 
-    public Map<String, String> getEnv() {
+    Map<String, String> getEnv() {
         return env
     }
 
-    public void arguments(String... arguments) {
+    void arguments(String... arguments) {
         this.arguments = ImmutableList.copyOf(arguments)
     }
 
-    public List<String> getArguments() {
+    List<String> getArguments() {
         return arguments
     }
 
-    public void ports(String... ports) {
+    void ports(String... ports) {
         ImmutableSet.Builder builder = ImmutableSet.builder()
         for (String port : ports) {
             String[] mapping = port.split(':', 2)
@@ -127,8 +142,8 @@ class DockerRunExtension {
         this.ports = builder.build()
     }
 
-    public void volumes(Map<Object,String> volumes) {
-      this.volumes = ImmutableMap.copyOf(volumes)
+    void volumes(Map<Object, String> volumes) {
+        this.volumes = ImmutableMap.copyOf(volumes)
     }
 
     private static void checkPortIsValid(String port) {

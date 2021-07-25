@@ -15,19 +15,13 @@
  */
 package com.palantir.gradle.docker
 
-import com.palantir.gradle.docker.task.dockerrun.*
+
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 
 class DockerRunPlugin implements Plugin<Project> {
     @Override
     void apply(Project project) {
-        DockerRunExtension defaultDockerRunExtension = project.extensions.create(DockerRunExtension.DEFAULT_EXTENSION_NAME, DockerRunExtension)
-        project.tasks.register('dockerRun', DockerRunTask, defaultDockerRunExtension)
-        project.tasks.register('dockerRunStatus', DockerRunStatusTask, defaultDockerRunExtension)
-        project.tasks.register('dockerStop', DockerStopTask, defaultDockerRunExtension)
-        project.tasks.register('dockerRemoveContainer', DockerRemoveTask, defaultDockerRunExtension)
-        project.tasks.register('dockerNetworkModeStatus', DockerNetworkModeStatusTask, defaultDockerRunExtension)
+        project.extensions.create(DockerRunExtension.DEFAULT_EXTENSION_NAME, DockerRunExtension, DockerRunExtension.DEFAULT_EXTENSION_NAME, project)
     }
-
 }

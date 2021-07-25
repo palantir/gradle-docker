@@ -2,6 +2,7 @@ package com.palantir.gradle.docker.task.dockerrun
 
 import com.google.common.collect.Lists
 import com.palantir.gradle.docker.DockerRunExtension
+import org.gradle.api.Task
 import org.gradle.internal.logging.text.StyledTextOutput
 
 import javax.inject.Inject
@@ -21,9 +22,8 @@ class DockerRunTask extends AbstractDockerRunTask {
         if (dockerRunExtension.clean) {
             args.add('--rm')
         }
-        // TODO dynamic runStatus task
         else {
-            finalizedBy project.tasks.dockerRunStatus
+            finalizedBy name+"Status"
         }
         if (dockerRunExtension.network) {
             args.addAll(['--network', dockerRunExtension.network])
