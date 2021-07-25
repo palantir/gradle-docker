@@ -266,7 +266,26 @@ dockerRun {
 - `command` the command to run.
 - `arguments` additional arguments to be passed into the docker run command.
    Please see https://docs.docker.com/engine/reference/run/ for possible values.
-   
+
+**Multiple Docker Run Instances**
+You can run more than 1 docker image by creating multiple DockerRunExtension instances:
+```gradle
+import com.palantir.gradle.docker.DockerRunExtension
+
+
+extensions.create("dockerUbuntu", DockerRunExtension, "dockerUbuntu", project)
+
+// This will provide another set of Docker Run tasks (e.g. `dockerUbuntuRun`, `dockerUbuntuStop`)
+dockerUbuntu {
+    name "dev-ubuntu-${project.name}"
+    image "ubuntu:latest"
+    command "sleep", "10"
+    clean true
+    ports "8080:8080"
+    daemonize true
+}
+```
+
 Tasks
 -----
 
