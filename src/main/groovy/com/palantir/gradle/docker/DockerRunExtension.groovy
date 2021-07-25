@@ -15,15 +15,14 @@
  */
 package com.palantir.gradle.docker
 
-import static com.google.common.base.Preconditions.checkNotNull
-
 import com.google.common.base.Preconditions
 import com.google.common.collect.ImmutableList
 import com.google.common.collect.ImmutableMap
 import com.google.common.collect.ImmutableSet
 
-class DockerRunExtension {
+import static com.google.common.base.Preconditions.checkNotNull
 
+class DockerRunExtension {
     private String name
     private String image
     private String network
@@ -34,6 +33,7 @@ class DockerRunExtension {
     private Map<Object,String> volumes = ImmutableMap.of()
     private boolean daemonize = true
     private boolean clean = false
+    final static String DEFAULT_EXTENSION_NAME ="dockerRun"
 
     public String getName() {
         return name
