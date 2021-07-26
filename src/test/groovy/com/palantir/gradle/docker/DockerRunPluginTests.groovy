@@ -167,21 +167,16 @@ class DockerRunPluginTests extends AbstractPluginTest {
                 name 'bar-ignore-exit-code'
                 image 'alpine:3.2'
                 ports '8080'
-                command 'sh', '-c', '"exit 100"'
+                command 'exit', '100'
                 ignoreExitValue true
             }
         '''.stripIndent()
 
         when:
-        BuildResult buildResult = with('dockerRemoveContainer', 'dockerRun', 'dockerRunStatus').build()
+        BuildResult buildResult = with('dockerRun').build()
 
         then:
-        buildResult.task(':dockerRemoveContainer').outcome == TaskOutcome.SUCCESS
-
         buildResult.task(':dockerRun').outcome == TaskOutcome.SUCCESS
-
-        buildResult.task(':dockerRunStatus').outcome == TaskOutcome.SUCCESS
-        buildResult.output =~ /(?m):dockerRunStatus${SEPARATOR}Docker container 'bar-ignore-exit-code' is STOPPED./
     }
 
     def 'can set additional arguments'() {
