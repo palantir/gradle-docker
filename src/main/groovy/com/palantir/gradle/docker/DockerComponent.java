@@ -16,6 +16,7 @@
 
 package com.palantir.gradle.docker;
 
+//CHECKSTYLE:OFF
 import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.Set;
@@ -32,6 +33,7 @@ import org.gradle.api.internal.attributes.ImmutableAttributesFactory;
 import org.gradle.api.internal.component.SoftwareComponentInternal;
 import org.gradle.api.internal.component.UsageContext;
 import org.gradle.api.model.ObjectFactory;
+//CHECKSTYLE:ON
 
 public class DockerComponent implements SoftwareComponentInternal {
     private final UsageContext runtimeUsage;
