@@ -261,6 +261,7 @@ dockerRun {
   These must be exposed in the Dockerfile with `ENV` instructions.
 - `daemonize` defaults to true to daemonize the container after starting. However
   if your container runs a command and exits, you can set this to false.
+- `ignoreExitValue` (optional) to ignore the exit code returned from the execution of the docker command; defaults to `false`
 - `clean` (optional) a boolean argument which adds `--rm` to the `docker run`
   command to ensure that containers are cleaned up after running; defaults to `false`
 - `command` the command to run.

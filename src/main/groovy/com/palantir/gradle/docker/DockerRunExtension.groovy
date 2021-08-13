@@ -34,6 +34,7 @@ class DockerRunExtension {
     private Map<Object,String> volumes = ImmutableMap.of()
     private boolean daemonize = true
     private boolean clean = false
+    private boolean ignoreExitValue = false
 
     public String getName() {
         return name
@@ -136,4 +137,11 @@ class DockerRunExtension {
         Preconditions.checkArgument(0 < val && val <= 65536, "Port must be in the range [1,65536]")
     }
 
+    public boolean getIgnoreExitValue() {
+        return ignoreExitValue
+    }
+
+    public void setIgnoreExitValue(boolean ignoreExitValue) {
+        this.ignoreExitValue = ignoreExitValue
+    }
 }

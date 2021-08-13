@@ -156,6 +156,29 @@ class DockerRunPluginTests extends AbstractPluginTest {
         buildResult.output =~ /(?m):dockerRunStatus${SEPARATOR}Docker container 'bar-nodaemonize' is STOPPED./
     }
 
+    def 'can optionally ignore exit code'() {
+        given:
+        buildFile << '''
+            plugins {
+                id 'com.palantir.docker-run'
+            }
+
+            dockerRun {
+                name 'bar-ignore-exit-code'
+                image 'alpine:3.2'
+                ports '8080'
+                command 'exit', '100'
+                ignoreExitValue true
+            }
+        '''.stripIndent()
+
+        when:
+        BuildResult buildResult = with('dockerRun').build()
+
+        then:
+        buildResult.task(':dockerRun').outcome == TaskOutcome.SUCCESS
+    }
+
     def 'can set additional arguments'() {
         given:
         file('Dockerfile') << '''

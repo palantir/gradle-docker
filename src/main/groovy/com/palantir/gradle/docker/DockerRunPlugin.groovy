@@ -93,6 +93,7 @@ class DockerRunPlugin implements Plugin<Project> {
             dockerRun.with {
                 List<String> args = Lists.newArrayList()
                 args.addAll(['docker', 'run'])
+                ignoreExitValue = ext.ignoreExitValue
                 if (ext.daemonize) {
                   args.add('-d')
                 }
