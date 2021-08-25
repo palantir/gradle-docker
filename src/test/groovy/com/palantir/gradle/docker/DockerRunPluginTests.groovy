@@ -212,7 +212,7 @@ class DockerRunPluginTests extends AbstractPluginTest {
         buildResult.output =~ /(?m)\/test/
 
         buildResult.task(':dockerRunStatus').outcome == TaskOutcome.SUCCESS
-        buildResult.output =~ /(?m):dockerRunStatus\nDocker container 'foo' is STOPPED./
+        buildResult.output =~ /(?m):dockerRunStatus\s+Docker container 'foo' is STOPPED./
     }
 
     def 'can mount volumes'() {

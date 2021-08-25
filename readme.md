@@ -63,6 +63,11 @@ build/
   a newer version of the base image before building; defaults to `false`
 - `noCache` (optional) a boolean argument which defines whether Docker build should add the option --no-cache,
     so that it rebuilds the whole image from scratch; defaults to `false`
+- `buildx` (optional) a boolean argument which defines whether Docker build should use buildx for cross platform builds; defaults to `false`
+- `platform` (optional) a list of strings argument which defines which platforms buildx should target; defaults to `false`
+- `builder` (optional) a string argument which defines which builder buildx should use; defaults to `null`
+- `load` (optional) a boolean argument which defines whether Docker buildx builder should add --load flag,
+  loading the image into the local repository; defaults to `false`
 
 To build a docker container, run the `docker` task. To push that container to a
 docker repository, run the `dockerPush` task.
