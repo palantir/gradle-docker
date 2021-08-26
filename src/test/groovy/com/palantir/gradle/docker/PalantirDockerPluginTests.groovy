@@ -489,7 +489,7 @@ class PalantirDockerPluginTests extends AbstractPluginTest {
 
         then:
         buildResult.task(':docker').outcome == TaskOutcome.SUCCESS
-        buildResult.output.contains 'Pulling from library/alpine'
+        buildResult.output.contains 'load metadata for docker.io/library/alpine'
         execCond("docker rmi -f ${id}")
     }
 
@@ -520,6 +520,8 @@ class PalantirDockerPluginTests extends AbstractPluginTest {
         buildResult.task(':docker').outcome == TaskOutcome.FAILED
         buildResult.output.contains('network foobar not found') or(
             buildResult.output.contains('No such network: foobar')
+        ) or(
+            buildResult.output.contains('network mode "foobar" not supported by buildkit')
         )
         execCond("docker rmi -f ${id}")
     }
