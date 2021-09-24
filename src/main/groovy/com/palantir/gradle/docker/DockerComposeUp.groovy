@@ -16,13 +16,12 @@
 
 package com.palantir.gradle.docker
 
+import groovy.util.logging.Slf4j
 import org.gradle.api.DefaultTask
 import org.gradle.api.artifacts.Configuration
 import org.gradle.api.tasks.InputFiles
 import org.gradle.api.tasks.Internal
 import org.gradle.api.tasks.TaskAction
-
-import groovy.util.logging.Slf4j
 
 @Slf4j
 class DockerComposeUp extends DefaultTask {
@@ -35,7 +34,7 @@ class DockerComposeUp extends DefaultTask {
 
     @TaskAction
     void run() {
-        project.exec {
+        GradleExecUtils.execWithErrorMessage(project) {
             it.executable "docker-compose"
             it.args "-f", getDockerComposeFile(), "up", "-d"
         }
