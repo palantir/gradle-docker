@@ -721,4 +721,27 @@ class PalantirDockerPluginTests extends AbstractPluginTest {
         buildResult.task(':dockerPrepare').outcome == TaskOutcome.SUCCESS
         file("build/docker/myDir/bar").exists()
     }
+    def 'dockerfileZip work without the distribution plugin'() {
+        given:
+        def dockerfilePath = 'scr/docker/Dockerfile'
+        buildFile << """
+        plugins {
+            //id 'distribution'
+            id 'com.palantir.docker'
+        }
+        docker {
+            name 'whatever'
+            dockerfile file('$dockerfilePath')
+        }   
+        """.stripIndent()
+
+        file('scr/docker/Dockerfile') << """
+        FROM scratch
+        """.stripIndent()
+        when:
+        BuildResult buildResult = with('dockerfileZip').build()
+
+        then:
+        buildResult.task(":dockerfileZip").outcome == TaskOutcome.SUCCESS
+    }
 }
