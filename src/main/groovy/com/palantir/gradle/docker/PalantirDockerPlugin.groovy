@@ -15,8 +15,6 @@
  */
 package com.palantir.gradle.docker
 
-import org.gradle.api.file.Directory
-
 import java.util.regex.Pattern
 import javax.inject.Inject
 import org.gradle.api.GradleException
