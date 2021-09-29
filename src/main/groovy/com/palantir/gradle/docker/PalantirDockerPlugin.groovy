@@ -15,6 +15,8 @@
  */
 package com.palantir.gradle.docker
 
+import org.gradle.api.file.Directory
+
 import java.util.regex.Pattern
 import javax.inject.Inject
 import org.gradle.api.GradleException
@@ -92,6 +94,8 @@ class PalantirDockerPlugin implements Plugin<Project> {
         Zip dockerfileZip = project.tasks.create('dockerfileZip', Zip, {
             group = 'Docker'
             description = 'Bundles the configured Dockerfile in a zip file'
+            archiveBaseName.convention(project.name)
+            destinationDirectory.convention(project.layout.buildDirectory.dir("distributions"))
         })
 
         PublishArtifact dockerArtifact = new ArchivePublishArtifact(dockerfileZip)
