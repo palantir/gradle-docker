@@ -721,6 +721,7 @@ class PalantirDockerPluginTests extends AbstractPluginTest {
         buildResult.task(':dockerPrepare').outcome == TaskOutcome.SUCCESS
         file("build/docker/myDir/bar").exists()
     }
+
     def 'dockerfileZip works without the distribution plugin'() {
         given:
         def dockerfilePath = 'scr/docker/Dockerfile'
@@ -742,5 +743,60 @@ class PalantirDockerPluginTests extends AbstractPluginTest {
 
         then:
         buildResult.task(":dockerfileZip").outcome == TaskOutcome.SUCCESS
+        file("build/distributions/${projectDir.name}.zip").exists()
+    }
+
+    def 'dockerfileZip works with the distribution plugin'() {
+        given:
+        def dockerfilePath = 'scr/docker/Dockerfile'
+        buildFile << """
+        plugins {
+            id 'com.palantir.docker'
+            id 'distribution'
+        }
+        docker {
+            name 'whatever'
+            dockerfile file('$dockerfilePath')
+        }
+        """.stripIndent()
+
+        file('scr/docker/Dockerfile') << """
+        FROM scratch
+        """.stripIndent()
+        when:
+        BuildResult buildResult = with('dockerfileZip').build()
+
+        then:
+        buildResult.task(":dockerfileZip").outcome == TaskOutcome.SUCCESS
+        file("build/distributions/${projectDir.name}.zip").exists()
+    }
+
+    def 'can set output for dockerfileZip task'() {
+        given:
+        def dockerfilePath = 'scr/docker/Dockerfile'
+        buildFile << """
+        plugins {
+            id 'com.palantir.docker'
+        }
+        docker {
+            name 'whatever'
+            dockerfile file('$dockerfilePath')
+        }
+        
+        tasks.named("dockerfileZip").configure {
+            archiveFileName = "test-distribution.zip"
+            destinationDirectory = layout.buildDirectory.dir('dist1')
+        }
+        """.stripIndent()
+
+        file('scr/docker/Dockerfile') << """
+        FROM scratch
+        """.stripIndent()
+        when:
+        BuildResult buildResult = with('dockerfileZip').build()
+
+        then:
+        buildResult.task(":dockerfileZip").outcome == TaskOutcome.SUCCESS
+        file('build/dist1/test-distribution.zip').exists()
     }
 }
