@@ -722,11 +722,12 @@ class PalantirDockerPluginTests extends AbstractPluginTest {
         file("build/docker/myDir/bar").exists()
     }
 
-    def 'dockerfileZip works without the distribution plugin'() {
+    def 'dockerfileZip works with default settings'() {
         given:
         def dockerfilePath = 'scr/docker/Dockerfile'
         buildFile << """
         plugins {
+            $distPlugin
             id 'com.palantir.docker'
         }
         docker {
@@ -743,17 +744,22 @@ class PalantirDockerPluginTests extends AbstractPluginTest {
 
         then:
         buildResult.task(":dockerfileZip").outcome == TaskOutcome.SUCCESS
-        file("build/distributions/${projectDir.name}.zip").exists()
+        file("build/distributions/${projectDir.name}-unspecified.zip").exists()
+
+        where:
+        distPlugin << ["id 'distribution'", '']
     }
 
-    def 'dockerfileZip works with the distribution plugin'() {
+    def 'dockerfileZip works with the project version'() {
         given:
         def dockerfilePath = 'scr/docker/Dockerfile'
         buildFile << """
         plugins {
             id 'com.palantir.docker'
-            id 'distribution'
+            $distPlugin
         }
+
+        project.version '0.42'
         docker {
             name 'whatever'
             dockerfile file('$dockerfilePath')
@@ -768,7 +774,10 @@ class PalantirDockerPluginTests extends AbstractPluginTest {
 
         then:
         buildResult.task(":dockerfileZip").outcome == TaskOutcome.SUCCESS
-        file("build/distributions/${projectDir.name}.zip").exists()
+        file("build/distributions/${projectDir.name}-0.42.zip").exists()
+
+        where:
+        distPlugin << ["id 'distribution'", '']
     }
 
     def 'can set output for dockerfileZip task'() {
@@ -777,7 +786,9 @@ class PalantirDockerPluginTests extends AbstractPluginTest {
         buildFile << """
         plugins {
             id 'com.palantir.docker'
+            $distPlugin
         }
+
         docker {
             name 'whatever'
             dockerfile file('$dockerfilePath')
@@ -798,5 +809,8 @@ class PalantirDockerPluginTests extends AbstractPluginTest {
         then:
         buildResult.task(":dockerfileZip").outcome == TaskOutcome.SUCCESS
         file('build/dist1/test-distribution.zip').exists()
+
+        where:
+        distPlugin << ["id 'distribution'", '']
     }
 }
