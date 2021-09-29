@@ -20,6 +20,7 @@ import java.io.ByteArrayOutputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
+import org.apache.tools.ant.util.TeeOutputStream;
 import org.gradle.api.Action;
 import org.gradle.api.GradleException;
 import org.gradle.api.Project;
@@ -34,8 +35,8 @@ final class GradleExecUtils {
         ExecResult execResult = project.exec(execSpec -> {
             execSpecAction.execute(execSpec);
             execSpec.setIgnoreExitValue(true);
-            execSpec.setStandardOutput(output);
-            execSpec.setErrorOutput(output);
+            execSpec.setStandardOutput(new TeeOutputStream(System.out, output));
+            execSpec.setErrorOutput(new TeeOutputStream(System.err, output));
             commandLine.addAll(execSpec.getCommandLine());
         });
 
