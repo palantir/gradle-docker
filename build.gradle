@@ -4,7 +4,7 @@ buildscript {
         mavenCentral()
     }
     dependencies {
-        classpath 'com.palantir.gradle.externalpublish:gradle-external-publish-plugin:1.4.0'
+        classpath 'com.palantir.gradle.externalpublish:gradle-external-publish-plugin:1.5.0'
         classpath 'com.palantir.javaformat:gradle-palantir-java-format:0.3.9'
         classpath 'com.palantir.gradle.consistentversions:gradle-consistent-versions:2.0.0'
         classpath 'com.palantir.baseline:gradle-baseline-java:4.31.0'
