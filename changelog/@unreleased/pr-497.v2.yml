@@ -1,0 +1,5 @@
+type: improvement
+improvement:
+  description: verbose logging for docker-compose up
+  links:
+  - https://github.com/palantir/gradle-docker/pull/497
