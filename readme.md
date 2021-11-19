@@ -40,6 +40,8 @@ automatically include outputs of task dependencies in the Docker build context.
 - `dockerfile` (optional) the dockerfile to use for building the image; defaults to
   `project.file('Dockerfile')` and must be a file object
 - `files` (optional) an argument list of files to be included in the Docker build context, evaluated per `Project#files`. For example, `files tasks.distTar.outputs` adds the TAR/TGZ file produced by the `distTar` tasks, and `files tasks.distTar.outputs, 'my-file.txt'` adds the archive in addition to file `my-file.txt` from the project root directory. The specified files are collected in a Gradle CopySpec which may be copied `into` the Docker build context directory. The underlying CopySpec may also be used to copy entire directories into the build context. The following example adds the aforementioned archive and text file to the CopySpec, uses the CopySpec to add all files `from` `src/myDir` into the CopySpec, then finally executes the copy into the directory `myDir` in docker build context.
+- `saveTarget` (optional) an argument specify a file as the output file.
+- `saveTargetName` (optional) an argument specify a file name as the output file, it will be created at `build/docker/<saveTargetName>`, it only works when `saveTarget` not set.
 ````gradle
 docker {
     files tasks.distTar.outputs, 'my-file.txt'
@@ -65,7 +67,8 @@ build/
     so that it rebuilds the whole image from scratch; defaults to `false`
 
 To build a docker container, run the `docker` task. To push that container to a
-docker repository, run the `dockerPush` task.
+docker repository, run the `dockerPush` task. To save that container to local, 
+run the `dockerSave` task.
 
 Tag and Push tasks for each tag will be generated for each provided `tag` and `tags` entry.
 
@@ -102,6 +105,8 @@ docker {
     labels(['key': 'value'])
     pull true
     noCache true
+    saveTargetName = 'target.tar'
+    saveTarget = file("${buildDir}/docker/target.tar") 
 }
 ```
 
@@ -273,6 +278,7 @@ Tasks
 
  * **Docker**
    * `docker`: build a docker image with the specified name and Dockerfile
+   * `dockerSave`: save the docker image to a target file
    * `dockerTag`: tag the docker image with all specified tags
    * `dockerTag<tag>`: tag the docker image with `<tag>`
    * `dockerPush`: push the specified image to a docker repository
