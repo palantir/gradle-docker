@@ -15,8 +15,6 @@
  */
 package com.palantir.gradle.docker
 
-import java.util.regex.Pattern
-import javax.inject.Inject
 import org.gradle.api.GradleException
 import org.gradle.api.Plugin
 import org.gradle.api.Project
@@ -33,6 +31,9 @@ import org.gradle.api.tasks.Copy
 import org.gradle.api.tasks.Delete
 import org.gradle.api.tasks.Exec
 import org.gradle.api.tasks.bundling.Zip
+
+import javax.inject.Inject
+import java.util.regex.Pattern
 
 class PalantirDockerPlugin implements Plugin<Project> {
 
@@ -92,6 +93,12 @@ class PalantirDockerPlugin implements Plugin<Project> {
         Zip dockerfileZip = project.tasks.create('dockerfileZip', Zip, {
             group = 'Docker'
             description = 'Bundles the configured Dockerfile in a zip file'
+        })
+
+        Exec save = project.tasks.create('dockerSave', Exec, {
+            group = 'Docker'
+            description = 'Save named Docker image to local file.'
+            dependsOn exec
         })
 
         PublishArtifact dockerArtifact = new ArchivePublishArtifact(dockerfileZip)
@@ -172,6 +179,21 @@ class PalantirDockerPlugin implements Plugin<Project> {
 
             dockerfileZip.with {
                 from(ext.resolvedDockerfile)
+            }
+
+            save.with {
+                if (ext.saveTarget == null) {
+                    if (ext.saveTargetName == null) {
+                        ext.saveTargetName = "save.tar"
+                    }
+                    log.info("save target not configured, set it a default value: save.tar")
+                    ext.saveTarget = project.file("${dockerDir}/${-> ext.saveTargetName}")
+                }
+
+                workingDir dockerDir
+                commandLine 'docker', 'save', "${-> ext.name}", '-o', "${-> ext.saveTarget.path}"
+                logging.captureStandardOutput LogLevel.INFO
+                logging.captureStandardError LogLevel.ERROR
             }
         }
     }

@@ -190,8 +190,8 @@ class PalantirDockerPluginTests extends AbstractPluginTest {
         then:
         buildResult.task(':publishToMavenLocal').outcome == TaskOutcome.SUCCESS
         def publishFolder = new DefaultLocalMavenRepositoryLocator(
-            new DefaultMavenSettingsProvider(new DefaultMavenFileLocations())).localMavenRepository.toPath()
-            .resolve("testgroup")
+                new DefaultMavenSettingsProvider(new DefaultMavenFileLocations())).localMavenRepository.toPath()
+                .resolve("testgroup")
 
         // Check java publication has the right dependencies
         def javaPublishFolder = publishFolder.resolve(projectDir.name).resolve("2.3.4")
@@ -202,8 +202,8 @@ class PalantirDockerPluginTests extends AbstractPluginTest {
 
         // Check docker publication has the right dependencies
         def dockerPublishFolder = publishFolder
-            .resolve(projectDir.name + "-docker")
-            .resolve("2.3.4")
+                .resolve(projectDir.name + "-docker")
+                .resolve("2.3.4")
         def zipFile = dockerPublishFolder.resolve(projectDir.name + "-docker-2.3.4.zip")
         zipFile.toFile().exists()
         def dockerPomFile = dockerPublishFolder.resolve(projectDir.name + "-docker-2.3.4.pom")
@@ -457,6 +457,7 @@ class PalantirDockerPluginTests extends AbstractPluginTest {
 
         then:
         buildResult.task(':docker').outcome == TaskOutcome.SUCCESS
+        println(buildResult.output)
         buildResult.output.contains 'Pulling from library/alpine'
         execCond("docker rmi -f ${id}")
     }
@@ -487,7 +488,7 @@ class PalantirDockerPluginTests extends AbstractPluginTest {
         then:
         buildResult.task(':docker').outcome == TaskOutcome.FAILED
         buildResult.output.contains('network foobar not found') or(
-            buildResult.output.contains('No such network: foobar')
+                buildResult.output.contains('No such network: foobar')
         )
         execCond("docker rmi -f ${id}")
     }
@@ -647,8 +648,8 @@ class PalantirDockerPluginTests extends AbstractPluginTest {
 
         then:
         buildResult.output.contains("Docker label 'test_label' contains illegal characters. Label keys " +
-            "must only contain lowercase alphanumberic, `.`, or `-` characters (must match " +
-            "^[a-z0-9.-]*\$).")
+                "must only contain lowercase alphanumberic, `.`, or `-` characters (must match " +
+                "^[a-z0-9.-]*\$).")
     }
 
     def 'check if compute name replaces the name correctly'() {
@@ -656,37 +657,37 @@ class PalantirDockerPluginTests extends AbstractPluginTest {
         PalantirDockerPlugin.computeName(name, tag) == result
 
         where:
-        name             | tag      | result
-        "v1"             | "latest" | "v1:latest"
-        "v1:1"           | "latest" | "v1:latest"
-        "host/v1"        | "latest" | "host/v1:latest"
-        "host/v1:1"      | "latest" | "host/v1:latest"
-        "host:port/v1"   | "latest" | "host:port/v1:latest"
-        "host:port/v1:1" | "latest" | "host:port/v1:latest"
-        "v1"             | "name@latest" | "v1:latest"
-        "v1:1"           | "name@latest" | "v1:latest"
-        "host/v1"        | "name@latest" | "host/v1:latest"
-        "host/v1:1"      | "name@latest" | "host/v1:latest"
-        "host:port/v1"   | "name@latest" | "host:port/v1:latest"
-        "host:port/v1:1" | "name@latest" | "host:port/v1:latest"
-        "v1"             | "name@v2:latest" | "v2:latest"
-        "v1:1"           | "name@v2:latest" | "v2:latest"
-        "host/v1"        | "name@v2:latest" | "v2:latest"
-        "host/v1:1"      | "name@v2:latest" | "v2:latest"
-        "host:port/v1"   | "name@v2:latest" | "v2:latest"
-        "host:port/v1:1" | "name@v2:latest" | "v2:latest"
-        "v1"             | "name@host/v2" | "host/v2"
-        "v1:1"           | "name@host/v2" | "host/v2"
-        "host/v1"        | "name@host/v2" | "host/v2"
-        "host/v1:1"      | "name@host/v2" | "host/v2"
-        "host:port/v1"   | "name@host/v2" | "host/v2"
-        "host:port/v1:1" | "name@host/v2" | "host/v2"
-        "v1"             | "name@host/v2:2" | "host/v2:2"
-        "v1:1"           | "name@host/v2:2" | "host/v2:2"
-        "host/v1"        | "name@host/v2:2" | "host/v2:2"
-        "host/v1:1"      | "name@host/v2:2" | "host/v2:2"
-        "host:port/v1"   | "name@host/v2:2" | "host/v2:2"
-        "host:port/v1:1" | "name@host/v2:2" | "host/v2:2"
+        name             | tag                   | result
+        "v1"             | "latest"              | "v1:latest"
+        "v1:1"           | "latest"              | "v1:latest"
+        "host/v1"        | "latest"              | "host/v1:latest"
+        "host/v1:1"      | "latest"              | "host/v1:latest"
+        "host:port/v1"   | "latest"              | "host:port/v1:latest"
+        "host:port/v1:1" | "latest"              | "host:port/v1:latest"
+        "v1"             | "name@latest"         | "v1:latest"
+        "v1:1"           | "name@latest"         | "v1:latest"
+        "host/v1"        | "name@latest"         | "host/v1:latest"
+        "host/v1:1"      | "name@latest"         | "host/v1:latest"
+        "host:port/v1"   | "name@latest"         | "host:port/v1:latest"
+        "host:port/v1:1" | "name@latest"         | "host:port/v1:latest"
+        "v1"             | "name@v2:latest"      | "v2:latest"
+        "v1:1"           | "name@v2:latest"      | "v2:latest"
+        "host/v1"        | "name@v2:latest"      | "v2:latest"
+        "host/v1:1"      | "name@v2:latest"      | "v2:latest"
+        "host:port/v1"   | "name@v2:latest"      | "v2:latest"
+        "host:port/v1:1" | "name@v2:latest"      | "v2:latest"
+        "v1"             | "name@host/v2"        | "host/v2"
+        "v1:1"           | "name@host/v2"        | "host/v2"
+        "host/v1"        | "name@host/v2"        | "host/v2"
+        "host/v1:1"      | "name@host/v2"        | "host/v2"
+        "host:port/v1"   | "name@host/v2"        | "host/v2"
+        "host:port/v1:1" | "name@host/v2"        | "host/v2"
+        "v1"             | "name@host/v2:2"      | "host/v2:2"
+        "v1:1"           | "name@host/v2:2"      | "host/v2:2"
+        "host/v1"        | "name@host/v2:2"      | "host/v2:2"
+        "host/v1:1"      | "name@host/v2:2"      | "host/v2:2"
+        "host:port/v1"   | "name@host/v2:2"      | "host/v2:2"
+        "host:port/v1:1" | "name@host/v2:2"      | "host/v2:2"
         "v1"             | "name@host:port/v2:2" | "host:port/v2:2"
         "v1:1"           | "name@host:port/v2:2" | "host:port/v2:2"
         "host/v1"        | "name@host:port/v2:2" | "host:port/v2:2"
@@ -720,5 +721,36 @@ class PalantirDockerPluginTests extends AbstractPluginTest {
         then:
         buildResult.task(':dockerPrepare').outcome == TaskOutcome.SUCCESS
         file("build/docker/myDir/bar").exists()
+    }
+
+    def 'save image'() {
+        given:
+        String id = 'id11'
+        String target = 'target.tar'
+        file('Dockerfile') << """
+            FROM alpine:3.2
+            MAINTAINER ${id}
+        """.stripIndent()
+        buildFile << """
+            plugins {
+                id 'com.palantir.docker'
+            }
+
+            docker {
+                name '${id}'
+                saveTargetName = '${target}'
+            }
+        """.stripIndent()
+
+        when:
+        BuildResult buildResult = with('dockerSave').build()
+
+        then:
+        buildResult.task(':dockerSave').outcome == TaskOutcome.SUCCESS
+        file("build/docker/${target}").exists()
+
+        then:
+        execCond("docker rmi -f ${id}")
+        file("build/docker/${target}").delete()
     }
 }

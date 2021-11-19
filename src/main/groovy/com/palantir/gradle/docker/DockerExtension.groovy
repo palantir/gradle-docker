@@ -46,78 +46,81 @@ class DockerExtension {
     private File resolvedDockerComposeTemplate = null
     private File resolvedDockerComposeFile = null
 
+    private File saveTarget = null
+    private String saveTargetName = null
+
     // The CopySpec defining the Docker Build Context files
     private final CopySpec copySpec
 
-    public DockerExtension(Project project) {
+    DockerExtension(Project project) {
         this.project = project
         this.copySpec = project.copySpec()
     }
 
-    public void setName(String name) {
+    void setName(String name) {
         this.name = name
     }
 
-    public String getName() {
+    String getName() {
         Preconditions.checkArgument(!Strings.isNullOrEmpty(name), "name is a required docker configuration item.")
         return name
     }
 
-    public void setDockerfile(File dockerfile) {
+    void setDockerfile(File dockerfile) {
         this.dockerfile = dockerfile
     }
 
-    public void setDockerComposeTemplate(String dockerComposeTemplate) {
+    void setDockerComposeTemplate(String dockerComposeTemplate) {
         this.dockerComposeTemplate = dockerComposeTemplate
         Preconditions.checkArgument(project.file(dockerComposeTemplate).exists(),
             "Could not find specified template file: %s", project.file(dockerComposeTemplate))
     }
 
-    public void setDockerComposeFile(String dockerComposeFile) {
+    void setDockerComposeFile(String dockerComposeFile) {
         this.dockerComposeFile = dockerComposeFile
     }
 
-    public void dependsOn(Task... args) {
+    void dependsOn(Task... args) {
         this.dependencies = ImmutableSet.copyOf(args)
     }
 
-    public Set<Task> getDependencies() {
+    Set<Task> getDependencies() {
         return dependencies
     }
 
-    public void files(Object... files) {
+    void files(Object... files) {
         copySpec.from(files)
     }
 
-    public Set<String> getTags() {
+    Set<String> getTags() {
         return tags
     }
 
     @Deprecated
-    public void tags(String... args) {
+    void tags(String... args) {
         this.tags = ImmutableSet.copyOf(args)
     }
 
-    public Map<String, String> getNamedTags() {
+    Map<String, String> getNamedTags() {
         return ImmutableMap.copyOf(namedTags)
     }
 
-    public void tag(String taskName, String tag) {
+    void tag(String taskName, String tag) {
         if (namedTags.putIfAbsent(taskName, tag) != null) {
             StyledTextOutput o = project.services.get(StyledTextOutputFactory.class).create(DockerExtension)
             o.withStyle(StyledTextOutput.Style.Error).println("WARNING: Task name '${taskName}' is existed.")
         }
     }
 
-    public Map<String, String> getLabels() {
+    Map<String, String> getLabels() {
         return labels
     }
 
-    public void labels(Map<String, String> labels) {
+    void labels(Map<String, String> labels) {
         this.labels = ImmutableMap.copyOf(labels)
     }
 
-    public File getResolvedDockerfile() {
+    File getResolvedDockerfile() {
         return resolvedDockerfile
     }
 
@@ -129,11 +132,11 @@ class DockerExtension {
         return resolvedDockerComposeFile
     }
 
-    public CopySpec getCopySpec() {
+    CopySpec getCopySpec() {
         return copySpec
     }
 
-    public void resolvePathsAndValidate() {
+    void resolvePathsAndValidate() {
         if (dockerfile != null) {
             resolvedDockerfile = dockerfile
         } else {
@@ -143,35 +146,51 @@ class DockerExtension {
         resolvedDockerComposeTemplate = project.file(dockerComposeTemplate)
     }
 
-    public Map<String, String> getBuildArgs() {
+    Map<String, String> getBuildArgs() {
         return buildArgs
     }
 
-    public String getNetwork() {
+    String getNetwork() {
         return network
     }
 
-    public void setNetwork(String network) {
+    void setNetwork(String network) {
         this.network = network
     }
 
-    public void buildArgs(Map<String, String> buildArgs) {
+    void buildArgs(Map<String, String> buildArgs) {
         this.buildArgs = ImmutableMap.copyOf(buildArgs)
     }
 
-    public boolean getPull() {
+    boolean getPull() {
         return pull
     }
 
-    public void pull(boolean pull) {
+    void pull(boolean pull) {
         this.pull = pull
     }
 
-    public boolean getNoCache() {
+    boolean getNoCache() {
         return noCache
     }
 
-    public void noCache(boolean noCache) {
+    void noCache(boolean noCache) {
         this.noCache = noCache
+    }
+
+    File getSaveTarget() {
+        return saveTarget
+    }
+
+    void setSaveTarget(File saveTarget) {
+        this.saveTarget = saveTarget
+    }
+
+    String getSaveTargetName() {
+        return saveTargetName
+    }
+
+    void setSaveTargetName(String saveTargetName) {
+        this.saveTargetName = saveTargetName
     }
 }
