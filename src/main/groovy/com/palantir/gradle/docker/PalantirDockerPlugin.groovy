@@ -78,15 +78,15 @@ class PalantirDockerPlugin implements Plugin<Project> {
             dependsOn exec
         })
 
-        Exec push = project.tasks.create('dockerPush', Exec, {
-            group = 'Docker'
-            description = 'Pushes named Docker image to configured Docker Hub.'
-            dependsOn tag
-        })
-
         Task pushAllTags = project.tasks.create('dockerTagsPush', {
             group = 'Docker'
             description = 'Pushes all tagged Docker images to configured Docker Hub.'
+        })
+
+        project.tasks.create('dockerPush', {
+            group = 'Docker'
+            description = 'Pushes named Docker image to configured Docker Hub.'
+            dependsOn pushAllTags
         })
 
         Zip dockerfileZip = project.tasks.create('dockerfileZip', Zip, {
@@ -163,11 +163,6 @@ class PalantirDockerPlugin implements Plugin<Project> {
                     dependsOn tagSubTask
                 })
                 pushAllTags.dependsOn pushSubTask
-            }
-
-            push.with {
-                workingDir dockerDir
-                commandLine 'docker', 'push', "${-> ext.name}"
             }
 
             dockerfileZip.with {
