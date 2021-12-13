@@ -35,7 +35,7 @@ class DockerExtension {
     private String dockerComposeTemplate = 'docker-compose.yml.template'
     private String dockerComposeFile = 'docker-compose.yml'
     private Set<Task> dependencies = ImmutableSet.of()
-    private Set<String> tags = ImmutableSet.of();
+    private Set<String> tags = ImmutableSet.of()
     private Map<String, String> namedTags = new HashMap<>()
     private Map<String, String> labels = ImmutableMap.of()
     private Map<String, String> buildArgs = ImmutableMap.of()
