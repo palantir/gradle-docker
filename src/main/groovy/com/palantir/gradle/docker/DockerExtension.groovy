@@ -22,6 +22,7 @@ import com.google.common.collect.ImmutableSet
 import org.gradle.api.Project
 import org.gradle.api.Task
 import org.gradle.api.file.CopySpec
+import org.gradle.api.provider.SetProperty
 import org.gradle.internal.logging.text.StyledTextOutput
 import org.gradle.internal.logging.text.StyledTextOutputFactory
 
@@ -34,13 +35,13 @@ class DockerExtension {
     private String dockerComposeTemplate = 'docker-compose.yml.template'
     private String dockerComposeFile = 'docker-compose.yml'
     private Set<Task> dependencies = ImmutableSet.of()
-    private Set<String> tags = ImmutableSet.of()
     private Map<String, String> namedTags = new HashMap<>()
     private Map<String, String> labels = ImmutableMap.of()
     private Map<String, String> buildArgs = ImmutableMap.of()
     private boolean pull = false
     private boolean noCache = false
     private String network = null
+    private SetProperty<String> tags
 
     private File resolvedDockerfile = null
     private File resolvedDockerComposeTemplate = null
@@ -52,6 +53,8 @@ class DockerExtension {
     public DockerExtension(Project project) {
         this.project = project
         this.copySpec = project.copySpec()
+        this.tags = project.getObjects().setProperty(String.class)
+        tags.convention(project.provider({ImmutableSet.<String> of(project.getVersion().toString())}))
     }
 
     public void setName(String name) {
@@ -70,7 +73,7 @@ class DockerExtension {
     public void setDockerComposeTemplate(String dockerComposeTemplate) {
         this.dockerComposeTemplate = dockerComposeTemplate
         Preconditions.checkArgument(project.file(dockerComposeTemplate).exists(),
-            "Could not find specified template file: %s", project.file(dockerComposeTemplate))
+                "Could not find specified template file: %s", project.file(dockerComposeTemplate))
     }
 
     public void setDockerComposeFile(String dockerComposeFile) {
@@ -90,12 +93,12 @@ class DockerExtension {
     }
 
     public Set<String> getTags() {
-        return tags
+        return tags.get()
     }
 
     @Deprecated
     public void tags(String... args) {
-        this.tags = ImmutableSet.copyOf(args)
+        this.tags.set(ImmutableSet.copyOf(args))
     }
 
     public Map<String, String> getNamedTags() {
