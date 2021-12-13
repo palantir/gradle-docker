@@ -54,7 +54,7 @@ class DockerExtension {
         this.project = project
         this.copySpec = project.copySpec()
         this.tags = project.getObjects().setProperty(String.class)
-        tags.convention(project.provider({ Set.of(project.getVersion().toString()) }))
+        tags.convention(project.provider({ImmutableSet.<String> of(project.getVersion().toString())}))
     }
 
     public void setName(String name) {
