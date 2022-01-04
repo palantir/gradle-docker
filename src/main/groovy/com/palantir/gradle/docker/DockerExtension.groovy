@@ -19,6 +19,7 @@ import com.google.common.base.Preconditions
 import com.google.common.base.Strings
 import com.google.common.collect.ImmutableMap
 import com.google.common.collect.ImmutableSet
+import com.google.common.collect.Sets
 import org.gradle.api.Project
 import org.gradle.api.Task
 import org.gradle.api.file.CopySpec
@@ -70,7 +71,7 @@ class DockerExtension {
     public void setDockerComposeTemplate(String dockerComposeTemplate) {
         this.dockerComposeTemplate = dockerComposeTemplate
         Preconditions.checkArgument(project.file(dockerComposeTemplate).exists(),
-            "Could not find specified template file: %s", project.file(dockerComposeTemplate))
+                "Could not find specified template file: %s", project.file(dockerComposeTemplate))
     }
 
     public void setDockerComposeFile(String dockerComposeFile) {
@@ -90,7 +91,7 @@ class DockerExtension {
     }
 
     public Set<String> getTags() {
-        return tags
+        return Sets.union(this.tags, ImmutableSet.of(project.getVersion().toString()))
     }
 
     @Deprecated
