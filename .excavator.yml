@@ -7,3 +7,4 @@ auto-label:
   tags:
     roomba: [ "merge when ready" ]
     automerge: [ "merge when ready" ]
+    autorelease: [ "autorelease" ]
