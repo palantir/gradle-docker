@@ -1,7 +1,7 @@
 buildscript {
     repositories {
-        gradlePluginPortal()
-        mavenCentral()
+        gradlePluginPortal() { metadataSources { mavenPom(); ignoreGradleMetadataRedirection() } }
+        mavenCentral() { metadataSources { mavenPom(); ignoreGradleMetadataRedirection() } }
     }
     dependencies {
         classpath 'com.palantir.gradle.externalpublish:gradle-external-publish-plugin:1.4.0'
@@ -18,7 +18,7 @@ plugins {
 }
 
 repositories {
-    mavenCentral()
+    mavenCentral() { metadataSources { mavenPom(); ignoreGradleMetadataRedirection() } }
 }
 
 apply plugin: 'com.palantir.external-publish'
