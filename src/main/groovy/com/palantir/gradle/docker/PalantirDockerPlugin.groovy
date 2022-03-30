@@ -178,15 +178,15 @@ class PalantirDockerPlugin implements Plugin<Project> {
 
     private List<String> buildCommandLine(DockerExtension ext) {
         List<String> buildCommandLine = ['docker']
-        if(ext.buildx) {
+        if (ext.buildx) {
             buildCommandLine.addAll(['buildx','build'])
-            if(!ext.platform.isEmpty()) {
+            if (!ext.platform.isEmpty()) {
                 buildCommandLine.addAll('--platform',String.join(',',ext.platform))
             }
-            if(ext.load) {
+            if (ext.load) {
                 buildCommandLine.add '--load'
             }
-            if(ext.builder != null) {
+            if (ext.builder != null) {
                 buildCommandLine.addAll('--builder',ext.builder)
             }
         } else {

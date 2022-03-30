@@ -142,7 +142,6 @@ class PalantirDockerPluginTests extends AbstractPluginTest {
         execCond("docker rmi -f ${id}")
     }
 
-    // TODO: Add support for buildx on CI system then un comment
     def 'check multiarch'() {
         given:
         String id = 'id4'
