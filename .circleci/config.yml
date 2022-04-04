@@ -5,9 +5,8 @@
 version: 2.1
 jobs:
   build:
-    machine:
-      docker_layer_caching: true
-      image: ubuntu-2004:202104-01
+    docker:
+      - image: cimg/openjdk:11.0.13
     environment:
       CIRCLE_TEST_REPORTS: /home/circleci/junit
       CIRCLE_ARTIFACTS: /home/circleci/artifacts
@@ -16,14 +15,8 @@ jobs:
       BUILDX_PLATFORMS: linux/amd64,linux/arm64,linux/ppc64le,linux/s390x,linux/386,linux/arm/v7,linux/arm/v6
     steps:
       - checkout
-      - run:
-          name: Install buildx
-          command: |
-            export DOCKER_BUILDKIT=1
-            docker build --platform=local -o . git://github.com/docker/buildx
-            mkdir -p ~/.docker/cli-plugins
-            mv buildx ~/.docker/cli-plugins/docker-buildx
-            docker buildx create --name mybuilder --use
+      - setup_remote_docker:
+          version: 20.10.11
       - run:
           name: delete_unrelated_tags
           command: |
