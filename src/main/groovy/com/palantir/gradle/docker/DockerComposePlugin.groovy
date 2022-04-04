@@ -44,15 +44,15 @@ class DockerComposePlugin implements Plugin<Project> {
             dockerConfiguration.extendsFrom(project.configurations.getByName('productDependencies'))
         })
 
-        project.tasks.create('generateDockerCompose', GenerateDockerCompose, {
+        project.tasks.register('generateDockerCompose', GenerateDockerCompose, {
             it.configuration = dockerConfiguration
         })
 
-        project.tasks.create('dockerComposeUp', DockerComposeUp, {
+        project.tasks.register('dockerComposeUp', DockerComposeUp, {
             it.configuration = dockerConfiguration
         })
 
-        project.tasks.create('dockerComposeDown', DockerComposeDown, {
+        project.tasks.register('dockerComposeDown', DockerComposeDown, {
             it.configuration = dockerConfiguration
         })
     }

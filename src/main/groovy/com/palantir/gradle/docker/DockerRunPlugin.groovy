@@ -29,35 +29,35 @@ class DockerRunPlugin implements Plugin<Project> {
     void apply(Project project) {
         DockerRunExtension ext = project.extensions.create('dockerRun', DockerRunExtension)
 
-        Exec dockerRunStatus = project.tasks.create('dockerRunStatus', Exec, {
+        def dockerRunStatus = project.tasks.register('dockerRunStatus', Exec, {
             group = 'Docker Run'
             description = 'Checks the run status of the container'
         })
 
-        Exec dockerRun = project.tasks.create('dockerRun', Exec, {
+        def dockerRun = project.tasks.register('dockerRun', Exec, {
             group = 'Docker Run'
             description = 'Runs the specified container with port mappings'
         })
 
-        Exec dockerStop = project.tasks.create('dockerStop', Exec, {
+        def dockerStop = project.tasks.register('dockerStop', Exec, {
             group = 'Docker Run'
             description = 'Stops the named container if it is running'
             ignoreExitValue = true
         })
 
-        Exec dockerRemoveContainer = project.tasks.create('dockerRemoveContainer', Exec, {
+        def dockerRemoveContainer = project.tasks.register('dockerRemoveContainer', Exec, {
             group = 'Docker Run'
             description = 'Removes the persistent container associated with the Docker Run tasks'
             ignoreExitValue = true
         })
 
-        Exec dockerNetworkModeStatus = project.tasks.create('dockerNetworkModeStatus', Exec, {
+        def dockerNetworkModeStatus = project.tasks.register('dockerNetworkModeStatus', Exec, {
             group = 'Docker Run'
             description = 'Checks the network configuration of the container'
         })
 
         project.afterEvaluate {
-            dockerRunStatus.with {
+            dockerRunStatus.configure {
                 standardOutput = new ByteArrayOutputStream()
                 commandLine 'docker', 'inspect', '--format={{.State.Running}}', ext.name
                 doLast {
@@ -70,7 +70,7 @@ class DockerRunPlugin implements Plugin<Project> {
                 }
             }
 
-            dockerNetworkModeStatus.with {
+            dockerNetworkModeStatus.configure {
                 standardOutput = new ByteArrayOutputStream()
                 commandLine 'docker', 'inspect', '--format={{.HostConfig.NetworkMode}}', ext.name
                 doLast {
@@ -90,7 +90,7 @@ class DockerRunPlugin implements Plugin<Project> {
                 }
             }
 
-            dockerRun.with {
+            dockerRun.configure {
                 List<String> args = Lists.newArrayList()
                 args.addAll(['docker', 'run'])
                 ignoreExitValue = ext.ignoreExitValue
@@ -134,11 +134,11 @@ class DockerRunPlugin implements Plugin<Project> {
                 commandLine args
             }
 
-            dockerStop.with {
+            dockerStop.configure {
                 commandLine 'docker', 'stop', ext.name
             }
 
-            dockerRemoveContainer.with {
+            dockerRemoveContainer.configure {
                 commandLine 'docker', 'rm', ext.name
             }
         }

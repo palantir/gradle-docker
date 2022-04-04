@@ -55,35 +55,35 @@ class PalantirDockerPlugin implements Plugin<Project> {
             project.configurations.create('docker')
         }
 
-        Delete clean = project.tasks.create('dockerClean', Delete, {
+        def clean = project.tasks.register('dockerClean', Delete, {
             group = 'Docker'
             description = 'Cleans Docker build directory.'
         })
 
-        Copy prepare = project.tasks.create('dockerPrepare', Copy, {
+        def prepare = project.tasks.register('dockerPrepare', Copy, {
             group = 'Docker'
             description = 'Prepares Docker build directory.'
             dependsOn clean
         })
 
-        Exec exec = project.tasks.create('docker', Exec, {
+        def exec = project.tasks.register('docker', Exec, {
             group = 'Docker'
             description = 'Builds Docker image.'
             dependsOn prepare
         })
 
-        Task tag = project.tasks.create('dockerTag', {
+        def tag = project.tasks.register('dockerTag', {
             group = 'Docker'
             description = 'Applies all tags to the Docker image.'
             dependsOn exec
         })
 
-        Task pushAllTags = project.tasks.create('dockerTagsPush', {
+        def pushAllTags = project.tasks.register('dockerTagsPush', {
             group = 'Docker'
             description = 'Pushes all tagged Docker images to configured Docker Hub.'
         })
 
-        project.tasks.create('dockerPush', {
+        project.tasks.register('dockerPush', {
             group = 'Docker'
             description = 'Pushes named Docker image to configured Docker Hub.'
             dependsOn pushAllTags
@@ -105,7 +105,7 @@ class PalantirDockerPlugin implements Plugin<Project> {
             String dockerDir = "${project.buildDir}/docker"
             clean.delete dockerDir
 
-            prepare.with {
+            prepare.configure {
                 with ext.copySpec
                 from(ext.resolvedDockerfile) {
                     rename { fileName ->
@@ -115,7 +115,7 @@ class PalantirDockerPlugin implements Plugin<Project> {
                 into dockerDir
             }
 
-            exec.with {
+            exec.configure {
                 workingDir dockerDir
                 commandLine buildCommandLine(ext)
                 dependsOn ext.getDependencies()
@@ -146,26 +146,30 @@ class PalantirDockerPlugin implements Plugin<Project> {
             }
 
             tags.each { taskName, tagConfig ->
-                Exec tagSubTask = project.tasks.create('dockerTag' + taskName, Exec, {
+                def tagSubTask = project.tasks.register('dockerTag' + taskName, Exec, {
                     group = 'Docker'
                     description = "Tags Docker image with tag '${tagConfig.tagName}'"
                     workingDir dockerDir
                     commandLine 'docker', 'tag', "${-> ext.name}", "${-> tagConfig.tagTask()}"
                     dependsOn exec
                 })
-                tag.dependsOn tagSubTask
+                tag.configure {
+                    dependsOn tagSubTask
+                }
 
-                Exec pushSubTask = project.tasks.create('dockerPush' + taskName, Exec, {
+                def pushSubTask = project.tasks.register('dockerPush' + taskName, Exec, {
                     group = 'Docker'
                     description = "Pushes the Docker image with tag '${tagConfig.tagName}' to configured Docker Hub"
                     workingDir dockerDir
                     commandLine 'docker', 'push', "${-> tagConfig.tagTask()}"
                     dependsOn tagSubTask
                 })
-                pushAllTags.dependsOn pushSubTask
+                pushAllTags.configure {
+                    dependsOn pushSubTask
+                }
             }
 
-            dockerfileZip.with {
+            dockerfileZip.configure {
                 from(ext.resolvedDockerfile)
             }
         }
