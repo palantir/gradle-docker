@@ -142,6 +142,37 @@ class PalantirDockerPluginTests extends AbstractPluginTest {
         execCond("docker rmi -f ${id}")
     }
 
+    def 'check multiarch'() {
+        given:
+        String id = 'id4'
+        String filename = "foo.txt"
+        file('Dockerfile') << """
+            FROM alpine
+            MAINTAINER ${id}
+            ADD ${filename} /tmp/
+        """.stripIndent()
+        buildFile << """
+            plugins {
+                id 'com.palantir.docker'
+            }
+            docker {
+                name '${id}'
+                files "${filename}"
+                buildx true
+                load true
+                platform 'linux/arm64'
+            }
+        """.stripIndent()
+        new File(projectDir, filename).createNewFile()
+        when:
+        BuildResult buildResult = with('docker').build()
+        then:
+        buildResult.task(':dockerPrepare').outcome == TaskOutcome.SUCCESS
+        buildResult.task(':docker').outcome == TaskOutcome.SUCCESS
+        exec("docker inspect --format '{{.Architecture}}' ${id}") == "'arm64'\n"
+        execCond("docker rmi -f ${id}")
+    }
+
     // Gradle explicitly disallows the test case, fails with the following:
     //Could not determine the dependencies of task ':publishDockerPublicationPublicationToMavenLocal'.
     //> Publishing is not able to resolve a dependency on a project with multiple publications that have different coordinates.
@@ -457,7 +488,7 @@ class PalantirDockerPluginTests extends AbstractPluginTest {
 
         then:
         buildResult.task(':docker').outcome == TaskOutcome.SUCCESS
-        buildResult.output.contains 'Pulling from library/alpine'
+        buildResult.output.contains 'load metadata for docker.io/library/alpine'
         execCond("docker rmi -f ${id}")
     }
 
@@ -488,6 +519,8 @@ class PalantirDockerPluginTests extends AbstractPluginTest {
         buildResult.task(':docker').outcome == TaskOutcome.FAILED
         buildResult.output.contains('network foobar not found') or(
             buildResult.output.contains('No such network: foobar')
+        ) or(
+            buildResult.output.contains('network mode "foobar" not supported by buildkit')
         )
         execCond("docker rmi -f ${id}")
     }

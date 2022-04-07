@@ -173,6 +173,8 @@ class DockerComposePluginTests extends AbstractPluginTest {
         with('dockerComposeUp').build()
         then:
         file("foobarbaz").exists()
+        execCond("docker stop helloworld")
+        execCond("docker rm helloworld")
     }
 
     def 'docker-compose successfully creates docker image from custom file'() {
@@ -200,6 +202,8 @@ class DockerComposePluginTests extends AbstractPluginTest {
         with('dockerComposeUp').build()
         then:
         file("qux").exists()
+        execCond("docker stop helloworld2")
+        execCond("docker rm helloworld2")
     }
 
     def 'can set custom properties on generateDockerCompose.ext'() {
@@ -236,10 +240,9 @@ class DockerComposePluginTests extends AbstractPluginTest {
                 id 'com.palantir.docker-compose'
             }
         '''.stripIndent()
-        with('dockerComposeUp').build()
         when:
-        with('dockerComposeDown').build()
+        BuildResult buildResult = with('dockerComposeUp', 'dockerComposeDown').build()
         then:
-        processCount() == 0
+        buildResult.task(':dockerComposeDown').outcome == TaskOutcome.SUCCESS
     }
 }
