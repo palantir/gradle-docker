@@ -1,2 +1,3 @@
+com.fasterxml.jackson.core:jackson-databind = 2.13.2.1
 com.netflix.nebula:nebula-test = 9.0.0
 com.google.guava:guava = 31.1-jre
