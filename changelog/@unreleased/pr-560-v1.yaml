@@ -1,0 +1,5 @@
+type: fix
+improvement:
+  description: Allow for version to be blank
+  links:
+    - https://github.com/palantir/gradle-docker/pull/560
