@@ -298,6 +298,32 @@ class PalantirDockerPluginTests extends AbstractPluginTest {
         buildResult.output.contains('dockerPushWithTaskNameByTag')
     }
 
+    def 'handle version is blank'() {
+        given:
+        String id = 'id5'
+        file('Dockerfile') << """
+            FROM alpine:3.2
+            MAINTAINER ${id}
+        """.stripIndent()
+        buildFile << """
+            plugins {
+                id 'com.palantir.docker'
+            }
+
+            version = ""
+            docker {
+                name '${id}'
+                tag 'withTaskNameByTag', '${id}:new-latest'
+            }
+        """.stripIndent()
+
+        when:
+        BuildResult buildResult = with('tasks').build()
+
+        then:
+        buildResult.output.contains('dockerTagUnspecified')
+    }
+
     def 'does not throw if name is configured after evaluation phase'() {
         given:
         String id = 'id6'

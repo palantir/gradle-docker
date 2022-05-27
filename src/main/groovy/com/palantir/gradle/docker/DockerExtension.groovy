@@ -95,7 +95,8 @@ class DockerExtension {
     }
 
     public Set<String> getTags() {
-        return Sets.union(this.tags, ImmutableSet.of(project.getVersion().toString()))
+        final String version = project.getVersion().toString()
+        return Sets.union(this.tags, ImmutableSet.of(version.isEmpty() ? Project.DEFAULT_VERSION : version))
     }
 
     @Deprecated
