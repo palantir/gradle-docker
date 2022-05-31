@@ -4,7 +4,7 @@ buildscript {
         gradlePluginPortal() { metadataSources { mavenPom(); ignoreGradleMetadataRedirection() } }
     }
     dependencies {
-        classpath 'com.palantir.gradle.externalpublish:gradle-external-publish-plugin:1.4.0'
+        classpath 'com.palantir.gradle.externalpublish:gradle-external-publish-plugin:1.11.0'
         classpath 'com.palantir.javaformat:gradle-palantir-java-format:0.3.9'
         classpath 'com.palantir.gradle.consistentversions:gradle-consistent-versions:2.11.0'
         classpath 'com.palantir.baseline:gradle-baseline-java:4.139.0'
@@ -14,7 +14,7 @@ buildscript {
 }
 
 plugins {
-    id 'com.gradle.plugin-publish' version '0.16.0'
+    id 'com.gradle.plugin-publish' version '0.21.0'
 }
 
 repositories {
