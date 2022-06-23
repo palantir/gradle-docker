@@ -68,6 +68,8 @@ build/
 - `builder` (optional) a string argument which defines which builder buildx should use; defaults to `null`
 - `load` (optional) a boolean argument which defines whether Docker buildx builder should add --load flag,
   loading the image into the local repository; defaults to `false`
+- `push` (optional) a boolean argument which defines whether Docker buildx builder should add --push flag,
+  pushing the image into the remote registry; defaults to `false`
 
 To build a docker container, run the `docker` task. To push that container to a
 docker repository, run the `dockerPush` task.

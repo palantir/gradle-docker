@@ -45,6 +45,7 @@ class DockerExtension {
     private boolean buildx = false
     private Set<String> platform = ImmutableSet.of()
     private boolean load = false
+    private boolean push = false
     private String builder = null
 
     private File resolvedDockerfile = null
@@ -186,6 +187,14 @@ class DockerExtension {
 
     public void load(boolean pull) {
         this.pull = pull
+    }
+
+    public boolean getPush() {
+	return push
+    }
+
+    public void push(boolean push) {
+	this.push = push
     }
 
     boolean getBuildx() {

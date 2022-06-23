@@ -181,6 +181,12 @@ class PalantirDockerPlugin implements Plugin<Project> {
             if (ext.load) {
                 buildCommandLine.add '--load'
             }
+	    if (ext.push) {
+	        buildCommandLine.add '--push'
+	    	if (ext.load) {
+    		    throw new Exception("cannot combine 'push' and 'load' options")
+	    	}
+	    }
             if (ext.builder != null) {
                 buildCommandLine.addAll('--builder', ext.builder)
             }
