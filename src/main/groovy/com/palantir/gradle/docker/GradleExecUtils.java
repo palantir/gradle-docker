@@ -43,9 +43,7 @@ final class GradleExecUtils {
         if (execResult.getExitValue() != 0) {
             throw new GradleException(String.format(
                     "The command '%s' failed with exit code %d. Output:\n%s",
-                    commandLine,
-                    execResult.getExitValue(),
-                    new String(output.toByteArray(), StandardCharsets.UTF_8)));
+                    commandLine, execResult.getExitValue(), new String(output.toByteArray(), StandardCharsets.UTF_8)));
         }
     }
 
