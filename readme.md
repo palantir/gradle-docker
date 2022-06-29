@@ -18,8 +18,11 @@ This repository provides three Gradle plugins for working with Docker containers
 - `com.palantir.docker-run`: adds tasks for starting, stopping, statusing and cleaning
   up a named container based on a specified image
 
-Docker Plugin
+~Docker Plugin~ - **Defunct**
 -------------
+
+**The `docker` gradle plugin is now defunct and should no longer be used.**
+
 Apply the plugin using standard gradle convention:
 
 ````gradle
