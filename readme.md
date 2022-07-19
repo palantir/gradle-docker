@@ -11,7 +11,7 @@ Disclaimer: This Repo is now Defunct
 -------------
 
 - This repo is on life support only - although we will keep it working, no new features are accepted;
-- It is now barely used internally at Palantir - Our internal gradle tooling should be used instead.
+- It is no longer used internally at Palantir.
 
 Docker Plugin
 -------------
