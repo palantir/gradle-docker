@@ -64,7 +64,8 @@ build/
 - `noCache` (optional) a boolean argument which defines whether Docker build should add the option --no-cache,
     so that it rebuilds the whole image from scratch; defaults to `false`
 - `buildx` (optional) a boolean argument which defines whether Docker build should use buildx for cross platform builds; defaults to `false`
-- `platform` (optional) a list of strings argument which defines which platforms buildx should target; defaults to empty
+- `platform` (for buildx optional) a list of strings argument which defines which platforms buildx should target; defaults to empty
+- `platform` (for build optional) string which defines which platform build should target; defaults to empty
 - `builder` (optional) a string argument which defines which builder buildx should use; defaults to `null`
 - `load` (optional) a boolean argument which defines whether Docker buildx builder should add --load flag,
   loading the image into the local repository; defaults to `false`
