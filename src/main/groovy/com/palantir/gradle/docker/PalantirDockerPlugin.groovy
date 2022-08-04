@@ -192,6 +192,9 @@ class PalantirDockerPlugin implements Plugin<Project> {
             }
         } else {
             buildCommandLine.add 'build'
+            if (!ext.platform.isEmpty()) {
+                buildCommandLine.addAll('--platform', ext.platform)
+            }
         }
         if (ext.noCache) {
             buildCommandLine.add '--no-cache'
