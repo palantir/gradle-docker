@@ -32,6 +32,7 @@ apply plugin: 'com.palantir.consistent-versions'
 apply plugin: 'com.palantir.git-version'
 apply plugin: 'org.inferred.processors'
 apply plugin: 'com.palantir.external-publish-jar'
+apply plugin: 'com.palantir.baseline-java-versions'
 
 group 'com.palantir.gradle.docker'
 version System.env.CIRCLE_TAG ?: gitVersion()
@@ -44,7 +45,6 @@ dependencies {
     testImplementation 'com.netflix.nebula:nebula-test'
 }
 
-sourceCompatibility = 1.8
 
 pluginBundle {
     website = 'https://github.com/palantir/gradle-docker'
@@ -74,3 +74,7 @@ publishPlugins.onlyIf { versionDetails().isCleanTag }
 tasks.publish.dependsOn publishPlugins
 project.ext.'gradle.publish.key' = System.env["GRADLE_KEY"]
 project.ext.'gradle.publish.secret' = System.env["GRADLE_SECRET"]
+
+javaVersions {
+    libraryTarget = 11
+}
