@@ -84,6 +84,38 @@ class PalantirDockerPluginTests extends AbstractPluginTest {
         execCond("docker rmi -f ${id}")
     }
 
+    def 'check plugin creates a docker container with default configuration and a target'() {
+        given:
+        String id = 'id1'
+        file('Dockerfile') << """
+            FROM alpine:3.2 as stage1
+            MAINTAINER ${id}
+
+            FROM alpine:3.2 as stage2
+            MAINTAINER ${id}
+        """.stripIndent()
+        buildFile << """
+            plugins {
+                id 'com.palantir.docker'
+            }
+
+            docker {
+                name '${id}'
+                target 'stage2'
+                
+            }
+        """.stripIndent()
+
+        when:
+        BuildResult buildResult = with('docker').build()
+
+        then:
+        buildResult.task(':dockerPrepare').outcome == TaskOutcome.SUCCESS
+        buildResult.task(':docker').outcome == TaskOutcome.SUCCESS
+        exec("docker inspect --format '{{.Author}}' ${id}") == "'${id}'\n"
+        execCond("docker rmi -f ${id}")
+    }
+
     def 'check plugin creates a docker container with non-standard Dockerfile name'() {
         given:
         String id = 'id2'

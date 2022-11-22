@@ -47,6 +47,7 @@ class DockerExtension {
     private boolean load = false
     private boolean push = false
     private String builder = null
+    private String target = null
 
     private File resolvedDockerfile = null
     private File resolvedDockerComposeTemplate = null
@@ -219,5 +220,13 @@ class DockerExtension {
 
     public void builder(String builder) {
         this.builder = builder
+    }
+
+    String getTarget() {
+        return target
+    }
+
+    void setTarget(String target) {
+        this.target = target
     }
 }
