@@ -23,7 +23,6 @@ import org.gradle.api.Project
 import org.gradle.api.Task
 import org.gradle.api.artifacts.Configuration
 import org.gradle.api.artifacts.PublishArtifact
-import org.gradle.api.internal.artifacts.publish.ArchivePublishArtifact
 import org.gradle.api.internal.attributes.ImmutableAttributesFactory
 import org.gradle.api.logging.LogLevel
 import org.gradle.api.logging.Logger
@@ -94,9 +93,8 @@ class PalantirDockerPlugin implements Plugin<Project> {
             description = 'Bundles the configured Dockerfile in a zip file'
         })
 
-        PublishArtifact dockerArtifact = new ArchivePublishArtifact(dockerfileZip)
         Configuration dockerConfiguration = project.getConfigurations().getByName('docker')
-        dockerConfiguration.getArtifacts().add(dockerArtifact)
+        PublishArtifact dockerArtifact = project.artifacts.add('docker', dockerfileZip)
         project.getComponents().add(new DockerComponent(dockerArtifact, dockerConfiguration.getAllDependencies(),
                 objectFactory, attributesFactory))
 
