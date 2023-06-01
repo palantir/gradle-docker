@@ -1,11 +1,11 @@
 # Run ./gradlew --write-locks to regenerate this file
 com.google.code.findbugs:jsr305:3.0.2 (1 constraints: 170aecb4)
-com.google.errorprone:error_prone_annotations:2.11.0 (1 constraints: 460a32bf)
+com.google.errorprone:error_prone_annotations:2.18.0 (1 constraints: 4d0a47bf)
 com.google.guava:failureaccess:1.0.1 (1 constraints: 140ae1b4)
-com.google.guava:guava:31.1-jre (1 constraints: 47069c47)
+com.google.guava:guava:32.0.0-jre (1 constraints: a5065453)
 com.google.guava:listenablefuture:9999.0-empty-to-avoid-conflict-with-guava (1 constraints: bd17c918)
-com.google.j2objc:j2objc-annotations:1.3 (1 constraints: b809eda0)
-org.checkerframework:checker-qual:3.12.0 (1 constraints: 480a3bbf)
+com.google.j2objc:j2objc-annotations:2.8 (1 constraints: be09f5a0)
+org.checkerframework:checker-qual:3.33.0 (1 constraints: 4b0a46bf)
 
 [Test dependencies]
 cglib:cglib-nodep:3.2.2 (1 constraints: 490ded24)
