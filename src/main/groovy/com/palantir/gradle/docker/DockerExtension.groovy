@@ -41,6 +41,7 @@ class DockerExtension {
     private Map<String, String> buildArgs = ImmutableMap.of()
     private boolean pull = false
     private boolean noCache = false
+    private boolean quiet = false
     private String network = null
     private boolean buildx = false
     private Set<String> platform = ImmutableSet.of()
@@ -219,5 +220,13 @@ class DockerExtension {
 
     public void builder(String builder) {
         this.builder = builder
+    }
+
+    public boolean getQuiet() {
+        return quiet
+    }
+
+    public void quiet(boolean quiet) {
+        this.quiet = quiet
     }
 }
