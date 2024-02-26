@@ -5,8 +5,8 @@ buildscript {
     }
     dependencies {
         classpath 'com.palantir.jakartapackagealignment:jakarta-package-alignment:0.6.0'
-        classpath 'com.palantir.gradle.jdks:gradle-jdks:0.34.0'
-        classpath 'com.palantir.gradle.jdkslatest:gradle-jdks-latest:0.12.0'
+        classpath 'com.palantir.gradle.jdks:gradle-jdks:0.36.0'
+        classpath 'com.palantir.gradle.jdkslatest:gradle-jdks-latest:0.13.0'
         classpath 'com.palantir.gradle.externalpublish:gradle-external-publish-plugin:1.4.0'
         classpath 'com.palantir.javaformat:gradle-palantir-java-format:2.40.0'
         classpath 'com.palantir.gradle.consistentversions:gradle-consistent-versions:2.21.0'
