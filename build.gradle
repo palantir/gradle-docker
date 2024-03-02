@@ -52,27 +52,31 @@ dependencies {
     testImplementation 'com.netflix.nebula:nebula-test'
 }
 
+gradlePlugin {
+    plugins {
+        dockerPlugin {
+            id = 'com.palantir.docker'
+            displayName = 'Palantir Gradle Docker'
+            implementationClass = 'com.palantir.gradle.docker.PalantirDockerPlugin'
+        }
+        dockerComposePlugin {
+            id = 'com.palantir.docker-compose'
+            displayName = 'Palantir Gradle Docker-Compose'
+            implementationClass = 'com.palantir.gradle.docker.DockerComposePlugin'
+        }
+        dockerRunPlugin {
+            id = 'com.palantir.docker-run'
+            displayName = 'Palantir Gradle Docker-Run'
+            implementationClass = 'com.palantir.gradle.docker.DockerRunPlugin'
+        }
+    }
+}
 
 pluginBundle {
     website = 'https://github.com/palantir/gradle-docker'
     vcsUrl = 'https://github.com/palantir/gradle-docker'
     description = 'Gradle Docker is a simple docker orchestrator for executing docker build and push from within Gradle.'
     tags = ['docker']
-
-    plugins {
-        dockerPlugin {
-            id = 'com.palantir.docker'
-            displayName = 'Palantir Gradle Docker'
-        }
-        dockerComposePlugin {
-            id = 'com.palantir.docker-compose'
-            displayName = 'Palantir Gradle Docker-Compose'
-        }
-        dockerRunPlugin {
-            id = 'com.palantir.docker-run'
-            displayName = 'Palantir Gradle Docker-Run'
-        }
-    }
 }
 
 publishPlugins.onlyIf { versionDetails().isCleanTag }
