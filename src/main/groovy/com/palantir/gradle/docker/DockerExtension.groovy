@@ -182,11 +182,11 @@ class DockerExtension {
     }
 
     public boolean getLoad() {
-        return pull
+        return load
     }
 
-    public void load(boolean pull) {
-        this.pull = pull
+    public void load(boolean load) {
+        this.load = load
     }
 
     public boolean getPush() {
