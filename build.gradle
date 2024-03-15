@@ -4,7 +4,6 @@ buildscript {
         gradlePluginPortal() { metadataSources { mavenPom(); ignoreGradleMetadataRedirection() } }
     }
     dependencies {
-        classpath 'com.palantir.gradle.failure-reports:gradle-failure-reports:1.9.0'
         classpath 'com.palantir.jakartapackagealignment:jakarta-package-alignment:0.6.0'
         classpath 'com.palantir.gradle.jdks:gradle-jdks:0.36.0'
         classpath 'com.palantir.gradle.jdkslatest:gradle-jdks-latest:0.13.0'
@@ -39,7 +38,6 @@ apply plugin: 'org.inferred.processors'
 apply plugin: 'com.palantir.external-publish-jar'
 apply plugin: 'com.palantir.baseline-java-versions'
 apply plugin: 'com.palantir.jdks.latest'
-apply plugin: 'com.palantir.failure-reports'
 
 group 'com.palantir.gradle.docker'
 version System.env.CIRCLE_TAG ?: gitVersion()
