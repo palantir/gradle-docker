@@ -1,4 +1,4 @@
-# Run ./gradlew writeVersionsLock to regenerate this file
+# Run ./gradlew writeVersionsLocks to regenerate this file
 com.google.code.findbugs:jsr305:3.0.2 (1 constraints: 170aecb4)
 com.google.errorprone:error_prone_annotations:2.26.1 (1 constraints: 4d0a46bf)
 com.google.guava:failureaccess:1.0.2 (1 constraints: 150ae2b4)
