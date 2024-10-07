@@ -58,25 +58,21 @@ gradlePlugin {
             id = 'com.palantir.docker'
             displayName = 'Palantir Gradle Docker'
             implementationClass = 'com.palantir.gradle.docker.PalantirDockerPlugin'
+            description = 'Gradle Docker is a simple docker orchestrator for executing docker build and push from within Gradle.'
         }
         dockerComposePlugin {
             id = 'com.palantir.docker-compose'
             displayName = 'Palantir Gradle Docker-Compose'
             implementationClass = 'com.palantir.gradle.docker.DockerComposePlugin'
+            description = 'Gradle Docker is a simple docker orchestrator for executing docker build and push from within Gradle.'
         }
         dockerRunPlugin {
             id = 'com.palantir.docker-run'
             displayName = 'Palantir Gradle Docker-Run'
             implementationClass = 'com.palantir.gradle.docker.DockerRunPlugin'
+            description = 'Gradle Docker is a simple docker orchestrator for executing docker build and push from within Gradle.'
         }
     }
-}
-
-pluginBundle {
-    website = 'https://github.com/palantir/gradle-docker'
-    vcsUrl = 'https://github.com/palantir/gradle-docker'
-    description = 'Gradle Docker is a simple docker orchestrator for executing docker build and push from within Gradle.'
-    tags = ['docker']
 }
 
 publishPlugins.onlyIf { versionDetails().isCleanTag }
