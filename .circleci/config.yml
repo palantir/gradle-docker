@@ -7,7 +7,6 @@ jobs:
   build:
     machine:
       docker_layer_caching: true
-      image: default
     environment:
       CIRCLE_TEST_REPORTS: /home/circleci/junit
       CIRCLE_ARTIFACTS: /home/circleci/artifacts
