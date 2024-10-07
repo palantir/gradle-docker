@@ -3,32 +3,26 @@
 # To manually manage the CircleCI configuration for this project, remove the .circleci/template.sh file.
 
 version: 2.1
-
-aliases:
-  - &check-no-files-changed
-    run:
-      name: Check that no git-tracked files were modified
-      command: |
-        FILES_MODIFIED="$(git status --porcelain)"
-        if [[ -n "$FILES_MODIFIED" ]]; then
-          echo "The following files were modified or added during the build process:"
-          echo "$FILES_MODIFIED"
-          echo "This will likely prevent successful publishing. Please run the build locally and include these changes in your pull request. (If new files are created, consider whether they should be checked in or .gitignored.)"
-          exit 1
-        fi
-
 jobs:
-
-  check:
-    docker: [{ image: 'cimg/openjdk:11.0.22-node' }]
-    resource_class: large
+  build:
+    machine:
+      docker_layer_caching: true
     environment:
       CIRCLE_TEST_REPORTS: /home/circleci/junit
       CIRCLE_ARTIFACTS: /home/circleci/artifacts
-      GRADLE_OPTS: -Dorg.gradle.workers.max=2 -Dorg.gradle.jvmargs='-Xmx2147483648 --add-exports jdk.compiler/com.sun.tools.javac.api=ALL-UNNAMED --add-exports jdk.compiler/com.sun.tools.javac.file=ALL-UNNAMED --add-exports jdk.compiler/com.sun.tools.javac.parser=ALL-UNNAMED --add-exports jdk.compiler/com.sun.tools.javac.tree=ALL-UNNAMED --add-exports jdk.compiler/com.sun.tools.javac.util=ALL-UNNAMED'
-      _JAVA_OPTIONS: -XX:ActiveProcessorCount=4 -XX:MaxRAM=8g -XX:+CrashOnOutOfMemoryError -XX:ErrorFile=/home/circleci/artifacts/hs_err_pid%p.log -XX:HeapDumpPath=/home/circleci/artifacts
+      _JAVA_OPTIONS: -Dorg.gradle.internal.launcher.welcomeMessageEnabled=false -Xmx8192m
+      DOCKER_BUILDKIT: 1
+      BUILDX_PLATFORMS: linux/amd64,linux/arm64,linux/ppc64le,linux/s390x,linux/386,linux/arm/v7,linux/arm/v6
     steps:
       - checkout
+      - run:
+          name: Install buildx
+          command: |
+            export DOCKER_BUILDKIT=1
+            docker build --platform=local -o . "https://github.com/docker/buildx.git"
+            mkdir -p ~/.docker/cli-plugins
+            mv buildx ~/.docker/cli-plugins/docker-buildx
+            docker buildx create --name mybuilder --use
       - run:
           name: delete_unrelated_tags
           command: |
@@ -53,109 +47,23 @@ jobs:
 
             echo "Detected tag build, deleting all tags except '$CIRCLE_TAG' which point to HEAD: [${TAGS_TO_DELETE/$'\n'/,}]"
             echo "$TAGS_TO_DELETE" | while read -r TAG; do git tag -d "$TAG" 1>/dev/null; done
-      - restore_cache: { key: 'gradle-wrapper-v1-{{ checksum "gradle/wrapper/gradle-wrapper.properties" }}' }
-      - restore_cache: { key: 'check-gradle-cache-v1-{{ checksum "versions.props" }}-{{ checksum "build.gradle" }}' }
-      - run:
-          name: check-setup
-          command: |
-            if [ -x .circleci/check-setup.sh ]; then
-                echo "Running check-setup" && .circleci/check-setup.sh && echo "check-setup complete"
-            fi
-      - run: ./gradlew --parallel --stacktrace --continue --max-workers=2 check -Porg.gradle.java.installations.fromEnv=JAVA_11_HOME,JAVA_17_HOME,JAVA_21_HOME,JAVA_HOME
-      - *check-no-files-changed
-      - persist_to_workspace:
-          root: /home/circleci
-          paths: [ project ]
+      - restore_cache: { key: 'gradle-wrapper-v2-{{ checksum "gradle/wrapper/gradle-wrapper.properties" }}' }
+      - restore_cache: { key: 'compile-gradle-cache-v2-{{ checksum "versions.props" }}-{{ checksum "build.gradle" }}' }
+      - run: ./gradlew --parallel --stacktrace build
+      - deploy:
+          command: ./gradlew --parallel --stacktrace --continue publish
       - save_cache:
-          key: 'gradle-wrapper-v1-{{ checksum "gradle/wrapper/gradle-wrapper.properties" }}'
+          key: 'gradle-wrapper-v2-{{ checksum "gradle/wrapper/gradle-wrapper.properties" }}'
           paths: [ ~/.gradle/wrapper ]
       - save_cache:
-          key: 'check-gradle-cache-v1-{{ checksum "versions.props" }}-{{ checksum "build.gradle" }}'
-          paths: [ ~/.gradle/caches ]
-      - run:
-          command: mkdir -p ~/junit && find . -type f -regex ".*/build/.*TEST.*xml" -exec cp --parents {} ~/junit/ \;
-          when: always
-      - store_test_results: { path: ~/junit }
-      - store_artifacts: { path: ~/artifacts }
-
-  build:
-    machine:
-      docker_layer_caching: true
-    environment:
-      CIRCLE_TEST_REPORTS: /home/circleci/junit
-      CIRCLE_ARTIFACTS: /home/circleci/artifacts
-      _JAVA_OPTIONS: -Dorg.gradle.internal.launcher.welcomeMessageEnabled=false -Xmx8192m
-      JAVA_HOME: /opt/java11
-    steps:
-      - checkout
-      - restore_cache: { key: 'gradle-wrapper-v1-{{ checksum "gradle/wrapper/gradle-wrapper.properties" }}' }
-      - restore_cache: { key: 'build-gradle-cache-v1-{{ checksum "versions.props" }}-{{ checksum "build.gradle" }}' }
-      - run:
-          name: Install Java 11
-          command: |
-            sudo mkdir -p /opt/java && cd /opt/java && sudo chown -R circleci:circleci .
-            curl https://corretto.aws/downloads/resources/11.0.24.8.1/amazon-corretto-11.0.24.8.1-linux-x64.tar.gz | tar -xzf - -C /opt/java
-            sudo ln -s /opt/java/*/ /opt/java11
-      - run:
-          name: build-setup
-          command: |
-            if [ -x .circleci/build-setup.sh ]; then
-                echo "Running build-setup" && .circleci/build-setup.sh && echo "build-setup complete"
-            fi
-      - run: ./gradlew --parallel --stacktrace build -x test -x check -Porg.gradle.java.installations.fromEnv=JAVA_11_HOME,JAVA_17_HOME,JAVA_21_HOME,JAVA_HOME
-      - *check-no-files-changed
-      - save_cache:
-          key: 'build-gradle-cache-v1-{{ checksum "versions.props" }}-{{ checksum "build.gradle" }}'
-          paths: [ ~/.gradle/caches ]
-      - run:
-          command: mkdir -p ~/junit && find . -type f -regex ".*/build/.*TEST.*xml" -exec cp --parents {} ~/junit/ \; || true
-          when: always
-      - store_test_results: { path: ~/junit }
-      - store_artifacts: { path: ~/artifacts }
-
-  publish:
-    docker: [{ image: 'cimg/openjdk:11.0.22-node' }]
-    resource_class: medium
-    environment:
-      CIRCLE_TEST_REPORTS: /home/circleci/junit
-      CIRCLE_ARTIFACTS: /home/circleci/artifacts
-      GRADLE_OPTS: -Dorg.gradle.workers.max=1 -Dorg.gradle.jvmargs='-Xmx2147483648 --add-exports jdk.compiler/com.sun.tools.javac.api=ALL-UNNAMED --add-exports jdk.compiler/com.sun.tools.javac.file=ALL-UNNAMED --add-exports jdk.compiler/com.sun.tools.javac.parser=ALL-UNNAMED --add-exports jdk.compiler/com.sun.tools.javac.tree=ALL-UNNAMED --add-exports jdk.compiler/com.sun.tools.javac.util=ALL-UNNAMED'
-      _JAVA_OPTIONS: -XX:ActiveProcessorCount=2 -XX:MaxRAM=4g -XX:+CrashOnOutOfMemoryError -XX:ErrorFile=/home/circleci/artifacts/hs_err_pid%p.log -XX:HeapDumpPath=/home/circleci/artifacts
-    steps:
-      - attach_workspace: { at: /home/circleci }
-      - restore_cache: { key: 'gradle-wrapper-v1-{{ checksum "gradle/wrapper/gradle-wrapper.properties" }}' }
-      - restore_cache: { key: 'publish-gradle-cache-v1-{{ checksum "versions.props" }}-{{ checksum "build.gradle" }}' }
-      - deploy:
-          command: ./gradlew --parallel --stacktrace --continue publish -Porg.gradle.java.installations.fromEnv=JAVA_11_HOME,JAVA_17_HOME,JAVA_21_HOME,JAVA_HOME
-      - run:
-          command: git status --porcelain
-          when: always
-      - save_cache:
-          key: 'publish-gradle-cache-v1-{{ checksum "versions.props" }}-{{ checksum "build.gradle" }}'
+          key: 'compile-gradle-cache-v2-{{ checksum "versions.props" }}-{{ checksum "build.gradle" }}'
           paths: [ ~/.gradle/caches ]
       - store_test_results: { path: ~/junit }
       - store_artifacts: { path: ~/artifacts }
-
-  circle-all:
-    docker: [{ image: 'busybox:1.36.1@sha256:6d9ac9237a84afe1516540f40a0fafdc86859b2141954b4d643af7066d598b74' }]
-    resource_class: small
-    steps:
-      - run: {command: echo "All required jobs finished successfully"}
 
 workflows:
   version: 2
   build:
     jobs:
-      - check:
-          filters: { tags: { only: /.*/ } }
-
       - build:
           filters: { tags: { only: /.*/ } }
-
-      - circle-all:
-          requires: [ check, build ]
-          filters: { tags: { only: /.*/ } }
-
-      - publish:
-          requires: [ circle-all ]
-          filters: { tags: { only: /.*/ }, branches: { only: develop } }

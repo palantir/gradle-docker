@@ -1,2 +1,0 @@
-# Mark .circleci/config.yml as generated for github reviews
-config.yml linguist-generated=true
