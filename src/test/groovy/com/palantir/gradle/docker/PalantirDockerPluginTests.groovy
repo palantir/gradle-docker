@@ -574,8 +574,8 @@ class PalantirDockerPluginTests extends AbstractPluginTest {
 
             task myTgz(type: Tar) {
                 destinationDirectory project.buildDir
-                baseName 'foo'
-                extension = 'tgz'
+                archiveBaseName 'foo'
+                archiveExtension = 'tgz'
                 compression = Compression.GZIP
                 into('.') {
                     from 'from_tgz'
