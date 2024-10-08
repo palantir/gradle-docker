@@ -32,3 +32,6 @@ fileeditor
 *.iws
 .idea/
 out/
+
+# Gradle JDKs setup
+!gradle/*
