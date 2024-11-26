@@ -176,6 +176,9 @@ class PalantirDockerPlugin implements Plugin<Project> {
             if (!ext.platform.isEmpty()) {
                 buildCommandLine.addAll('--platform', String.join(',', ext.platform))
             }
+	    if (ext.sbom) {
+		buildCommandLine.add '--sbom=true'
+	    }
             if (ext.load) {
                 buildCommandLine.add '--load'
             }
