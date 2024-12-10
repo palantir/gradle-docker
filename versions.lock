@@ -10,7 +10,7 @@ org.checkerframework:checker-qual:3.43.0 (1 constraints: 4c0a4abf)
 [Test dependencies]
 cglib:cglib-nodep:3.2.2 (1 constraints: 490ded24)
 com.netflix.nebula:nebula-test:10.6.1 (1 constraints: 3a053a3b)
-com.palantir.gradle.plugintesting:plugin-testing-core:0.4.0 (1 constraints: 0605f735)
+com.palantir.gradle.plugintesting:plugin-testing-core:0.5.0 (1 constraints: 0705fa35)
 junit:junit:4.13.2 (1 constraints: 1b0e1d4c)
 org.apiguardian:apiguardian-api:1.1.2 (2 constraints: 5523ed36)
 org.codehaus.groovy:groovy:3.0.12 (2 constraints: 781b1f9d)
