@@ -13,7 +13,7 @@ buildscript {
         classpath 'com.palantir.javaformat:gradle-palantir-java-format:2.55.0'
         classpath 'com.palantir.suppressible-error-prone:gradle-suppressible-error-prone:2.4.0'
         classpath 'com.palantir.gradle.consistentversions:gradle-consistent-versions:2.31.0'
-        classpath 'com.palantir.baseline:gradle-baseline-java:6.14.0'
+        classpath 'com.palantir.baseline:gradle-baseline-java:6.15.0'
         classpath 'com.palantir.gradle.gitversion:gradle-git-version:3.1.0'
         classpath 'gradle.plugin.org.inferred:gradle-processors:3.7.0'
     }
