@@ -17,6 +17,7 @@
 package com.palantir.gradle.docker;
 
 // CHECKSTYLE:OFF
+
 import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.Set;
@@ -28,8 +29,8 @@ import org.gradle.api.artifacts.PublishArtifact;
 import org.gradle.api.attributes.AttributeContainer;
 import org.gradle.api.attributes.Usage;
 import org.gradle.api.capabilities.Capability;
+import org.gradle.api.internal.attributes.AttributesFactory;
 import org.gradle.api.internal.attributes.ImmutableAttributes;
-import org.gradle.api.internal.attributes.ImmutableAttributesFactory;
 import org.gradle.api.internal.component.SoftwareComponentInternal;
 import org.gradle.api.internal.component.UsageContext;
 import org.gradle.api.model.ObjectFactory;
@@ -44,7 +45,7 @@ public class DockerComponent implements SoftwareComponentInternal {
             PublishArtifact dockerArtifact,
             DependencySet runtimeDependencies,
             ObjectFactory objectFactory,
-            ImmutableAttributesFactory attributesFactory) {
+            AttributesFactory attributesFactory) {
         artifacts.add(dockerArtifact);
         this.runtimeDependencies = runtimeDependencies;
         Usage usage = objectFactory.named(Usage.class, Usage.JAVA_RUNTIME);
