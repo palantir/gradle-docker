@@ -1,0 +1,5 @@
+type: fix
+fix:
+  description: Support Gradle 8.12
+  links:
+  - https://github.com/palantir/gradle-docker/pull/836
