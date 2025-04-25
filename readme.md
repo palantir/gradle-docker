@@ -7,11 +7,12 @@ Docker Gradle Plugin
 [![Build Status](https://circleci.com/gh/palantir/gradle-docker.svg?style=shield)](https://circleci.com/gh/palantir/gradle-docker)
 [![Gradle Plugins Release](https://img.shields.io/github/release/palantir/gradle-docker.svg)](https://plugins.gradle.org/plugin/com.palantir.docker)
 
-Disclaimer: This Repo is now Defunct
+Disclaimer: This Repo is now End of Life
 -------------
 
-- This repo is on life support only - although we will keep it working, no new features are accepted;
+- This repo is end of life - no new features will be accepted and no bugs will necessarily be fixed.
 - It is no longer used internally at Palantir.
+- Pull Requests and Issues for this repo are unmonitored.
 
 Docker Plugin
 -------------
