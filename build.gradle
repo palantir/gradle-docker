@@ -9,7 +9,7 @@ buildscript {
         classpath 'com.palantir.gradle.jdkslatest:gradle-jdks-latest:0.18.0'
         classpath 'com.palantir.gradle.plugintesting:gradle-plugin-testing:0.6.0'
         classpath 'com.palantir.gradle.externalpublish:gradle-external-publish-plugin:1.19.0'
-        classpath 'com.palantir.gradle.failure-reports:gradle-failure-reports:1.13.0'
+        classpath 'com.palantir.gradle.failure-reports:gradle-failure-reports:1.14.0'
         classpath 'com.palantir.javaformat:gradle-palantir-java-format:2.67.0'
         classpath 'com.palantir.suppressible-error-prone:gradle-suppressible-error-prone:2.9.0'
         classpath 'com.palantir.gradle.consistentversions:gradle-consistent-versions:2.34.0'
