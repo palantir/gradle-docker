@@ -96,5 +96,5 @@ jdks {
 }
 
 gradleTestUtils {
-    gradleVersions = ['7.6.4', '8.8', '8.12.1']
+    gradleVersions = ['7.6.5', '8.14.2']
 }
