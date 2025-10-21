@@ -16,7 +16,7 @@ buildscript {
         classpath 'com.palantir.baseline:gradle-baseline-java:6.65.0'
         classpath 'com.palantir.gradle.gitversion:gradle-git-version:4.0.0'
         classpath 'com.palantir.gradle.guide:gradle-guide:1.24.0'
-        classpath 'com.palantir.gradle.idea-configuration:gradle-idea-configuration:0.6.0'
+        classpath 'com.palantir.gradle.idea-configuration:gradle-idea-configuration:0.7.0'
     }
 }
 
