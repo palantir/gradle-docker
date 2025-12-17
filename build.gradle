@@ -90,6 +90,7 @@ project.ext.'gradle.publish.key' = System.env["GRADLE_KEY"]
 project.ext.'gradle.publish.secret' = System.env["GRADLE_SECRET"]
 
 javaVersions {
+    javaCompiler = 25
     libraryTarget = 17
 }
 
