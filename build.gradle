@@ -4,6 +4,7 @@ buildscript {
         gradlePluginPortal()
     }
     dependencies {
+        classpath 'com.palantir.baseline-error-prone:gradle-baseline-error-prone:0.6.0'
         classpath 'com.palantir.jakartapackagealignment:jakarta-package-alignment:0.6.0'
         classpath 'com.palantir.gradle.jdks:gradle-jdks:0.71.0'
         classpath 'com.palantir.gradle.jdkslatest:gradle-jdks-latest:0.24.0'
@@ -37,6 +38,7 @@ apply plugin: 'com.palantir.external-publish'
 apply plugin: 'java-gradle-plugin'
 apply plugin: 'groovy'
 apply plugin: 'com.palantir.baseline'
+apply plugin: 'com.palantir.baseline-error-prone-root'
 apply plugin: 'com.palantir.consistent-versions'
 apply plugin: 'com.palantir.git-version'
 apply plugin: 'com.palantir.gradle-guide'
