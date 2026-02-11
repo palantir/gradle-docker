@@ -1,18 +1,16 @@
 # Run ./gradlew writeVersionsLocks to regenerate this file. Blank lines are to minimize merge conflicts.
 
-com.google.code.findbugs:jsr305:3.0.2 (1 constraints: 170aecb4)
+com.google.errorprone:error_prone_annotations:2.41.0 (1 constraints: 490a3ebf)
 
-com.google.errorprone:error_prone_annotations:2.36.0 (1 constraints: 4d0a49bf)
+com.google.guava:failureaccess:1.0.3 (1 constraints: 160ae3b4)
 
-com.google.guava:failureaccess:1.0.2 (1 constraints: 150ae2b4)
-
-com.google.guava:guava:33.4.0-jre (2 constraints: d31e7b7d)
+com.google.guava:guava:33.5.0-jre (2 constraints: d41ec57d)
 
 com.google.guava:listenablefuture:9999.0-empty-to-avoid-conflict-with-guava (1 constraints: bd17c918)
 
-com.google.j2objc:j2objc-annotations:3.0.0 (1 constraints: 150aeab4)
+com.google.j2objc:j2objc-annotations:3.1 (1 constraints: b809f1a0)
 
-org.checkerframework:checker-qual:3.43.0 (1 constraints: 4c0a4abf)
+org.jspecify:jspecify:1.0.0 (4 constraints: a13f56dd)
 
 
 
@@ -42,15 +40,15 @@ org.junit.jupiter:junit-jupiter-engine:5.8.2 (1 constraints: 0c0edf3b)
 
 org.junit.jupiter:junit-jupiter-params:5.8.2 (1 constraints: 0c0edf3b)
 
-org.junit.platform:junit-platform-commons:1.9.0 (2 constraints: dc200c4b)
+org.junit.platform:junit-platform-commons:6.0.2 (2 constraints: da200c4b)
 
-org.junit.platform:junit-platform-engine:1.9.0 (3 constraints: 29302258)
+org.junit.platform:junit-platform-engine:6.0.2 (3 constraints: 2730d657)
 
-org.junit.platform:junit-platform-launcher:1.9.0 (1 constraints: 0c050b36)
+org.junit.platform:junit-platform-launcher:6.0.2 (1 constraints: 0a050b36)
 
 org.objenesis:objenesis:2.4 (1 constraints: ea0c8c0a)
 
-org.opentest4j:opentest4j:1.2.0 (2 constraints: cd205b49)
+org.opentest4j:opentest4j:1.3.0 (2 constraints: ce205e49)
 
 org.spockframework:spock-core:2.3-groovy-3.0 (2 constraints: 922109a6)
 
