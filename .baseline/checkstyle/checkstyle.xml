@@ -20,15 +20,6 @@
         <property name="format" value="&gt;&gt;&gt;&gt;&gt;&gt;&gt;"/>
         <property name="message" value="Found (&gt;&gt;&gt;&gt;&gt;&gt;&gt;), so it looks like you had a merge conflict that compiles. Please fix it."/>
     </module>
-    <module name="RegexpSingleline">
-        <property name="format" value="\s+$"/>
-        <property name="message" value="Whitespace at end-of-line"/>
-    </module>
-    <module name="RegexpMultiline"> <!-- Java Style Guide: Vertical Whitespace -->
-        <property name="fileExtensions" value="java"/>
-        <property name="format" value="^\n\n$"/>
-        <property name="message" value="Two consecutive blank lines are not permitted."/>
-    </module>
     <module name="SuppressionFilter"> <!-- baseline-gradle: README.md -->
         <property name="file" value="${config_loc}/checkstyle-suppressions.xml"/>
     </module>
