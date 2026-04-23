@@ -1,18 +1,16 @@
 # Run ./gradlew writeVersionsLocks to regenerate this file. Blank lines are to minimize merge conflicts.
 
-com.google.code.findbugs:jsr305:3.0.2 (1 constraints: 170aecb4)
+com.google.errorprone:error_prone_annotations:2.41.0 (1 constraints: 490a3ebf)
 
-com.google.errorprone:error_prone_annotations:2.36.0 (1 constraints: 4d0a49bf)
+com.google.guava:failureaccess:1.0.3 (1 constraints: 160ae3b4)
 
-com.google.guava:failureaccess:1.0.2 (1 constraints: 150ae2b4)
-
-com.google.guava:guava:33.4.0-jre (2 constraints: d31e7b7d)
+com.google.guava:guava:33.5.0-jre (3 constraints: 1b3ae6de)
 
 com.google.guava:listenablefuture:9999.0-empty-to-avoid-conflict-with-guava (1 constraints: bd17c918)
 
-com.google.j2objc:j2objc-annotations:3.0.0 (1 constraints: 150aeab4)
+com.google.j2objc:j2objc-annotations:3.1 (1 constraints: b809f1a0)
 
-org.checkerframework:checker-qual:3.43.0 (1 constraints: 4c0a4abf)
+org.jspecify:jspecify:1.0.0 (1 constraints: 130ae0b4)
 
 
 
@@ -20,38 +18,54 @@ org.checkerframework:checker-qual:3.43.0 (1 constraints: 4c0a4abf)
 
 cglib:cglib-nodep:3.2.2 (1 constraints: 490ded24)
 
-com.netflix.nebula:nebula-test:10.6.2 (1 constraints: 3b053b3b)
+com.netflix.nebula:nebula-test:10.6.2 (2 constraints: d61de72d)
 
-com.palantir.gradle.plugintesting:plugin-testing-core:0.6.0 (1 constraints: 0805fd35)
+com.palantir.gradle.plugintesting:configuration-cache-spec:0.69.0 (1 constraints: 4105523b)
+
+com.palantir.gradle.plugintesting:discover-tests-cli:0.69.0 (1 constraints: 4105523b)
+
+com.palantir.gradle.plugintesting:gradle-plugin-testing-junit:0.69.0 (1 constraints: 4105523b)
+
+com.palantir.gradle.plugintesting:plugin-testing-core:0.69.0 (2 constraints: 1e1f448f)
+
+commons-io:commons-io:2.21.0 (1 constraints: d419f8de)
+
+info.picocli:picocli:4.7.7 (1 constraints: 2816dcdd)
 
 junit:junit:4.13.2 (1 constraints: 1b0e1d4c)
 
+net.bytebuddy:byte-buddy:1.15.11 (1 constraints: 7f0bc9ea)
+
 org.apiguardian:apiguardian-api:1.1.2 (6 constraints: 5366ce6e)
 
-org.codehaus.groovy:groovy:3.0.12 (2 constraints: 781b1f9d)
+org.assertj:assertj-core:3.27.3 (1 constraints: de1913df)
+
+org.codehaus.groovy:groovy:3.0.24 (3 constraints: 133429dd)
 
 org.hamcrest:hamcrest:2.2 (1 constraints: d20cdc04)
 
 org.hamcrest:hamcrest-core:1.3 (1 constraints: cc05fe3f)
 
+org.jetbrains:annotations:26.1.0 (1 constraints: d81910df)
+
 org.junit.jupiter:junit-jupiter:5.8.2 (1 constraints: 11051e36)
 
-org.junit.jupiter:junit-jupiter-api:5.8.2 (3 constraints: 762f77dd)
+org.junit.jupiter:junit-jupiter-api:5.13.4 (5 constraints: 3d601df9)
 
 org.junit.jupiter:junit-jupiter-engine:5.8.2 (1 constraints: 0c0edf3b)
 
-org.junit.jupiter:junit-jupiter-params:5.8.2 (1 constraints: 0c0edf3b)
+org.junit.jupiter:junit-jupiter-params:5.13.4 (2 constraints: ca243ad7)
 
-org.junit.platform:junit-platform-commons:1.9.0 (2 constraints: dc200c4b)
+org.junit.platform:junit-platform-commons:1.13.4 (2 constraints: 39219184)
 
-org.junit.platform:junit-platform-engine:1.9.0 (3 constraints: 29302258)
+org.junit.platform:junit-platform-engine:1.13.4 (3 constraints: 58302f82)
 
-org.junit.platform:junit-platform-launcher:1.9.0 (1 constraints: 0c050b36)
+org.junit.platform:junit-platform-launcher:1.13.4 (2 constraints: 5a1bde62)
 
 org.objenesis:objenesis:2.4 (1 constraints: ea0c8c0a)
 
-org.opentest4j:opentest4j:1.2.0 (2 constraints: cd205b49)
+org.opentest4j:opentest4j:1.3.0 (2 constraints: cf209249)
 
-org.spockframework:spock-core:2.3-groovy-3.0 (2 constraints: 922109a6)
+org.spockframework:spock-core:2.3-groovy-3.0 (3 constraints: 2c3deb38)
 
 org.spockframework:spock-junit4:2.3-groovy-3.0 (1 constraints: 7a1000b0)
