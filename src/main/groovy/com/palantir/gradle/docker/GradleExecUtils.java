@@ -29,6 +29,9 @@ import org.gradle.process.ExecResult;
 import org.gradle.process.ExecSpec;
 
 abstract class GradleExecUtils {
+    @SuppressWarnings("checkstyle:RedundantModifier")
+    public GradleExecUtils() {}
+
     public final void execWithErrorMessage(Action<ExecSpec> execSpecAction) {
         List<String> commandLine = new ArrayList<>();
         ByteArrayOutputStream output = new ByteArrayOutputStream();

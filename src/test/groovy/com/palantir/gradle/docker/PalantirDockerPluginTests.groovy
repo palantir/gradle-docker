@@ -618,7 +618,7 @@ class PalantirDockerPluginTests extends AbstractPluginTest {
                 id 'java'
                 id 'application'
             }
-            mainClassName = "test.Test"
+            application.mainClass = "test.Test"
 
             docker {
                 name '${id}'

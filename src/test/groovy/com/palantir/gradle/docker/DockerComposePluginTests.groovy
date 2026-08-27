@@ -37,7 +37,7 @@ class DockerComposePluginTests extends AbstractPluginTest {
             }
 
             repositories {
-                jcenter()
+                mavenCentral()
             }
 
             dockerCompose {
@@ -75,7 +75,7 @@ class DockerComposePluginTests extends AbstractPluginTest {
             }
 
             repositories {
-                jcenter()
+                mavenCentral()
             }
 
             dependencies {
@@ -103,7 +103,7 @@ class DockerComposePluginTests extends AbstractPluginTest {
             }
 
             repositories {
-                jcenter()
+                mavenCentral()
             }
 
             dockerCompose {
