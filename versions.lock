@@ -10,7 +10,7 @@ com.google.guava:listenablefuture:9999.0-empty-to-avoid-conflict-with-guava (1 c
 
 com.google.j2objc:j2objc-annotations:3.1 (1 constraints: b809f1a0)
 
-org.jspecify:jspecify:1.0.1 (2 constraints: 5617bf62)
+org.jspecify:jspecify:1.0.1 (5 constraints: e44cef50)
 
 
 
@@ -46,11 +46,11 @@ org.junit.jupiter:junit-jupiter-engine:5.12.2 (1 constraints: 370e054a)
 
 org.junit.jupiter:junit-jupiter-params:5.12.2 (1 constraints: 370e054a)
 
-org.junit.platform:junit-platform-commons:1.14.3 (2 constraints: 3621f883)
+org.junit.platform:junit-platform-commons:6.1.3 (2 constraints: 0721d462)
 
-org.junit.platform:junit-platform-engine:1.14.3 (3 constraints: b030b6d2)
+org.junit.platform:junit-platform-engine:6.1.3 (3 constraints: 813051a8)
 
-org.junit.platform:junit-platform-launcher:1.14.3 (2 constraints: 86123532)
+org.junit.platform:junit-platform-launcher:6.1.3 (2 constraints: 86123932)
 
 org.objenesis:objenesis:2.4 (1 constraints: ea0c8c0a)
 
