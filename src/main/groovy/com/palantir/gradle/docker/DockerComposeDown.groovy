@@ -20,12 +20,13 @@ import org.gradle.api.DefaultTask
 import org.gradle.api.artifacts.Configuration
 import org.gradle.api.tasks.InputFiles
 import org.gradle.api.tasks.Internal
+import org.gradle.api.tasks.Nested
 import org.gradle.api.tasks.TaskAction
 
 import groovy.util.logging.Slf4j
 
 @Slf4j
-class DockerComposeDown extends DefaultTask {
+abstract class DockerComposeDown extends DefaultTask {
     @Internal
     Configuration configuration
 
@@ -35,11 +36,14 @@ class DockerComposeDown extends DefaultTask {
 
     @TaskAction
     void run() {
-        GradleExecUtils.execWithErrorMessage(project) {
+        gradleExecUtils.execWithErrorMessage {
             it.executable "docker-compose"
             it.args "-f", getDockerComposeFile(), "down"
         }
     }
+
+    @Nested
+    abstract GradleExecUtils getGradleExecUtils()
 
     @InputFiles
     File getDockerComposeFile() {

@@ -37,7 +37,7 @@ class DockerComposePluginTests extends AbstractPluginTest {
             }
 
             repositories {
-                jcenter()
+                mavenCentral()
             }
 
             dockerCompose {
@@ -75,7 +75,7 @@ class DockerComposePluginTests extends AbstractPluginTest {
             }
 
             repositories {
-                jcenter()
+                mavenCentral()
             }
 
             dependencies {
@@ -103,7 +103,7 @@ class DockerComposePluginTests extends AbstractPluginTest {
             }
 
             repositories {
-                jcenter()
+                mavenCentral()
             }
 
             dockerCompose {
@@ -149,7 +149,8 @@ class DockerComposePluginTests extends AbstractPluginTest {
         when:
         BuildResult buildResult = with('dockerComposeUp', "--stacktrace").buildAndFail()
         then:
-        buildResult.output.contains("Top-level object must be a mapping")
+        buildResult.output.contains("The command '[docker-compose")
+        buildResult.output.contains("failed with exit code")
     }
 
     def 'docker-compose successfully creates docker image'() {

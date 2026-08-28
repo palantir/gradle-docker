@@ -50,7 +50,7 @@ public class DockerComponent implements SoftwareComponentInternal {
         this.runtimeDependencies = runtimeDependencies;
         Usage usage = objectFactory.named(Usage.class, Usage.JAVA_RUNTIME);
         ImmutableAttributes attributes = attributesFactory.of(Usage.USAGE_ATTRIBUTE, usage);
-        runtimeUsage = new RuntimeUsageContext(usage, attributes);
+        runtimeUsage = new RuntimeUsageContext(attributes);
     }
 
     @Override
@@ -65,17 +65,10 @@ public class DockerComponent implements SoftwareComponentInternal {
 
     private class RuntimeUsageContext implements UsageContext {
 
-        private final Usage usage;
         private final ImmutableAttributes attributes;
 
-        private RuntimeUsageContext(Usage usage, ImmutableAttributes attributes) {
-            this.usage = usage;
+        private RuntimeUsageContext(ImmutableAttributes attributes) {
             this.attributes = attributes;
-        }
-
-        @Override
-        public Usage getUsage() {
-            return usage;
         }
 
         @Override

@@ -21,10 +21,11 @@ import org.gradle.api.DefaultTask
 import org.gradle.api.artifacts.Configuration
 import org.gradle.api.tasks.InputFiles
 import org.gradle.api.tasks.Internal
+import org.gradle.api.tasks.Nested
 import org.gradle.api.tasks.TaskAction
 
 @Slf4j
-class DockerComposeUp extends DefaultTask {
+abstract class DockerComposeUp extends DefaultTask {
     @Internal
     Configuration configuration
 
@@ -34,11 +35,14 @@ class DockerComposeUp extends DefaultTask {
 
     @TaskAction
     void run() {
-        GradleExecUtils.execWithErrorMessage(project) {
+        gradleExecUtils.execWithErrorMessage {
             it.executable "docker-compose"
             it.args "-f", getDockerComposeFile(), "up", "-d"
         }
     }
+
+    @Nested
+    abstract GradleExecUtils getGradleExecUtils()
 
     @Internal
     @Override
