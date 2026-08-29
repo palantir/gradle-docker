@@ -1,5 +1,0 @@
-type: improvement
-improvement:
-  description: Add ignoreExitValue option to the Docker Run Plugin. It is false by default. When set to true it will ignore the exit code returned from the execution of the docker command.
-  links:
-  - https://github.com/palantir/gradle-docker/pull/460

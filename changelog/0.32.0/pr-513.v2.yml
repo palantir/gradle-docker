@@ -1,5 +1,0 @@
-type: improvement
-improvement:
-  description: Use project version as default tag
-  links:
-  - https://github.com/palantir/gradle-docker/pull/513

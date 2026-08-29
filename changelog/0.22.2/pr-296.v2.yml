@@ -1,5 +1,0 @@
-type: improvement
-improvement:
-  description: New dockerComposeDown Gradle task available in Docker Compose plugin.
-  links:
-    - https://github.com/palantir/gradle-docker/pull/297

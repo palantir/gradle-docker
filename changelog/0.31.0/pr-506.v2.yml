@@ -1,6 +1,0 @@
-type: improvement
-improvement:
-  description: The dockerPush task is now an alias for the dockerTagsPush task and
-    will push all available tags per default.
-  links:
-  - https://github.com/palantir/gradle-docker/pull/506

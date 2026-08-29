@@ -1,5 +1,0 @@
-type: improvement
-improvement:
-  description: The `docker` plugin is declared as defunct.
-  links:
-  - https://github.com/palantir/gradle-docker/pull/573
