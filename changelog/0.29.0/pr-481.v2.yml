@@ -1,5 +1,0 @@
-type: fix
-fix:
-  description: Include command output in exception if it fails.
-  links:
-  - https://github.com/palantir/gradle-docker/pull/481

@@ -1,6 +1,0 @@
-type: improvement
-improvement:
-  description: Add ability to do multi platform docker builds using buildx
-  links:
-    - https://github.com/palantir/gradle-docker/pull/528
-    - https://github.com/palantir/gradle-docker/issues/353

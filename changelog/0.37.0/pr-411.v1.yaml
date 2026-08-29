@@ -1,5 +1,0 @@
-type: improvement
-improvement:
-  description: Add ability to specify 'network' for DockerPlugin.
-  links:
-    - https://github.com/palantir/gradle-docker/pull/411

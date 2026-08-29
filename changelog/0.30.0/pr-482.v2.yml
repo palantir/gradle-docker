@@ -1,6 +1,0 @@
-type: fix
-fix:
-  description: Ensure the progress of `docker-compose up` is printing to stderr/stdout
-    to prevent circle context deadlines being hit when pulling a large number of containers..
-  links:
-  - https://github.com/palantir/gradle-docker/pull/482
