@@ -9,7 +9,7 @@ buildscript {
         classpath 'com.palantir.gradle.jdks:gradle-jdks:0.82.0'
         classpath 'com.palantir.gradle.jdkslatest:gradle-jdks-latest:0.32.0'
         classpath 'com.palantir.gradle.plugintesting:gradle-plugin-testing:0.76.0'
-        classpath 'com.palantir.gradle.externalpublish:gradle-external-publish-plugin:1.33.0'
+        classpath 'com.palantir.gradle.externalpublish:gradle-external-publish-plugin:1.37.0'
         classpath 'com.palantir.gradle.failure-reports:gradle-failure-reports:1.21.0'
         classpath 'com.palantir.javaformat:gradle-palantir-java-format:2.97.0'
         classpath 'com.palantir.suppressible-error-prone:gradle-suppressible-error-prone:2.28.0'
@@ -23,7 +23,7 @@ buildscript {
 }
 
 plugins {
-    id 'com.gradle.plugin-publish' version '2.0.0'
+    id 'com.gradle.plugin-publish' version '2.1.1'
 }
 allprojects {
     apply plugin: 'com.palantir.java-format'
