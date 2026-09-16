@@ -10,7 +10,7 @@ com.google.guava:listenablefuture:9999.0-empty-to-avoid-conflict-with-guava (1 c
 
 com.google.j2objc:j2objc-annotations:3.1 (1 constraints: b809f1a0)
 
-org.jspecify:jspecify:1.0.1 (5 constraints: e44cef50)
+org.jspecify:jspecify:1.0.1 (8 constraints: 967df209)
 
 
 
@@ -50,17 +50,17 @@ org.hamcrest:hamcrest-core:1.3 (1 constraints: cc05fe3f)
 
 org.jetbrains:annotations:26.1.0 (1 constraints: d81910df)
 
-org.junit.jupiter:junit-jupiter:5.12.2 (1 constraints: 3c05493b)
+org.junit.jupiter:junit-jupiter:6.1.3 (1 constraints: 76070f77)
 
-org.junit.jupiter:junit-jupiter-api:5.13.4 (5 constraints: 9360889f)
+org.junit.jupiter:junit-jupiter-api:6.1.3 (5 constraints: 00600196)
 
-org.junit.jupiter:junit-jupiter-engine:5.12.2 (1 constraints: 370e054a)
+org.junit.jupiter:junit-jupiter-engine:6.1.3 (1 constraints: 070ed03b)
 
-org.junit.jupiter:junit-jupiter-params:5.13.4 (2 constraints: f5241efc)
+org.junit.jupiter:junit-jupiter-params:6.1.3 (2 constraints: c5242bd7)
 
-org.junit.platform:junit-platform-commons:6.1.3 (2 constraints: 0a216c63)
+org.junit.platform:junit-platform-commons:6.1.3 (2 constraints: db20e44a)
 
-org.junit.platform:junit-platform-engine:6.1.3 (3 constraints: 813051a8)
+org.junit.platform:junit-platform-engine:6.1.3 (3 constraints: 55301988)
 
 org.junit.platform:junit-platform-launcher:6.1.3 (3 constraints: d428c5a2)
 

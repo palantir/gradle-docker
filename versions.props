@@ -1,4 +1,5 @@
 com.netflix.nebula:nebula-test = 12.1.0
 com.google.guava:guava = 33.7.1-jre
 org.junit.platform:* = 6.1.3
+org.junit.jupiter:* = 6.1.3
 org.spockframework:* = 2.4-groovy-4.0

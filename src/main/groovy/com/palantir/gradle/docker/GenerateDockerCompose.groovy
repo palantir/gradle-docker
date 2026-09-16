@@ -27,6 +27,7 @@ import org.gradle.api.tasks.TaskAction
 
 import com.google.common.base.Preconditions
 
+import groovy.transform.CompileStatic
 import groovy.transform.Memoized
 import groovy.util.logging.Slf4j
 
@@ -62,10 +63,11 @@ class GenerateDockerCompose extends DefaultTask {
 
     @Internal
     @Override
+    @CompileStatic
     String getDescription() {
         def defaultDescription = "Populates ${dockerComposeExtension.template.name} file with versions" +
                 " of dependencies from the '${configuration.name}' configuration"
-        return super.description ?: defaultDescription
+        return super.getDescription() ?: defaultDescription
     }
 
     @Input

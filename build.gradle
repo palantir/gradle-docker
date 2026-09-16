@@ -59,28 +59,34 @@ dependencies {
 
     testImplementation gradleTestKit()
     testImplementation 'com.netflix.nebula:nebula-test'
+    testImplementation 'org.junit.jupiter:junit-jupiter'
     testImplementation 'org.spockframework:spock-core'
     testCompileOnly 'junit:junit'
     testRuntimeOnly 'org.spockframework:spock-junit4'
 }
 
 gradlePlugin {
+    website = 'https://github.com/palantir/gradle-docker'
+    vcsUrl = 'https://github.com/palantir/gradle-docker'
     plugins {
         dockerPlugin {
             id = 'com.palantir.docker'
             displayName = 'Palantir Gradle Docker'
+            tags = ['docker']
             implementationClass = 'com.palantir.gradle.docker.PalantirDockerPlugin'
             description = 'Gradle Docker is a simple docker orchestrator for executing docker build and push from within Gradle.'
         }
         dockerComposePlugin {
             id = 'com.palantir.docker-compose'
             displayName = 'Palantir Gradle Docker-Compose'
+            tags = ['docker']
             implementationClass = 'com.palantir.gradle.docker.DockerComposePlugin'
             description = 'Gradle Docker is a simple docker orchestrator for executing docker build and push from within Gradle.'
         }
         dockerRunPlugin {
             id = 'com.palantir.docker-run'
             displayName = 'Palantir Gradle Docker-Run'
+            tags = ['docker']
             implementationClass = 'com.palantir.gradle.docker.DockerRunPlugin'
             description = 'Gradle Docker is a simple docker orchestrator for executing docker build and push from within Gradle.'
         }
@@ -91,8 +97,6 @@ publishPlugins.onlyIf { versionDetails().isCleanTag }
 
 // Configure the publishPlugins task
 tasks.publish.dependsOn publishPlugins
-project.ext.'gradle.publish.key' = System.env["GRADLE_KEY"]
-project.ext.'gradle.publish.secret' = System.env["GRADLE_SECRET"]
 
 javaVersions {
     javaCompiler = 25
@@ -102,4 +106,3 @@ javaVersions {
 jdks {
     daemonTarget = 21
 }
-
