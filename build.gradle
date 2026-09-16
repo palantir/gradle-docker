@@ -97,12 +97,6 @@ publishPlugins.onlyIf { versionDetails().isCleanTag }
 
 // Configure the publishPlugins task
 tasks.publish.dependsOn publishPlugins
-if (System.env.GRADLE_KEY) {
-    System.setProperty('gradle.publish.key', System.env.GRADLE_KEY)
-}
-if (System.env.GRADLE_SECRET) {
-    System.setProperty('gradle.publish.secret', System.env.GRADLE_SECRET)
-}
 
 javaVersions {
     javaCompiler = 25
