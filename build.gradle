@@ -59,6 +59,7 @@ dependencies {
 
     testImplementation gradleTestKit()
     testImplementation 'com.netflix.nebula:nebula-test'
+    testImplementation 'org.junit.jupiter:junit-jupiter'
     testImplementation 'org.spockframework:spock-core'
     testCompileOnly 'junit:junit'
     testRuntimeOnly 'org.spockframework:spock-junit4'
@@ -102,4 +103,3 @@ javaVersions {
 jdks {
     daemonTarget = 21
 }
-

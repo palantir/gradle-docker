@@ -16,6 +16,7 @@
 
 package com.palantir.gradle.docker
 
+import groovy.transform.CompileStatic
 import groovy.util.logging.Slf4j
 import org.gradle.api.DefaultTask
 import org.gradle.api.artifacts.Configuration
@@ -46,9 +47,10 @@ abstract class DockerComposeUp extends DefaultTask {
 
     @Internal
     @Override
+    @CompileStatic
     String getDescription() {
         def defaultDescription = "Executes `docker-compose` using ${dockerComposeFile.name}"
-        return super.description ?: defaultDescription
+        return super.getDescription() ?: defaultDescription
     }
 
     @InputFiles
