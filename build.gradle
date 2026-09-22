@@ -4,7 +4,7 @@ buildscript {
         gradlePluginPortal()
     }
     dependencies {
-        classpath 'com.palantir.baseline-error-prone:gradle-baseline-error-prone:0.27.0'
+        classpath 'com.palantir.baseline-error-prone:gradle-baseline-error-prone:0.28.0'
         classpath 'com.palantir.jakartapackagealignment:jakarta-package-alignment:0.7.0'
         classpath 'com.palantir.gradle.jdks:gradle-jdks:0.82.0'
         classpath 'com.palantir.gradle.jdkslatest:gradle-jdks-latest:0.32.0'
